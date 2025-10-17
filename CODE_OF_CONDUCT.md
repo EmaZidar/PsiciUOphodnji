@@ -45,9 +45,9 @@ Najgore je šutnja. Ako imate problem, možete:
 3. Ako je problem ozbiljan (uznemiravanje, diskriminacija, plagijat), pošaljite e-mail na službenu adresu za prijave.
 
 Preporučeni kontakt za prijave:
-- Voditelj predmeta / odgovorna osoba: profesor@example.edu
-- Asistent: asistent@example.edu
-- Generalna kontakt-adresa repozitorija (zamijenite stvarnom): conduct-report@example.com
+- Voditelj predmeta / odgovorna osoba: iva.sovic@fer.hr
+- Asistent: mislav.markusic@fer.hr
+- Generalna kontakt-adresa repozitorija (zamijenite stvarnom): ema.zidar@fer.hr
 
 U prijavi navedite:
 - Kratki sažetak problema.

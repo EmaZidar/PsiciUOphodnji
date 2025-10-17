@@ -1,4 +1,4 @@
-# Pawpal
+# Pawpal 🐾
 
 # Opis projekta
 

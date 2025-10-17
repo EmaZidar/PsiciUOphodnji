@@ -18,7 +18,7 @@ I šetači i vlasnici imaju svoj javni profil s osobnim podatcima i dodatnim pod
 
 
 # Tehnologije
-javascript, java
+JavaScript, Node.js, Express, HTML5, CSS3
 
 # Članovi tima
 Vikor Wilder, Nina Zamberlin, Ema Zidar, Leonard Zadro, Luka Zadro, Jakov Ramljak, Lana Šapić

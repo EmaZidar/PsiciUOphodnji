@@ -87,12 +87,3 @@ Nepoznavanje pravila može dovesti do:
 
 ## Ažuriranja i izmjene
 Ovaj kodeks može se povremeno ažurirati. Sve promjene bit će objavljene u repozitoriju s kratkim objašnjenjem razloga izmjene.
-
----
-
-Ako želite, mogu:
-- Prilagoditi gornji tekst vašim konkretnim kontaktima i pravilima fakulteta (unesite e-mailove i imena).
-- Generirati i dodati datoteke: CODE_OF_CONDUCT.md i CONTRIBUTING.md te predložak za privatnu prijavu (issue template ili e-mail template).
-- Otvoriti PR u vašem GitHub repozitoriju s tim datotekama (trebat ćete mi dati repo u formatu owner/repo i odobriti stvaranje PR-a).
-
-Želite li da napravim datoteke i otvorim PR u vašem repozitoriju sada?  

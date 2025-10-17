@@ -1,4 +1,4 @@
-# Kodeks ponašanja (Contributor Covenant — prilagođeno)
+# Kodeks ponašanja (Contributor Covenant)
 
 Ovaj dokument opisuje očekivano ponašanje za sudionike u repozitoriju i timu, kako rješavamo konflikte te kako prijaviti i riješiti probleme. Temelji se na načelima Contributor Covenant-a i na akademskim kodeksima ponašanja primjerenima za timski rad na sveučilištu.
 

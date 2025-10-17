@@ -23,14 +23,19 @@ javascript, java
 # Članovi tima
 Vikor Wilder, Nina Zamberlin, Ema Zidar, Leonard Zadro, Luka Zadro, Jakov Ramljak, Lana Šapić
 
-# Kontribucije
-Ema Zidar - voditeljica tima, frontend i dizajn
-Jakov Ramljak - frontend i dizajn
-Nina Zamberlin - baza podataka i dizajn
-Lana Šapić -  baza podataka i backend
-Luka Zadro - backend
-Leonard Zadro - backend, autorizacija pomoću OAuth 2.0
-Viktor Wilder - frontend
+# Contributing Guide – Timske uloge i odgovornosti
+
+Ova tablica prikazuje članove tima, njihove uloge i detaljne odgovornosti u projektu. Cilj je jasnoća i profesionalna organizacija.
+
+| Član tima      | Uloga u timu             | Odgovornosti                                                                 |
+|----------------|-------------------------|-----------------------------------------------------------------------------|
+| **Ema Zidar**  | Voditeljica tima, Frontend & Dizajn | - Koordinacija cijelog tima<br>- Planiranje i raspodjela zadataka<br>- Frontend razvoj i dizajn korisničkog sučelja<br>- Pregled i odobravanje pull requestova<br>- Održavanje vizualnog identiteta projekta<br>- Praćenje napretka tima i rokova |
+| **Jakov Ramljak** | Frontend & Dizajn      | - Razvoj frontend funkcionalnosti<br>- Implementacija dizajna i UX elemenata<br>- Suradnja s Emom na vizualnom identitetu<br>- Sudjelovanje u code review procesima<br>- Testiranje korisničkog sučelja |
+| **Nina Zamberlin** | Baza podataka & Dizajn  | - Projektiranje baze podataka<br>- Implementacija i održavanje schema i tabela<br>- Suradnja na dizajnu aplikacije<br>- Dokumentacija strukture baze<br>- Optimizacija upita i performansi baze |
+| **Lana Šapić** | Baza podataka & Backend   | - Razvoj backend funkcionalnosti<br>- Integracija baze podataka s aplikacijom<br>- Pisanje API endpointa<br>- Testiranje backend logike<br>- Dokumentiranje backend procesa |
+| **Luka Zadro** | Backend developer         | - Razvoj backend modula i servisa<br>- Implementacija poslovne logike<br>- Suradnja s Lanom i Leonardom<br>- Pisanje testova i debugging<br>- Održavanje stabilnosti koda |
+| **Leonard Zadro** | Backend & Autorizacija (OAuth 2.0) | - Implementacija backend modula<br>- Upravljanje autorizacijom i autentikacijom<br>- Integracija OAuth 2.0 sustava<br>- Sigurnosne provjere i kontrola pristupa<br>- Suradnja s timom na backend arhitekturi |
+| **Viktor Wilder** | Frontend developer       | - Razvoj frontend funkcionalnosti<br>- Implementacija dizajnerskih smjernica<br>- Sudjelovanje u code review procesu<br>- Suradnja s Emom i Jakovom<br>- Testiranje i optimizacija korisničkog sučelja |
 
 
 ## 🙂 Kodeks ponašanja

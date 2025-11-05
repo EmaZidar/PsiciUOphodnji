@@ -9,10 +9,7 @@ export default function Hero() {
           Poveži se s provjerenim šetačima u svom susjedstvu — brzo, sigurno i jednostavno.
         </p>
         <div className="hero-buttons">
-          <a className="btn primary" href="#signup">
-            Registracija
-          </a>
-          <a className="btn outline" href="#login">
+          <a className="btn outline" href="/login">
             Prijava
           </a>
         </div>

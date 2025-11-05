@@ -18,7 +18,7 @@ I šetači i vlasnici imaju svoj javni profil s osobnim podatcima i dodatnim pod
 
 
 # Tehnologije
-JavaScript, Node.js, Express, HTML5, CSS3, React
+JavaScript, Node.js, Express, HTML5, CSS3, React, Render, PostgreSQL
 
 # Članovi tima
 Viktor Wilder, Nina Zamberlin, Ema Zidar, Leonard Zadro, Luka Zadro, Jakov Ramljak, Lana Šapić

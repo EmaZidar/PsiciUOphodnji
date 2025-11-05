@@ -5,7 +5,6 @@ import Steps from "./components/Steps";
 import Feature from "./components/Feature";
 import Footer from "./components/Footer";
 import "./style.css";
-
 function App() {
   return (
     <>

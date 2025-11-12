@@ -5,14 +5,16 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
+  const handleGoogle = () => {
+    window.location.href = "/login/auth";
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/login/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -32,11 +34,7 @@ export default function Login() {
     }
   };
 
-  const handleGoogle = () => {
-    window.location.href = "/login";
-  };
-
-  return (
+    return (
     <section className="login-page">
       <div className="login-container">
         <h2>Prijava</h2>

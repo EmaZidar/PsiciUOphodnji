@@ -26,6 +26,12 @@ body {
   padding: 14px 18px;
   border-bottom: 1px solid var(--c-3);
 }
+.header-a {
+  background: var(--c-5);
+  color: #000;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--c-3);
+}
 
 .header-inner {
   max-width: 1100px;
@@ -41,6 +47,7 @@ body {
   line-height: 20px;
   padding-top: 2px;
   color: var(--c-4);
+  text-decoration: none;
 }
 
 .header-nav {

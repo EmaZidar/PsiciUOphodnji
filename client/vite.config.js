@@ -8,16 +8,16 @@ export default defineConfig({
     proxy: {
       // Forward OAuth start and callback routes to the backend during development
       '/login': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
       '/google/callback': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
       // Forward any API requests to the backend as well
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
       },

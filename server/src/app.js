@@ -2,8 +2,11 @@ import * as dotenv from "dotenv"
 dotenv.config()
 import express from "express"
 import session from "express-session"
-
 import fetch from "node-fetch"
+import * as db from "./db.js"
+
+// Test database connection on startup
+db.testConnection()
 
 const app = express()
 app.use(express.json())

@@ -95,12 +95,11 @@ app.get("/google/callback", async (req, res) => {
       // Ako user ne postoji salje email i name u front za daljnju obradu
       return res.redirect(`/register?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`)
     } else {
+      //Dohvati ulogu korisnika preko id-a
       const userId = existingUser.id
-      const userRole = await db.getUserRoleById(userId)
-      return res.redirect('/?role=${encodeURIComponent(userRole)}')
+      const userWithRole = await db.getUserRoleById(userId)
+      return res.redirect(`/?role=${encodeURIComponent(userWithRole)}`)
     }
-
-    res.status(token_info_response.status).redirect('/register')
   } catch (error) {
     console.error("Error in callback:", error)
     res.status(500).json({ error: "Internal server error" })

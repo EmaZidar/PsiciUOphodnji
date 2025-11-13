@@ -92,7 +92,7 @@ export default function Register (){
           })
         });
       } else if (formData.uloga === 'vlasnik') {
-        await fetch('/api/korisnik/registracija/vlasnik', {
+        await fetch('/api/korisnik/vlasnik', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

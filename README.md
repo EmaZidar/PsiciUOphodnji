@@ -18,7 +18,7 @@ I šetači i vlasnici imaju svoj javni profil s osobnim podatcima i dodatnim pod
 
 
 # Tehnologije
-JavaScript, Node.js, Express, HTML5, CSS3
+JavaScript, Node.js, Express, HTML5, CSS3, React, Render, PostgreSQL
 
 # Članovi tima
 Viktor Wilder, Nina Zamberlin, Ema Zidar, Leonard Zadro, Luka Zadro, Jakov Ramljak, Lana Šapić
@@ -72,8 +72,8 @@ Ako se pojavi problem:
 3. Za ozbiljne incidente (uznemiravanje, plagijat), pošaljite e-mail.
 
 **Primjer kontakta:**  
-- Voditelj predmeta: iva.sovic@fer.hr  
-- Asistent: mislav.markusic@fer.hr  
+- Asistentica: iva.sovic@fer.hr  
+- Demos: mislav.markusic@fer.hr  
 - Repo kontakt: ema.zidar@fer.hr  
 
 U prijavi navedite kratak opis, datum i vrijeme, sudionike, dokaze i željeni ishod.

@@ -89,6 +89,17 @@ app.get("/google/callback", async (req, res) => {
 
     req.session.user = { email: email, name: name }
 
+    const existingUser = await db.findUserByEmail(email)
+    if (!existingUser) {
+      console.log("User exists:", existingUser)
+      // Ako user ne postoji salje email i name u front za daljnju obradu
+      return res.redirect(`/register?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`)
+    } else {
+      const userId = existingUser.id
+      const userRole = await db.getUserRoleById(userId)
+      return res.redirect('/?role=${encodeURIComponent(userRole)}')
+    }
+
     res.status(token_info_response.status).redirect('/register')
   } catch (error) {
     console.error("Error in callback:", error)

@@ -84,8 +84,6 @@ app.get("/google/callback", async (req, res) => {
     const token_info_data = await token_info_response.json()
     const { email, name } = token_info_data
 
-    const token = user.generateToken();
-
     req.session.user = { email: email, name: name }
 
     res.status(token_info_response.status).redirect('/testboard')

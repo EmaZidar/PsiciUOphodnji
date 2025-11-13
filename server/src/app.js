@@ -89,7 +89,7 @@ app.get("/google/callback", async (req, res) => {
 
     req.session.user = { email: email, name: name }
 
-    res.status(token_info_response.status).redirect('/testboard')
+    res.status(token_info_response.status).redirect('/register')
   } catch (error) {
     console.error("Error in callback:", error)
     res.status(500).json({ error: "Internal server error" })

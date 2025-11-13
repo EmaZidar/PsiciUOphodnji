@@ -3,12 +3,22 @@ import * as dotenv from "dotenv"
 dotenv.config()
 
 import express from "express"
+import session from "express-session"
 
 import fetch from "node-fetch"
 
 const app = express()
 
 app.use(express.json())
+
+app.use(session({
+  secret: 'Rainbow feline',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 4, // 4 hours session expiry
+  }
+}))
 
 const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL
 
@@ -83,7 +93,16 @@ app.get("/google/callback", async (req, res) => {
   }
   const token = user.generateToken();*/
 
-  res.status(token_info_response.status).json({ email: email, name: name })
+  req.session.user = { email: email, name: name }
+
+  res.status(token_info_response.status).redirect('/testboard')
+})
+
+app.get("/testboard", (req, res) => {
+  if (req.session.user)
+    res.send(`Welcome back, ${req.session.user.name}`)
+  else
+    res.send('Access denied. Please log in first.')
 })
 
 // TODO treba promijeniti port da slusa na 80 (za http) i/ili 443 (za https)

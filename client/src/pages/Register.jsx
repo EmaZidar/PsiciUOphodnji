@@ -110,8 +110,8 @@ export default function Register() {
 
       console.log('Result fom', resultForm)
 
-      // TODO maknuti :8000 treba kroz proxy ici
-      const fetchResult = await fetch('http://localhost:8000/api/register', {
+      // Use relative path so proxy / same-origin works in production
+      const fetchResult = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

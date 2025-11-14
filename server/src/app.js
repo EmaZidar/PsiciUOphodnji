@@ -5,6 +5,8 @@ import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Test database connection on startup
 db.testConnection();
@@ -31,8 +33,8 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-// FIX: Use normal URLs, not URL-encoded
-const GOOGLE_CALLBACK_URL = "http://localhost:8000/google/callback";
+// Use configured callback URL in production, fallback to localhost for dev
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:8000/google/callback";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
@@ -168,5 +170,20 @@ const start = async (port) => {
         console.log(`Server running on port: http://localhost:${port}`);
     });
 };
+
+// Serve built frontend (if present)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+
+try {
+    app.use(express.static(clientDistPath));
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api') || req.path.startsWith('/google') || req.path.startsWith('/login') || req.path.startsWith('/favicon.ico')) return next();
+        res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
+} catch (err) {
+    console.log('Client dist not found, skipping static serving');
+}
 
 start(PORT);

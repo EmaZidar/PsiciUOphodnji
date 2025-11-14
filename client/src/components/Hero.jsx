@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
   return (
@@ -9,9 +10,9 @@ export default function Hero() {
           Poveži se s provjerenim šetačima u svom susjedstvu — brzo, sigurno i jednostavno.
         </p>
         <div className="hero-buttons">
-          <a className="btn outline" href="/login">
+          <Link className="btn outline" to="/login">
             Prijava
-          </a>
+          </Link>
         </div>
       </div>
     </section>

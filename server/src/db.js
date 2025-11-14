@@ -20,8 +20,8 @@ export async function findUserByEmail(email) {
 
 export async function createUser(imeKorisnik, prezimeKorisnik, email, telefon) {
     const res = await pool.query(
-        "INSERT INTO korisnik (imeKorisnik, prezimeKorisnik, email, telefon) VALUES ($1, $2, $3, $4) RETURNING *",
-        [imeKorisnik, prezimeKorisnik, email, telefon]
+        "INSERT INTO korisnik (idKorisnik, imeKorisnik, prezimeKorisnik, email, telefon) VALUES ($5, $1, $2, $3, $4) RETURNING *",
+        [imeKorisnik, prezimeKorisnik, email, telefon, Math.floor(Math.random() * 1_000_000)]
     );
     return res;
 }

@@ -26,6 +26,22 @@ export async function createUser(imeKorisnik, prezimeKorisnik, email, telefon) {
     return res;
 }
 
+export async function createSetac(tipClanarina, profilFoto, idKorisnik, lokDjelovanja) {
+    const res = await pool.query(
+        "INSERT INTO setac (tipClanarina, profilFoto, idKorisnik, lokDjelovanja) VALUES ($1, $2, $3, $4) RETURNING *",
+        [tipClanarina, profilFoto, idKorisnik, lokDjelovanja]
+    )
+    return res
+}
+
+export async function createVlasnik(primanjeObavijesti, idKorisnik) {
+    const res = await pool.query(
+        "INSERT INTO vlasnik (primanjeObavijesti, idKorisnik) VALUES ($1, $2) RETURNING *",
+        [primanjeObavijesti, idKorisnik]
+    )
+    return res
+}
+
 export async function getUserWithRole(userId) {
     const userResult = await pool.query(
         "SELECT * FROM KORISNIK WHERE idKorisnik = $1",

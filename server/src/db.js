@@ -20,8 +20,8 @@ export async function findUserByEmail(email) {
 
 export async function createUser(imeKorisnik, prezimeKorisnik, email, telefon) {
     const res = await pool.query(
-        "INSERT INTO korisnik (idKorisnik, imeKorisnik, prezimeKorisnik, email, telefon) VALUES ($5, $1, $2, $3, $4) RETURNING *",
-        [imeKorisnik, prezimeKorisnik, email, telefon, Math.floor(Math.random() * 1_000_000)]
+        "INSERT INTO korisnik (imeKorisnik, prezKorisnik, email, telefon) VALUES ($1, $2, $3, $4) RETURNING *",
+        [imeKorisnik, prezimeKorisnik, email, telefon]
     );
     return res;
 }
@@ -94,8 +94,8 @@ export async function getUserById(idKorisnik) {
 
 export async function testConnection() {
     try {
-        const rows = await pool.query("SELECT NOW()");
-        console.log("Database connected:", rows.rows[0]);
+        const rows = await pool.query("SELECT * FROM korisnik");
+        console.log("Database connected:", rows.rows);
     } catch (err) {
         console.error("Database connection error:", err);
     }

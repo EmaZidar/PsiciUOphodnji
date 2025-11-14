@@ -16,7 +16,7 @@ export default defineConfig({
         changeOrigin: true,
       },
       // Forward any API requests to the backend as well
-      '/api': {
+      '/api/register': {
         target: 'http://localhost:8000',
         changeOrigin: true,
       },

@@ -4,6 +4,7 @@ import express from "express";
 import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
+import cors from "cors";
 
 // Test database connection on startup
 db.testConnection();
@@ -11,8 +12,11 @@ db.testConnection();
 const app = express();
 app.use(express.json());
 
+app.use(cors())
+
 app.use(
-    session({
+    session({          'Access-Control-Allow-Origin': '*',
+
         secret: "Rainbow feline",
         resave: false,
         saveUninitialized: false,
@@ -107,7 +111,7 @@ app.get("/google/callback", async (req, res) => {
         } else {
             //Dohvati ulogu korisnika preko id-a
             const userId = existingUser.id;
-            const userWithRole = await db.getUserRoleById(userId);
+            const userWithRole = await db.getUserWithRole(userId);
             res.redirect(`${clientUrl}/?role=${encodeURIComponent(userWithRole)}`);
         }
     } catch (error) {
@@ -116,23 +120,25 @@ app.get("/google/callback", async (req, res) => {
     }
 });
 
-app.get('/api/register', (req, res) => {
-  if (req.headers["Content-Type"] !== "application/json") {
+app.post('/api/register', (req, res) => {
+  console.log("registering....")
+  if (req.headers["content-type"] !== "application/json") {
     res.status(400).send('Expected form data')
     return
   }
-  let requestForm
-  try {
+  let requestForm = req.body
+  /*try {
     requestForm = JSON.parse(req.body)
   } catch (syntaxError) {
+    console.log('Syntax error in form data: %s', req.body)
     res.sendStatus(400).send('Syntax error in form data')
-    console.log('Syntax error in form data: %s', syntaxError)
     return
-  }
+  }*/
 
   const isSetac = requestForm.uloga === "setac"
   if (!isSetac && requestForm.uloga !== "vlasnik") {
     res.sendStatus(400).send('Nevalidna uloga')
+    console.log('nevaldna uloga')
     return
   }
 
@@ -144,12 +150,16 @@ app.get('/api/register', (req, res) => {
     requestForm.email,
     requestForm.telefon,
   ).then(user => {
-    const idKorisnik = user.rows[0].idKorisnik // TODO treba vidjet jel postoji lol
+    console.log('Created user:', user)
+    const idKorisnik = user.rows[0].idkorisnik // TODO treba vidjet jel postoji lol
+    console.log('id korisnik:', idKorisnik)
     if (isSetac)
       db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
     else
       db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
   })
+
+  res.sendStatus(200)
 })
 
 const PORT = process.env.PORT || 8000;

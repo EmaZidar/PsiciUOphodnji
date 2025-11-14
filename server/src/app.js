@@ -6,13 +6,11 @@ import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
 
-// Test database connection on startup
 db.testConnection();
 
 const app = express();
 app.use(express.json());
 
-// Allow requests from the client and include credentials for sessions
 app.use(
     cors({
         origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -26,7 +24,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: 1000 * 60 * 60 * 4, // 4 hours session expiry
+            maxAge: 1000 * 60 * 60 * 4, // 4 sata
             sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
         },
@@ -38,7 +36,6 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-// FIX: Use normal URLs, not URL-encoded
 const GOOGLE_CALLBACK_URL = "http://localhost:8000/google/callback";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
@@ -48,7 +45,6 @@ const GOOGLE_OAUTH_SCOPES = [
 app.get("/login/auth", async (_req, res) => {
     const state = "some_state";
 
-    // FIX: URL encode the scopes and callback URL when building the OAuth URL
     const encodedScopes = GOOGLE_OAUTH_SCOPES.map((scope) =>
         encodeURIComponent(scope)
     ).join(" ");
@@ -75,7 +71,7 @@ app.get("/google/callback", async (req, res) => {
         code,
         client_id: GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: GOOGLE_CALLBACK_URL, // Use the variable
+        redirect_uri: GOOGLE_CALLBACK_URL,
         grant_type: "authorization_code",
     };
 
@@ -95,7 +91,6 @@ app.get("/google/callback", async (req, res) => {
 
         const { id_token } = access_token_data;
 
-        // Verify and extract the information in the id token
         const token_info_response = await fetch(
             `${process.env.GOOGLE_TOKEN_INFO_URL}?id_token=${id_token}`
         );
@@ -116,13 +111,11 @@ app.get("/google/callback", async (req, res) => {
                 )}&name=${encodeURIComponent(name)}`
             );
         } else {
-            // Dohvati ulogu korisnika preko id-a
+            // Dohvati ulogu korisnika preko id
             const userId = existingUser.idkorisnik ?? existingUser.idKorisnik ?? existingUser.id ?? existingUser.id_korisnik;
             const userWithRole = await db.getUserWithRole(userId);
             const role = userWithRole?.role ?? "unassigned";
-            // Save full user info into session for later retrieval by the client
             req.session.user = userWithRole;
-            // Redirect logged-in users to the logged-in main page
             res.redirect(`${clientUrl}/main?role=${encodeURIComponent(role)}`);
         }
     } catch (error) {
@@ -173,7 +166,6 @@ app.post('/api/register', (req, res) => {
   res.sendStatus(200)
 })
 
-// Return current session + DB user info
 app.get('/api/me', async (req, res) => {
     try {
         if (!req.session?.user) {
@@ -181,7 +173,6 @@ app.get('/api/me', async (req, res) => {
         }
 
         const sessionUser = req.session.user;
-        // If session contains only email/name (from OAuth when user is new), try to fetch DB row
         const dbUser = await db.findUserByEmail(sessionUser.email);
         if (!dbUser) {
             console.log('/api/me - no DB user, session:', sessionUser);

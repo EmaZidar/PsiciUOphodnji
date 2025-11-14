@@ -1,12 +1,14 @@
 import React from "react";
 
-export default function Feature({ title, text, btnText, bg }) {
+export default function Feature({ title, text, btnText, bg, align }) {
+  // align: optional prop, 'center' will center content inside the image
+  const heroClass = `feature-hero ${align === 'center' ? 'align-center' : ''}`;
   return (
     <section className="feature-section">
       <div className="feature-wrapper">
-        <div className="feature-hero" style={{ backgroundImage: `url(${bg})` }}>
+        <div className={heroClass} style={{ backgroundImage: `url(${bg})` }}>
           <div className="partner-overlay">
-            <div className="partner-content">
+            <div className={`partner-content ${align === 'center' ? 'center' : ''}`}>
               <h3>{title}</h3>
               <p>{text}</p>
               {btnText && (

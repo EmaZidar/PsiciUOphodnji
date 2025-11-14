@@ -100,7 +100,7 @@ app.get("/google/callback", async (req, res) => {
         req.session.user = { email: email, name: name };
 
         const existingUser = await db.findUserByEmail(email);
-        const clientUrl = process.env.CLIENT_URL || "https://psiciuophodnji.onrender.com:5173";
+        const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
         
         if (!existingUser) {
             console.log("User doesn't exist");

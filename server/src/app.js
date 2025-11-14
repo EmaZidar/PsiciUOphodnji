@@ -47,7 +47,8 @@ app.get("/login/auth", async (_req, res) => {
     const state = "some_state";
 
     // Build callback dynamically if no env override
-    const callbackToUse = GOOGLE_CALLBACK_URL || `${_req.protocol}://${_req.get('host')}/google/callback`;
+    // Use hostname (no port) to avoid including internal port like :8000 in the redirect URI
+    const callbackToUse = GOOGLE_CALLBACK_URL || `${_req.protocol}://${_req.hostname}/google/callback`;
 
     // URL encode scopes and callback
     const encodedScopes = encodeURIComponent(GOOGLE_OAUTH_SCOPES.join(' '));
@@ -72,7 +73,8 @@ app.get("/google/callback", async (req, res) => {
     const { code } = req.query;
 
     // Determine redirect_uri for token exchange
-    const redirectUri = GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/google/callback`;
+    // Use hostname (no port) to avoid including internal port like :8000 in the redirect URI
+    const redirectUri = GOOGLE_CALLBACK_URL || `${req.protocol}://${req.hostname}/google/callback`;
     console.log('Using token exchange redirect_uri:', redirectUri);
 
     const data = {
@@ -117,7 +119,8 @@ app.get("/google/callback", async (req, res) => {
 
         const existingUser = await db.findUserByEmail(email);
         // Compute client URL from env or request origin so deployed host is used
-        const clientUrl = process.env.CLIENT_URL || `${req.protocol}://${req.get('host')}`;
+        // use `req.hostname` to avoid an internal port appearing in the host
+        const clientUrl = process.env.CLIENT_URL || `${req.protocol}://${req.hostname}`;
         
         if (!existingUser) {
             console.log("User doesn't exist");

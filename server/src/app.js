@@ -13,8 +13,6 @@ db.testConnection();
 
 const app = express();
 app.use(express.json());
-// When behind a proxy (Render, Heroku, etc.) trust proxy so req.protocol reflects https
-app.set('trust proxy', true);
 
 app.use(cors())
 
@@ -35,8 +33,8 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-// Allow explicit env override; when empty we'll compute from the incoming request
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "";
+// Use configured callback URL in production, fallback to localhost for dev
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:8000/google/callback";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
@@ -45,12 +43,11 @@ const GOOGLE_OAUTH_SCOPES = [
 app.get("/login/auth", async (_req, res) => {
     const state = "some_state";
 
-    // Build callback dynamically if no env override
-    const callbackToUse = GOOGLE_CALLBACK_URL || `${_req.protocol}://${_req.get('host')}/google/callback`;
-
-    // URL encode scopes and callback
-    const encodedScopes = encodeURIComponent(GOOGLE_OAUTH_SCOPES.join(' '));
-    const encodedCallback = encodeURIComponent(callbackToUse);
+    // FIX: URL encode the scopes and callback URL when building the OAuth URL
+    const encodedScopes = GOOGLE_OAUTH_SCOPES.map((scope) =>
+        encodeURIComponent(scope)
+    ).join(" ");
+    const encodedCallback = encodeURIComponent(GOOGLE_CALLBACK_URL);
 
     const GOOGLE_OAUTH_CONSENT_SCREEN_URL =
         `${GOOGLE_OAUTH_URL}?` +
@@ -61,7 +58,6 @@ app.get("/login/auth", async (_req, res) => {
         `state=${state}&` +
         `scope=${encodedScopes}`;
 
-    console.log("Using OAuth callback:", callbackToUse);
     console.log("Redirecting to:", GOOGLE_OAUTH_CONSENT_SCREEN_URL);
     res.redirect(GOOGLE_OAUTH_CONSENT_SCREEN_URL);
 });
@@ -70,38 +66,27 @@ app.get("/google/callback", async (req, res) => {
     console.log("Callback received:", req.query);
     const { code } = req.query;
 
-    // Determine redirect_uri for token exchange
-    const redirectUri = GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/google/callback`;
-    console.log('Using token exchange redirect_uri:', redirectUri);
-
     const data = {
         code,
         client_id: GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: redirectUri,
+        redirect_uri: GOOGLE_CALLBACK_URL, // Use the variable
         grant_type: "authorization_code",
     };
 
-    console.log("Exchanging code for token (will send form-urlencoded):", { client_id: GOOGLE_CLIENT_ID, redirect_uri: redirectUri });
+    console.log("Exchanging code for token:", data);
 
     try {
-        // Google expects application/x-www-form-urlencoded body
-        const tokenResponse = await fetch(GOOGLE_ACCESS_TOKEN_URL, {
+        const response = await fetch(GOOGLE_ACCESS_TOKEN_URL, {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
-            body: new URLSearchParams(data).toString(),
+            body: JSON.stringify(data),
         });
 
-        const access_token_data = await tokenResponse.json();
+        const access_token_data = await response.json();
         console.log("Token response:", access_token_data);
-
-        if (access_token_data.error) {
-            console.error('Token endpoint returned error:', access_token_data);
-            res.status(500).json({ error: 'Token exchange failed' });
-            return;
-        }
 
         const { id_token } = access_token_data;
 

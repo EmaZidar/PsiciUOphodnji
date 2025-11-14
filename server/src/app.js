@@ -14,6 +14,9 @@ db.testConnection();
 const app = express();
 app.use(express.json());
 
+// When behind a proxy (Render, Heroku, etc.) trust proxy so req.protocol reflects https
+app.set('trust proxy', true);
+
 app.use(cors())
 
 app.use(
@@ -33,8 +36,8 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-// Use configured callback URL in production, fallback to localhost for dev
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:8000/google/callback";
+// Allow an explicit env override; if empty, we'll compute the callback URL from the incoming request
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
@@ -47,7 +50,9 @@ app.get("/login/auth", async (_req, res) => {
     const encodedScopes = GOOGLE_OAUTH_SCOPES.map((scope) =>
         encodeURIComponent(scope)
     ).join(" ");
-    const encodedCallback = encodeURIComponent(GOOGLE_CALLBACK_URL);
+    // If no env var is provided, build callback URL from the current request (works on Render when trust proxy is set)
+    const callbackToUse = GOOGLE_CALLBACK_URL || `${_req.protocol}://${_req.get('host')}/google/callback`;
+    const encodedCallback = encodeURIComponent(callbackToUse);
 
     const GOOGLE_OAUTH_CONSENT_SCREEN_URL =
         `${GOOGLE_OAUTH_URL}?` +
@@ -66,11 +71,14 @@ app.get("/google/callback", async (req, res) => {
     console.log("Callback received:", req.query);
     const { code } = req.query;
 
+    // Use env override if set, otherwise compute from request (supports running behind HTTPS proxy)
+    const redirectUri = GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/google/callback`;
+
     const data = {
         code,
         client_id: GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: GOOGLE_CALLBACK_URL, // Use the variable
+        redirect_uri: redirectUri,
         grant_type: "authorization_code",
     };
 

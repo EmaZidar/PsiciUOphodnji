@@ -47,7 +47,7 @@ export default function Register() {
               type === 'file' ? files[0] : value
     }));
     
-    // Očisti error kada korisnik počne unositi
+    
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -90,13 +90,13 @@ export default function Register() {
         uloga: formData.uloga,
       }
 
-      // Zatim registriraj specifičnu ulogu
+      // registriraj specifičnu ulogu
       if (formData.uloga === 'setac')
         resultForm = {
           ...resultForm,
           tipClanarina: formData.tipClanarina,
           lokDjelovanja: formData.lokDjelovanja,
-          profilFoto: '/default-profile.jpg', // Za sementara
+          profilFoto: '/default-profile.jpg', 
         }
       else if (formData.uloga === 'vlasnik')
         resultForm = {
@@ -110,7 +110,7 @@ export default function Register() {
 
       console.log('Result fom', resultForm)
 
-      // Use relative path so proxy / same-origin works in production
+     
       const fetchResult = await fetch('/api/register', {
         method: 'POST',
         headers: {

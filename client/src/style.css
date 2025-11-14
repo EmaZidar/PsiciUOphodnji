@@ -84,7 +84,6 @@ body {
   background: rgba(0,0,0,0.06);
 }
 
-/* make nav items vertically centered */
 .header-nav a, .header-nav .login-link {
   display: inline-flex;
   align-items: center;
@@ -129,7 +128,6 @@ body {
 }
 
 .header-inner {
-  /* desktop: vertically center brand + nav */
   align-items: center;
 }
 
@@ -338,10 +336,8 @@ body {
 .partner-overlay {
   position: absolute;
   inset: 0;
-  /* darker gradient towards bottom so text is readable */
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.52) 100%);
   display: flex;
-  /* place content at bottom-left */
   align-items: flex-end;
   justify-content: flex-start;
   padding-left: 48px;
@@ -355,7 +351,6 @@ body {
   text-align: left;
 }
 
-/* when feature-hero has align-center, center content both vertically and horizontally */
 .feature-hero.align-center .partner-overlay {
   align-items: center;
   justify-content: center;
@@ -385,7 +380,7 @@ body {
 }
 
 .partner-cta {
-  margin-top: 0; /* reset - we place CTA at bottom via overlay */
+  margin-top: 0;
 }
 
 .partner-cta .btn.primary {
@@ -396,7 +391,6 @@ body {
   display: inline-block;
 }
 
-/* If you want the CTA to sit flush to the lower-left corner of the image */
 .feature-hero .partner-content .partner-cta { margin-top: 8px; }
 
 
@@ -408,7 +402,7 @@ body {
 
   .partner-overlay {
     padding-left: 18px;
-    align-items: center; /* center content on smaller screens */
+    align-items: center; 
     padding-bottom: 18px;
   }
 
@@ -699,7 +693,6 @@ body {
   }
 }
 
-/* Profile page styles */
 .profile-main h1 {
   margin-bottom: 18px;
 }

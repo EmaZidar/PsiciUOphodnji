@@ -3,7 +3,7 @@ import './Register.css';
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    // Osnovni podaci za sve korisnike
+    // za sve korisnike
     ime: '',
     prezime: '',
     email: '',
@@ -12,23 +12,23 @@ export default function Register() {
     // Odabir uloge
     uloga: '',
     
-    // Podaci specifični za šetače
+    //  za šetače
     tipClanarina: '',
     lokDjelovanja: '',
     profilFoto: null,
     
-    // Podaci specifični za vlasnike
+    // za vlasnike
     primanjeObavijesti: false
   });
 
-  // Preuzmi ime, prezime i email iz URL parametara
+  //  ime, prezime i email iz URL parametara
   const fullName = new URLSearchParams(window.location.search).get('name') || '';
   const firstName = fullName.split(' ')[0] || '';
   const lastName = fullName.split(' ')[1] || '';
   const email = new URLSearchParams(window.location.search).get('email') || '';
   console.log('Preuzeti podaci iz URL-a:', { firstName, lastName, email });
 
-  // Postavi preuzete podatke u formu kada se komponenta učita
+ 
   useEffect(() => {
     setFormData(prev => ({
       ...prev,
@@ -56,7 +56,7 @@ export default function Register() {
   const validateForm = () => {
     const newErrors = {};
 
-    // Osnovna validacija
+    //  validacija
     if (!formData.ime.trim()) newErrors.ime = 'Ime je obavezno';
     if (!formData.prezime.trim()) newErrors.prezime = 'Prezime je obavezno';
     if (!formData.email.trim()) newErrors.email = 'Email je obavezan';
@@ -65,7 +65,7 @@ export default function Register() {
     // Validacija uloge
     if (!formData.uloga) newErrors.uloga = 'Odaberite ulogu';
     
-    // Validacija specifična za šetače
+    // Validacija  za šetače
     if (formData.uloga === 'setac') {
       if (!formData.tipClanarina) newErrors.tipClanarina = 'Odaberite vrstu članarine';
       if (!formData.lokDjelovanja.trim()) newErrors.lokDjelovanja = 'Lokacija djelovanja je obavezna';
@@ -90,7 +90,7 @@ export default function Register() {
         uloga: formData.uloga,
       }
 
-      // registriraj specifičnu ulogu
+      
       if (formData.uloga === 'setac')
         resultForm = {
           ...resultForm,
@@ -121,7 +121,7 @@ export default function Register() {
       console.log('Fetch result:', fetchResult)
 
       alert('Registracija uspješna!');
-      // Redirect na login ili dashboard
+      
       
     } catch (error) {
       console.error('Greška pri registraciji:', error);

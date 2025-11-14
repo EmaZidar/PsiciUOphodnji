@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Feature({ title, text, btnText, bg, align }) {
-  // align: optional prop, 'center' will center content inside the image
+
   const heroClass = `feature-hero ${align === 'center' ? 'align-center' : ''}`;
   return (
     <section className="feature-section">

@@ -39,18 +39,21 @@ export default function Home() {
           title="Za vlasnike pasa"
           text="Pouzdani šetači, provjerene recenzije, potpuna kontrola. Pronađi idealnog šetača prema lokaciji, cijeni i ocjeni korisnika. Primaj obavijesti o novim šetačima i rezerviraj šetnju u par klikova."
           bg="images/dog-6977210_1280.jpg"
+          align="center"
         />
 
         <Feature
           title="Zarada za šetače"
           text="Što više šetaš, to više zarađuješ. Poveži se s vlasnicima u svom gradu, objavi termine i naplati svoje usluge jednostavno i sigurno."
           bg="images/beautiful-couple-spend-time-summer-city.jpg"
+          align="center"
         />
 
         <Feature
           title="Fleksibilno radno vrijeme"
           text="Odaberi svoje radno vrijeme i raspored. Radi kada želiš i provodi slobodno vrijeme među svojim čupavim prijateljima."
           bg="images/dog-5521309_1280.jpg"
+          align="center"
         />
       </main>
       <Footer />

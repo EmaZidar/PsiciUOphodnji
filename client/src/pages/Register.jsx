@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Register.css';
 
 export default function Register (){
@@ -21,6 +21,22 @@ export default function Register (){
     primanjeObavijesti: false
   });
 
+  // Preuzmi ime, prezime i email iz URL parametara
+  const fullName = new URLSearchParams(window.location.search).get('name') || '';
+  const firstName = fullName.split(' ')[0] || '';
+  const lastName = fullName.split(' ')[1] || '';
+  const email = new URLSearchParams(window.location.search).get('email') || '';
+  console.log('Preuzeti podaci iz URL-a:', { firstName, lastName, email });
+
+  // Postavi preuzete podatke u formu kada se komponenta učita
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      ime: firstName,
+      prezime: lastName,
+      email: email
+    }));
+  }, [firstName, lastName, email]);
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {

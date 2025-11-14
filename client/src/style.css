@@ -71,6 +71,26 @@ body {
   font-weight: 600;
 }
 
+.header-nav .login-link {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: transparent;
+  color: #000;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.header-nav .login-link:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+/* make nav items vertically centered */
+.header-nav a, .header-nav .login-link {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+}
+
 .header-nav a:hover {
   background: rgba(0, 0, 0, 0.06);
 }
@@ -109,7 +129,8 @@ body {
 }
 
 .header-inner {
-  align-items: flex-start
+  /* desktop: vertically center brand + nav */
+  align-items: center;
 }
 
 
@@ -313,21 +334,37 @@ body {
   margin-top: 0
 }
 
+
 .partner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.48) 100%);
+  /* darker gradient towards bottom so text is readable */
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.52) 100%);
   display: flex;
-  align-items: center;
+  /* place content at bottom-left */
+  align-items: flex-end;
   justify-content: flex-start;
-  padding-left: 48px
+  padding-left: 48px;
+  padding-bottom: 28px;
 }
 
 .partner-content {
   color: #fff;
   padding: 0;
   max-width: 680px;
+  text-align: left;
+}
 
+/* when feature-hero has align-center, center content both vertically and horizontally */
+.feature-hero.align-center .partner-overlay {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-left: 0;
+  padding-bottom: 0;
+}
+.feature-hero.align-center .partner-content.center {
+  margin: 0 auto;
 }
 
 .partner-content h3 {
@@ -347,12 +384,20 @@ body {
   margin-top: 28px
 }
 
+.partner-cta {
+  margin-top: 0; /* reset - we place CTA at bottom via overlay */
+}
+
 .partner-cta .btn.primary {
   background: var(--c-5);
   color: var(--c-4);
   padding: 10px 16px;
-  border-radius: 8px
+  border-radius: 8px;
+  display: inline-block;
 }
+
+/* If you want the CTA to sit flush to the lower-left corner of the image */
+.feature-hero .partner-content .partner-cta { margin-top: 8px; }
 
 
 
@@ -362,7 +407,9 @@ body {
   }
 
   .partner-overlay {
-    padding-left: 18px
+    padding-left: 18px;
+    align-items: center; /* center content on smaller screens */
+    padding-bottom: 18px;
   }
 
   .partner-content {
@@ -650,4 +697,59 @@ body {
     text-align: center !important;
     flex: 0 0 auto;
   }
+}
+
+/* Profile page styles */
+.profile-main h1 {
+  margin-bottom: 18px;
+}
+.profile-container {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-top: 12px;
+}
+.profile-avatar-wrapper {
+  flex: 0 0 auto;
+}
+.profile-avatar {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(8,48,66,0.06);
+}
+.profile-details {
+  flex: 1 1 auto;
+}
+.profile-row {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #083042;
+}
+
+.profile-info-box {
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(8,48,66,0.04);
+  box-shadow: 0 6px 18px rgba(2,10,20,0.03);
+}
+
+.profile-name {
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+@media (max-width:720px) {
+  .profile-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .profile-avatar {
+    width: 140px;
+    height: 140px;
+  }
+  .profile-details { text-align: center; }
 }

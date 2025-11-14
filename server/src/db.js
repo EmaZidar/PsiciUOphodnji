@@ -6,9 +6,9 @@ dotenv.config();
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     // MAKNUTI KAD SE DEPLOYA NA RENDER
-    ssl: {
-        rejectUnauthorized: false,
-    },
+    // ssl: {
+    //     rejectUnauthorized: false,
+    // },
 });
 
 export async function findUserByEmail(email) {

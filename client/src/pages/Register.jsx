@@ -108,11 +108,17 @@ export default function Register() {
         return
       }
 
-      await fetch('/api/register', {
+      console.log('Result fom', resultForm)
+
+      // TODO maknuti :8000 treba kroz proxy ici
+      const fetchResult = await fetch('http://localhost:8000/api/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(resultForm),
       })
+      console.log('Fetch result:', fetchResult)
 
       alert('Registracija uspješna!');
       // Redirect na login ili dashboard

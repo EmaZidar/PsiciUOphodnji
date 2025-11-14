@@ -97,7 +97,7 @@ app.get("/google/callback", async (req, res) => {
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
         
         if (!existingUser) {
-            console.log("User exists:", existingUser);
+            console.log("User doesn't exist");
             // Ako user ne postoji salje email i name u front za daljnju obradu
             res.redirect(
                 `${clientUrl}/register?email=${encodeURIComponent(
@@ -144,7 +144,7 @@ app.get('/api/register', (req, res) => {
     requestForm.email,
     requestForm.telefon,
   ).then(user => {
-    const idKorisnik = user.idKorisnik // TODO treba vidjet jel postoji lol
+    const idKorisnik = user.rows[0].idKorisnik // TODO treba vidjet jel postoji lol
     if (isSetac)
       db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
     else

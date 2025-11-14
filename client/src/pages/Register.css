@@ -1,0 +1,342 @@
+/* RegistrationForm.css */
+.registration-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.registration-form {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 2em;
+  margin: 0 auto;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.registration-form h1 {
+  font-size: 2em;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.registration-form > p {
+  color: #6c757d;
+  margin-bottom: 2em;
+  text-align: center;
+  font-size: 1em;
+}
+
+.form-section {
+  margin-bottom: 2em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.form-section h2 {
+  font-size: 1.3em;
+  margin-bottom: 1em;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.input-field label {
+  margin-bottom: 0.5em;
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9em;
+}
+
+.input-field input,
+.input-field select {
+  padding: 0.75em;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background: white;
+  color: #495057;
+  font-size: 1em;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.input-field input:focus,
+.input-field select:focus {
+  outline: none;
+  border-color: #61dafb;
+}
+
+.input-field input.error,
+.input-field select.error {
+  border-color: #dc3545;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 0.8em;
+  margin-top: 0.3em;
+}
+
+/* Role Selection Styles */
+.role-selection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  margin-top: 1em;
+}
+
+.role-option {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.role-option:hover {
+  border-color: #61dafb;
+  background: #f8fdff;
+}
+
+.role-option.selected {
+  border-color: #61dafb;
+  background: #f0fbff;
+}
+
+.role-icon {
+  font-size: 2em;
+  margin-bottom: 1em;
+}
+
+.role-option h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5em;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.role-option p {
+  color: #6c757d;
+  margin-bottom: 1em;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.role-option ul {
+  text-align: left;
+  color: #6c757d;
+  font-size: 0.8em;
+  line-height: 1.4;
+  padding-left: 1em;
+}
+
+.role-option li {
+  margin-bottom: 0.3em;
+}
+
+/* Role Specific Sections */
+.role-specific {
+  background: #f0fbff;
+  border: 1px solid #61dafb;
+  border-radius: 8px;
+  padding: 1.5em;
+  margin-top: 1em;
+}
+
+.role-specific h2 {
+  color: #2c3e50;
+  margin-bottom: 1em;
+  font-size: 1.2em;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  margin-bottom: 1em;
+  text-align: left;
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.2em;
+  accent-color: #61dafb;
+}
+
+.checkbox-field label {
+  color: #495057;
+  font-weight: normal;
+  cursor: pointer;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.info-box {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.2em;
+  margin-top: 1em;
+  text-align: left;
+}
+
+.info-box h4 {
+  color: #2c3e50;
+  margin-bottom: 0.8em;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.info-box ul {
+  color: #6c757d;
+  line-height: 1.5;
+  padding-left: 1em;
+  font-size: 0.9em;
+}
+
+.info-box li {
+  margin-bottom: 0.4em;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 0.875em 2em;
+  background: #61dafb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  margin-top: 1.5em;
+}
+
+.submit-btn:hover {
+  background: #4fd1f9;
+}
+
+.submit-btn:active {
+  background: #3dc8f7;
+}
+
+.submit-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Login Link */
+.login-link {
+  text-align: center;
+  margin-top: 1.5em;
+  color: #6c757d;
+  font-size: 0.9em;
+}
+
+.login-link a {
+  color: #61dafb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .registration-container {
+    padding: 1rem;
+  }
+  
+  .registration-form {
+    padding: 1.5em;
+  }
+  
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .role-selection {
+    grid-template-columns: 1fr;
+  }
+  
+  .role-option {
+    padding: 1.2em;
+  }
+  
+  .registration-form h1 {
+    font-size: 1.7em;
+  }
+}
+
+/* Focus styles for accessibility */
+.input-field input:focus-visible,
+.input-field select:focus-visible {
+  outline: 2px solid #61dafb;
+  outline-offset: 1px;
+}
+
+.role-option:focus-visible {
+  outline: 2px solid #61dafb;
+  outline-offset: 2px;
+}
+
+.submit-btn:focus-visible {
+  outline: 2px solid #61dafb;
+  outline-offset: 2px;
+}
+
+/* File input styling */
+.input-field input[type="file"] {
+  padding: 0.5em;
+  background: white;
+}
+
+.input-field input[type="file"]::file-selector-button {
+  background: #61dafb;
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 1em;
+  font-family: inherit;
+}
+
+.input-field input[type="file"]::file-selector-button:hover {
+  background: #4fd1f9;
+}
+
+/* Select dropdown styling */
+.input-field select {
+  cursor: pointer;
+}
+
+.input-field select option {
+  padding: 0.5em;
+}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Register.css';
 
-export default function Register (){
+export default function Register() {
   const [formData, setFormData] = useState({
     // Osnovni podaci za sve korisnike
     ime: '',
@@ -81,42 +81,38 @@ export default function Register (){
     if (!validateForm()) return;
 
     try {
-      // Prvo registriraj osnovnog korisnika
-      const userResponse = await fetch('/api/korisnik/registracija', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ime: formData.ime,
-          prezime: formData.prezime,
-          email: formData.email,
-          telefon: formData.telefon
-        })
-      });
 
-      const userData = await userResponse.json();
+      let resultForm = {
+        ime: formData.ime,
+        prezime: formData.prezime,
+        email: formData.email,
+        telefon: formData.telefon,
+        uloga: formData.uloga,
+      }
 
       // Zatim registriraj specifičnu ulogu
-      if (formData.uloga === 'setac') {
-        await fetch('/api/korisnik/registracija/setac', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            idKorisnik: userData.id,
-            tipClanarina: formData.tipClanarina,
-            lokDjelovanja: formData.lokDjelovanja,
-            profilFoto: '/default-profile.jpg' // Za sementara
-          })
-        });
-      } else if (formData.uloga === 'vlasnik') {
-        await fetch('/api/korisnik/vlasnik', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            idKorisnik: userData.id,
-            primanjeObavijesti: formData.primanjeObavijesti
-          })
-        });
+      if (formData.uloga === 'setac')
+        resultForm = {
+          ...resultForm,
+          tipClanarina: formData.tipClanarina,
+          lokDjelovanja: formData.lokDjelovanja,
+          profilFoto: '/default-profile.jpg', // Za sementara
+        }
+      else if (formData.uloga === 'vlasnik')
+        resultForm = {
+          ...resultForm,
+          primanjeObavijesti: formData.primanjeObavijesti,
+        }
+      else {
+        alert(`Nevalidna uloga: ${formData.uloga}`)
+        return
       }
+
+      await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resultForm),
+      })
 
       alert('Registracija uspješna!');
       // Redirect na login ili dashboard

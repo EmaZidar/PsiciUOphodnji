@@ -116,10 +116,41 @@ app.get("/google/callback", async (req, res) => {
     }
 });
 
-app.get("/testboard", (req, res) => {
-    if (req.session.user) res.send(`Welcome back, ${req.session.user.name}`);
-    else res.send("Access denied. Please log in first.");
-});
+app.get('/api/register', (req, res) => {
+  if (req.headers["Content-Type"] !== "application/json") {
+    res.status(400).send('Expected form data')
+    return
+  }
+  let requestForm
+  try {
+    requestForm = JSON.parse(req.body)
+  } catch (syntaxError) {
+    res.sendStatus(400).send('Syntax error in form data')
+    console.log('Syntax error in form data: %s', syntaxError)
+    return
+  }
+
+  const isSetac = requestForm.uloga === "setac"
+  if (!isSetac && requestForm.uloga !== "vlasnik") {
+    res.sendStatus(400).send('Nevalidna uloga')
+    return
+  }
+
+  // TODO treba provjeriti jos ostale parametre valjaju li
+
+  db.createUser(
+    requestForm.ime,
+    requestForm.prezime,
+    requestForm.email,
+    requestForm.telefon,
+  ).then(user => {
+    const idKorisnik = user.idKorisnik // TODO treba vidjet jel postoji lol
+    if (isSetac)
+      db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
+    else
+      db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
+  })
+})
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

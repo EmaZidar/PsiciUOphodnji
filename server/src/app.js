@@ -12,16 +12,23 @@ db.testConnection();
 const app = express();
 app.use(express.json());
 
-app.use(cors())
+// Allow requests from the client and include credentials for sessions
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        credentials: true,
+    })
+);
 
 app.use(
-    session({          'Access-Control-Allow-Origin': '*',
-
+    session({
         secret: "Rainbow feline",
         resave: false,
         saveUninitialized: false,
         cookie: {
             maxAge: 1000 * 60 * 60 * 4, // 4 hours session expiry
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
         },
     })
 );
@@ -99,7 +106,7 @@ app.get("/google/callback", async (req, res) => {
 
         const existingUser = await db.findUserByEmail(email);
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-        
+
         if (!existingUser) {
             console.log("User doesn't exist");
             // Ako user ne postoji salje email i name u front za daljnju obradu
@@ -109,10 +116,14 @@ app.get("/google/callback", async (req, res) => {
                 )}&name=${encodeURIComponent(name)}`
             );
         } else {
-            //Dohvati ulogu korisnika preko id-a
-            const userId = existingUser.id;
+            // Dohvati ulogu korisnika preko id-a
+            const userId = existingUser.idkorisnik ?? existingUser.idKorisnik ?? existingUser.id ?? existingUser.id_korisnik;
             const userWithRole = await db.getUserWithRole(userId);
-            res.redirect(`${clientUrl}/?role=${encodeURIComponent(userWithRole)}`);
+            const role = userWithRole?.role ?? "unassigned";
+            // Save full user info into session for later retrieval by the client
+            req.session.user = userWithRole;
+            // Redirect logged-in users to the logged-in main page
+            res.redirect(`${clientUrl}/main?role=${encodeURIComponent(role)}`);
         }
     } catch (error) {
         console.error("Error in callback:", error);
@@ -161,6 +172,32 @@ app.post('/api/register', (req, res) => {
 
   res.sendStatus(200)
 })
+
+// Return current session + DB user info
+app.get('/api/me', async (req, res) => {
+    try {
+        if (!req.session?.user) {
+            return res.status(401).json({ error: 'Not authenticated' });
+        }
+
+        const sessionUser = req.session.user;
+        // If session contains only email/name (from OAuth when user is new), try to fetch DB row
+        const dbUser = await db.findUserByEmail(sessionUser.email);
+        if (!dbUser) {
+            console.log('/api/me - no DB user, session:', sessionUser);
+            return res.json({ session: sessionUser, user: null });
+        }
+
+        const userId = dbUser.idkorisnik ?? dbUser.idKorisnik ?? dbUser.id ?? dbUser.id_korisnik;
+        const userWithRole = await db.getUserWithRole(userId);
+        console.log('/api/me - returning userWithRole:', userWithRole);
+
+        res.json({ session: sessionUser, user: userWithRole });
+    } catch (err) {
+        console.error('Error in /api/me:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

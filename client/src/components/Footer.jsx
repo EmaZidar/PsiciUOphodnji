@@ -18,7 +18,7 @@ export default function Footer() {
           </div>
           <div className="col">
             <h4>Kontakt</h4>
-            <p>Email: info@pawpal.example</p>
+            <p>Email: info@pawpal.com</p>
           </div>
         </div>
       </div>

@@ -1,0 +1,27 @@
+.prikaz_setaca{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: 30% 70%;
+    
+}
+
+.popis_setaca{
+    border: 2px solid black;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+    width: 70vw;
+    height: 70vh;
+    overflow-y: scroll;
+    
+}
+
+.sortiranje{
+    border: 2px solid black;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+    width: 15vw;
+    height: 70vh;
+}

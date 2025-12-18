@@ -1,33 +1,75 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
-import Hero from '../components/Hero';
-import Steps from '../components/Steps';
-import Feature from '../components/Feature';
 import Footer from '../components/Footer';
-import './Home.css';
+import UlogiranVlasnik from './UlogiranVlasnik';
+import UlogiranSetac from './UlogiranSetac';
+import UlogiranAdmin from './UlogiranAdmin';
 
 export default function HomeUlogiran() {
-  return (
-    <>
-      <HeaderUlogiran />
-      <main>
-        <Hero />
-        <section style={{padding: '32px 18px'}}>
-          <h2>Dobrodošli nazad!</h2>
-          <p>Ovo je glavna stranica za prijavljene korisnike. Kliknite na ikonu u gornjem desnom kutu za pregled profila.</p>
-        </section>
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-        <Steps />
+  useEffect(() => {
+    // Fetch user info from server
+    const API = 'http://localhost:8000/api/me';
+    fetch(API, { credentials: 'include' })
+      .then((r) => {
+        if (!r.ok) throw new Error('Not authenticated');
+        return r.json();
+      })
+      .then((data) => {
+        setUser(data.user ?? data.session ?? null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
-        <Feature
-          title="Postani partner šetač"
-          text="Zaradi šećući u svom mjestu. Odredi vlastito radno vrijeme i dostavljaj kada i gdje želiš."
-          btnText="Postani šetač"
-          bg="images/mother-her-daughter-playing-with-dog-family-autumn-park-pet-domestic-animal-lifestyle-concept.jpg"
-        />
+  if (loading) {
+    return (
+      <>
+        <HeaderUlogiran />
+        <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p>Učitavanje...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
-      </main>
-      <Footer />
-    </>
-  );
+  if (error) {
+    return (
+      <>
+        <HeaderUlogiran />
+        <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p>Greška pri učitavanju: {error}</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  const role = user?.role || 'unassigned';
+
+  // Dynamically render the appropriate component based on user role
+  if (role === 'vlasnik') {
+    return <UlogiranVlasnik user={user} />;
+  } else if (role === 'setac') {
+    return <UlogiranSetac user={user} />;
+  } else if (role === 'admin') {
+    return <UlogiranAdmin user={user} />;
+  } else {
+    return (
+      <>
+        <HeaderUlogiran />
+        <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p>Vaša uloga nije određena. Molimo kontaktirajte administratora.</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 }

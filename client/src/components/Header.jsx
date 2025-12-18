@@ -6,13 +6,30 @@ export default function Header() {
   return (
     <header className="header-container">
       <div className="header-inner">
-        <div className="brand"><Link className="brand" to="/">Pawpal</Link></div>
-        <nav className="header-nav" aria-label="Glavni izbornik">
-          <a href="#about">O nama</a>
-          <a href="#zasto">Zašto mi?</a>
-          <a href="#kontakt">Kontakt</a>
-          <a href="/login">Prijava</a>
-        </nav>
+        <div className="header-left">
+          <Link className="brand" to="/">Pawpal</Link>
+        </div>
+
+        <div className="header-center">
+          <input
+            className="header-search"
+            type="search"
+            placeholder="Search Pawpal"
+            aria-label="Search"
+          />
+        </div>
+
+        <div className="header-right">
+          <nav className="header-nav" aria-label="Glavni izbornik">
+            <a href="#about">O nama</a>
+            <a href="#zasto">Zašto mi?</a>
+            <a href="#kontakt">Kontakt</a>
+          </nav>
+          <div className="auth-actions">
+            <a href="/login" className="btn signin">Sign in</a>
+            <a href="/register" className="btn primary">Sign up</a>
+          </div>
+        </div>
       </div>
     </header>
   );

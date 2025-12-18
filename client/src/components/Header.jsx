@@ -11,7 +11,7 @@ export default function Header() {
           <a href="#about">O nama</a>
           <a href="#zasto">Zašto mi?</a>
           <a href="#kontakt">Kontakt</a>
-          <Link to="/login" className="login-link">Prijava</Link>
+          <a href="/login">Prijava</a>
         </nav>
       </div>
     </header>

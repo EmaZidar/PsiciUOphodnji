@@ -5,11 +5,52 @@ import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 db.testConnection();
 
 const app = express();
 app.use(express.json());
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Serve static files from public directory
+app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = /jpeg|jpg|png/;
+        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Samo JPG, JPEG i PNG slike su dozvoljene!'));
+    }
+});
 
 app.use(
     cors({
@@ -189,6 +230,29 @@ app.get('/api/me', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+// TODO: Implementirati endpoint za upload profilne slike
+// POST /api/upload-profile-image
+// - Primiti file iz req.file (multer je već konfiguriran)
+// - Spremi putanju /uploads/... u DB (koristiti db.updateUserProfileImage())
+// - Vrati updated user kao JSON
+// - Klijent će tada prikazati novu sliku
+//
+// Frontend je spreman i čeka ovaj endpoint
+// Multer je već konfiguriran na serveru
+
+// TODO: Implementirati endpoint za brisanje profila
+// DELETE /api/delete-profile
+// - Provjeri je li korisnik ulogiran (req.session?.user)
+// - Dohvati korisnika iz baze po email-u
+// - Obriši sve podatke povezane s tim korisnikom:
+//   * Obriši iz korisnik tablice
+//   * Obriši iz setac/vlasnik/administrator tablica (ovisno o ulozi)
+// - Uništi sesiju (req.session.destroy())
+// - Vrati 200 sa porukom ili 500 ako greška
+//
+// Frontend prikazuje modal s "Jeste li sigurni?" i gumbi "Da" i "Ne"
+// Nakon brisanja korisnik se preusmjerava na početnu stranicu
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

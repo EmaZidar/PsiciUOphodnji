@@ -92,6 +92,16 @@ export async function getUserById(idKorisnik) {
     return res.rows[0];
 }
 
+// TODO: Implementirati sprema profilne slike
+// Funkcija treba:
+// 1. Provjeri je li korisnik setac ili vlasnik
+// 2. UPDATE odgovarajuću tablicu (setac ili vlasnik) SET profilFoto = imagePath WHERE idKorisnik = userId
+// 3. Vrati { success: true }
+// 
+// export async function updateUserProfileImage(userId, imagePath) {
+//     // implementacija...
+// }
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");

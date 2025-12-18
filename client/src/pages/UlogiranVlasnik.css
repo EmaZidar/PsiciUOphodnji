@@ -1,0 +1,37 @@
+/* Minimal Vlasnik page */
+
+.ulogiran-vlasnik-main {
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 60px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ulogiran-vlasnik-main h1 {
+  font-size: 2.4rem;
+  color: #2c3e50;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .ulogiran-vlasnik-main {
+    padding: 40px 20px;
+  }
+
+  .ulogiran-vlasnik-main h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .ulogiran-vlasnik-main {
+    padding: 30px 15px;
+  }
+
+  .ulogiran-vlasnik-main h1 {
+    font-size: 1.8rem;
+  }
+}

@@ -7,6 +7,7 @@ import Register from "./pages/Register.jsx";
 import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
+import ProfilVlasnik from "./pages/ProfilVlasnik.jsx";
 function App() {
   return (
     <>
@@ -14,7 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/main" element={<HomeUlogiran />} />
-          <Route path="/profil" element={<Profile />} />
+          <Route path="/profil" element={<ProfilVlasnik />} />  
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

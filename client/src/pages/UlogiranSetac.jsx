@@ -36,8 +36,19 @@ export default function UlogiranSetac({ user }) {
     <>
       <HeaderUlogiran />
       <main className="ulogiran-setac-main">
-        <h1>Dobrodošli!</h1>
-        <Appointments userId={userId} />
+        <div className="setac-container">
+          <div className="welcome-card">
+            <h1>Dobrodošli!</h1>
+            <p className="muted">Ovime upravljate svojim terminima šetnje.</p>
+            <div className="dashboard-main">
+              <Appointments userId={userId} showHeader={false} />
+            </div>
+          </div>
+
+          <aside className="dashboard-side">
+            {/* sidebar widgets (calendar, stats) can go here */}
+          </aside>
+        </div>
       </main>
       <Footer />
     </>

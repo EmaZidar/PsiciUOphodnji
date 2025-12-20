@@ -1,11 +1,26 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate()
+
+  const handleBrandClick = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await fetch('/api/me', { credentials: 'include' })
+      if (res.ok) {
+        navigate('/main')
+        return
+      }
+    } catch (err) {
+    }
+    navigate('/')
+  }
+
   return (
     <header className="header-container">
       <div className="header-inner">
-        <div className="brand"><Link className="brand" to="/">Pawpal</Link></div>
+        <div className="brand"><a className="brand" href="/" onClick={handleBrandClick}>Pawpal</a></div>
         <nav className="header-nav" aria-label="Glavni izbornik">
           <a href="/notifications" aria-label="Obavijesti" title="Obavijesti" style={{ display: 'inline-flex', alignItems: 'center', padding: 6 }}>
             <img src="/images/notification.png" alt="Obavijesti" style={{ width: 32, height: 32 }} />

@@ -14,7 +14,7 @@ function randomFutureDate() {
   return dt.toISOString()
 }
 
-export default function Appointments({ userId, userName }) {
+export default function Appointments({ userId, userName, showHeader = true }) {
   const key = `appointments_${userId || 'anon'}`
   const [items, setItems] = useState([])
   const [editingId, setEditingId] = useState(null)
@@ -40,6 +40,8 @@ export default function Appointments({ userId, userName }) {
       notes: ''
     }
     setItems(s=>[newItem, ...s])
+    // open editor immediately for the newly created item
+    setEditingId(newItem.id)
   }
 
   const saveEdit = (id, patch) => {
@@ -54,7 +56,7 @@ export default function Appointments({ userId, userName }) {
 
   return (
     <div className="appointments-panel">
-      <h3>Dobrodošli{userName? ', '+userName : ''}!</h3>
+      {showHeader && <h3>Dobrodošli{userName? ', '+userName : ''}!</h3>}
       <div className="appointments-actions">
         <button onClick={addDefault} className="btn">Dodaj termin šetnje</button>
       </div>
@@ -62,14 +64,14 @@ export default function Appointments({ userId, userName }) {
       <div className="appointments-list">
         {items.length===0 && <div className="muted">Nema termina. Dodajte prvi termin.</div>}
         {items.map(item=> (
-          <div key={item.id} className="appointment-item">
+          <div key={item.id} className={`appointment-item ${editingId===item.id ? 'editing' : ''}`}>
             {editingId===item.id ? (
               <AppointmentEditor item={item} onCancel={()=>setEditingId(null)} onSave={(patch)=>saveEdit(item.id, patch)} />
             ) : (
               <>
                 <div className="appointment-main">
                   <div className="appointment-date">{formatDate(item.date)}</div>
-                  <div className="appointment-meta">{item.type} · {item.duration} min · {item.price} kn</div>
+                  <div className="appointment-meta">{item.type} · {item.duration} min · {item.price} €</div>
                 </div>
                 <div className="appointment-controls">
                   <button onClick={()=>setEditingId(item.id)} className="link">Uredi</button>
@@ -97,7 +99,7 @@ function AppointmentEditor({ item, onSave, onCancel }){
           <option value="group">Grupna</option>
         </select>
       </label>
-      <label>Cijena (kn)
+      <label>Cijena (€)
         <input type="number" value={form.price} onChange={e=>setForm(s=>({...s, price: Number(e.target.value)}))} />
       </label>
       <label>Trajanje (min)

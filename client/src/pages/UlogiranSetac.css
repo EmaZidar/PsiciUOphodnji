@@ -1,37 +1,149 @@
-/* Minimal Šetač page */
+/* Šetač dashboard — larger, carded and better organized */
+
+:root{
+  --bg: #f6f8fa;
+  --card: #ffffff;
+  --accent: #2c7be5;
+  --muted: #6b7280;
+  --radius: 12px;
+}
 
 .ulogiran-setac-main {
   min-height: 100vh;
-  background: #ffffff;
-  padding: 0px;
+  background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+  padding: 40px 20px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
-.ulogiran-setac-main h1 {
-  font-size: 2.4rem;
-  color: #2c3e50;
-  font-weight: 700;
-  text-align: center;
+.setac-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 28px;
+  align-items: start;
 }
 
-@media (max-width: 768px) {
-  .ulogiran-setac-main {
-    padding: 40px 20px;
-  }
+.welcome-card {
+  grid-column: 1 / -1;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(36, 59, 85, 0.08);
+  padding: 28px 32px;
+}
 
-  .ulogiran-setac-main h1 {
-    font-size: 2rem;
-  }
+.welcome-card h1 {
+  margin: 0 0 8px 0;
+  font-size: 2.6rem;
+  color: #0f1724;
+  font-weight: 800;
+}
+
+.welcome-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.dashboard-main {
+  background: transparent;
+}
+
+.appointments-panel {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(36,59,85,0.06);
+}
+
+.appointments-panel h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.5rem;
+  color: #0f1724;
+}
+
+.appointments-actions {
+  margin-bottom: 14px;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid #dbe7ff;
+  color: var(--accent);
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appointment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  border: 1px solid rgba(15,23,36,0.04);
+}
+
+.appointment-item.editing {
+  border-color: var(--accent);
+  box-shadow: 0 8px 28px rgba(44,123,229,0.12);
+}
+
+.appointment-date { font-weight: 700; font-size: 1.05rem; }
+.appointment-meta { color: var(--muted); font-size: 0.98rem; }
+
+.appointment-controls .link { margin-left: 12px; font-size: 0.95rem; }
+.link { background: none; border: none; color: var(--accent); cursor: pointer; }
+.link.danger { color: #e02424; }
+
+.muted { color: var(--muted); font-size: 1rem; }
+
+.appointment-edit {
+  margin: 0 auto;
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+.appointment-edit { border-radius: 8px; }
+.appointment-item.editing .appointment-edit { border: 1px solid rgba(44,123,229,0.08); background: linear-gradient(180deg,#fff,#fbfdff); padding:10px; }
+.appointment-edit label { display:block; margin-bottom:8px; font-size:0.96rem; width:100%; }
+.appointment-edit input, .appointment-edit select { width:100%; max-width:520px; padding:8px; border-radius:8px; border:1px solid #e6edf8; }
+.editor-actions { display:flex; gap:8px; margin-top:8px; justify-content:center; width:100%; }
+
+/* Sidebar: currently blank for future widgets */
+.dashboard-side {
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+@media (max-width: 980px) {
+  .setac-container { grid-template-columns: 1fr; padding: 0 8px; }
+  .welcome-card { grid-column: 1 / -1; }
 }
 
 @media (max-width: 640px) {
-  .ulogiran-setac-main {
-    padding: 30px 15px;
-  }
-
-  .ulogiran-setac-main h1 {
-    font-size: 1.8rem;
-  }
+  .welcome-card h1 { font-size: 2.2rem; }
+  .btn { width: 100%; }
 }

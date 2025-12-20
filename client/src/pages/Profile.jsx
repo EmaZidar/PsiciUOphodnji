@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
+import Reviews from '../components/Reviews';
 import './Profile.css';
 
 export default function Profile() {
@@ -12,6 +13,8 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [avgRating, setAvgRating] = useState(null);
+  const [ratingCount, setRatingCount] = useState(0);
 
   useEffect(() => {
     const API = 'http://localhost:8000/api/me';
@@ -26,10 +29,35 @@ export default function Profile() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
+        // Backend may be offline during development — don't surface an error message.
+        console.warn('Could not load /api/me, continuing with empty profile UI', err);
+        setUser(null);
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    let mounted = true
+    async function loadRating() {
+      try {
+        if (!user || !(user._id || user.id)) return
+        const res = await fetch(`/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
+        if (!res.ok) throw new Error('no reviews')
+        const data = await res.json()
+        const list = data.reviews || data || []
+        if (!Array.isArray(list)) return
+        const c = list.length
+        const a = c ? list.reduce((s,r)=>s+(r.rating||0),0)/c : null
+        if (!mounted) return
+        setAvgRating(a ? Math.round(a*10)/10 : null)
+        setRatingCount(c)
+      } catch (e) {
+        console.warn('Could not load reviews for rating', e)
+      }
+    }
+    loadRating()
+    return () => { mounted = false }
+  }, [user])
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
@@ -137,7 +165,8 @@ export default function Profile() {
             const lastName = pick(user, ['prezKorisnik', 'prezkorisnik', 'prezime', 'prezKorisnik', 'surname', 'family_name']) || '';
 
             return (
-              <section className="profile-container">
+              <>
+                <section className="profile-container">
                 <div className="profile-avatar-wrapper">
                   <img
                     src={imagePreview || fullAvatarSrc}
@@ -162,6 +191,16 @@ export default function Profile() {
                       </button>
                     )}
                   </div>
+
+                  <div className="profile-rating-below">
+                    <div className="rating-value">{avgRating ?? '—'}</div>
+                    <div className="rating-stars" aria-hidden>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span key={i} className={i < Math.round(avgRating || 0) ? 'star filled' : 'star'}>★</span>
+                      ))}
+                    </div>
+                    <div className="rating-count">{ratingCount} recenzija</div>
+                  </div>
                 </div>
 
                 <div className="profile-details">
@@ -182,7 +221,10 @@ export default function Profile() {
                     </button>
                   </div>
                 </div>
-              </section>
+                </section>
+
+                <Reviews targetUserId={user._id || user.id} canReview={true} />
+              </>
             );
           })()
         )}

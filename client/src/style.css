@@ -203,13 +203,29 @@ body {
 }
 
 .hero-full {
-  width: 100%;
+  /* Make hero span the full viewport width even when inside constrained parents */
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
   background: var(--c-4);
   color: #fff;
   min-height: 480px;
   display: flex;
   align-items: center;
-  padding: 0px;
+  padding: 40px 0;
+}
+
+/* Logged-in pages: make main sections span full viewport and remove side gaps */
+.ulogiran-vlasnik-main,
+.ulogiran-setac-main {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 40px 0;
+  margin: 0;
 }
 
 .hero-container {

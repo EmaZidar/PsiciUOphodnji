@@ -87,7 +87,12 @@ export default function Appointments({ userId, userName, showHeader = true }) {
               <>
                 <div className="appointment-main">
                   <div className="appointment-date">{formatDate(item.date)}</div>
-                  <div className="appointment-meta">{item.type} · {item.duration} min · {item.price} €</div>
+                  <div className="appointment-meta">
+                    <span className="type-pill">{item.type === 'group' ? 'Grupna' : 'Individualna'}</span>
+                    <span className="duration-pill">{item.duration} min</span>
+                    <span className="price-pill">€{item.price}</span>
+                  </div>
+                  {item.notes ? <div className="appointment-notes">{item.notes}</div> : null}
                 </div>
                 <div className="appointment-controls">
                   <button onClick={()=>setEditingId(item.id)} className="link">Uredi</button>

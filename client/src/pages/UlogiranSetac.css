@@ -108,6 +108,12 @@
 
 .appointment-date { font-weight: 700; font-size: 1.05rem; }
 .appointment-meta { color: var(--muted); font-size: 0.98rem; }
+.appointment-notes { margin-top:8px; color: #243b55; font-size:0.95rem; opacity:0.9 }
+
+.appointment-meta { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+.type-pill{ background: rgba(44,123,229,0.1); color:var(--accent); padding:4px 8px; border-radius:999px; font-weight:600; font-size:0.9rem }
+.duration-pill{ background: rgba(15,23,36,0.04); color:#0f1724; padding:4px 8px; border-radius:999px; font-size:0.9rem }
+.price-pill{ background: linear-gradient(90deg,#e6f0ff,#d9ecff); color:var(--accent); padding:6px 10px; border-radius:8px; font-weight:700 }
 
 .appointment-controls .link { margin-left: 12px; font-size: 0.95rem; }
 .link { background: none; border: none; color: var(--accent); cursor: pointer; }

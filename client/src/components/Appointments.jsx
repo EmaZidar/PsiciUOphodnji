@@ -18,6 +18,7 @@ export default function Appointments({ userId, userName, showHeader = true }) {
   const key = `appointments_${userId || 'anon'}`
   const [items, setItems] = useState([])
   const [editingId, setEditingId] = useState(null)
+  const [draft, setDraft] = useState(null)
 
   useEffect(()=>{
     try{
@@ -39,12 +40,20 @@ export default function Appointments({ userId, userName, showHeader = true }) {
       duration: 60,
       notes: ''
     }
-    setItems(s=>[newItem, ...s])
-    // open editor immediately for the newly created item
+    // create a draft that is not yet persisted to the appointments list
+    setDraft(newItem)
     setEditingId(newItem.id)
   }
 
   const saveEdit = (id, patch) => {
+    if (draft && draft.id === id) {
+      // persist draft as a real item
+      const saved = { ...draft, ...patch }
+      setItems(prev => [saved, ...prev])
+      setDraft(null)
+      setEditingId(null)
+      return
+    }
     setItems(prev=> prev.map(i=> i.id===id ? { ...i, ...patch } : i))
     setEditingId(null)
   }
@@ -62,7 +71,14 @@ export default function Appointments({ userId, userName, showHeader = true }) {
       </div>
 
       <div className="appointments-list">
-        {items.length===0 && <div className="muted">Nema termina. Dodajte prvi termin.</div>}
+        {draft && editingId===draft.id && (
+          <div className={`appointment-item editing`}>
+            <AppointmentEditor item={draft} onCancel={()=>{ setDraft(null); setEditingId(null) }} onSave={(patch)=>saveEdit(draft.id, patch)} />
+          </div>
+        )}
+
+        {items.length===0 && !draft && <div className="muted">Nema termina. Dodajte prvi termin.</div>}
+
         {items.map(item=> (
           <div key={item.id} className={`appointment-item ${editingId===item.id ? 'editing' : ''}`}>
             {editingId===item.id ? (

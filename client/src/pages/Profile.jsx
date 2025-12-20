@@ -223,7 +223,7 @@ export default function Profile() {
                 </div>
                 </section>
 
-                <Reviews targetUserId={user._id || user.id} canReview={true} />
+                  <Reviews targetUserId={user._id || user.id} canReview={true} />
               </>
             );
           })()

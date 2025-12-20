@@ -437,6 +437,24 @@
 .reviews-add-actions { margin-top:8px }
 .reviews-submit { padding:8px 14px; background:var(--secondary-color); color:#fff; border:none; border-radius:6px }
 
+/* Appointments */
+.appointments-panel { margin-top: 20px; background: linear-gradient(180deg,#fff,#fbfdff); padding:16px; border-radius:10px; box-shadow:0 6px 18px rgba(20,40,80,0.04) }
+.appointments-actions { margin-bottom:12px }
+.appointments-list { display:flex; flex-direction:column; gap:8px }
+.appointment-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #f0f4fb; border-radius:8px; background:white }
+.appointment-main { display:flex; flex-direction:column }
+.appointment-date { font-weight:600 }
+.appointment-meta { color:var(--text-light); font-size:0.95rem }
+.appointment-controls .link { margin-left:8px }
+.appointment-edit label { display:block; margin-bottom:8px }
+.appointment-edit input, .appointment-edit select, .appointment-edit textarea { width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px }
+.editor-actions { display:flex; gap:8px; margin-top:8px }
+.btn { padding:8px 12px; border-radius:8px; background:var(--secondary-color); color:white; border:none }
+.btn.ghost { background:transparent; color:var(--primary-color); border:1px solid var(--border-color) }
+.link { background:transparent; border:none; color:var(--secondary-color); cursor:pointer }
+.link.danger { color: #c0392b }
+
+
 /* Fractional star styling */
 .star-row { position: relative; display: inline-block; line-height: 1 }
 .stars-empty { color: #ddd }

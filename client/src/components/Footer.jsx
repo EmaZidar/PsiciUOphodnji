@@ -6,7 +6,9 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="footer-columns">
           <div className="col">
-            <img src="images/logo.png" alt="PawPal logo" className="footer-logo" />
+            <a href="/" aria-label="PawPal home">
+              <img src="images/logo.png" alt="PawPal logo" className="footer-logo" />
+            </a>
           </div>
           <div className="col">
             <h4>Brze poveznice</h4>

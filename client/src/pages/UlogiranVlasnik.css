@@ -9,6 +9,17 @@
   justify-content: center;
 }
 
+.ulogiran-vlasnik-main.fullwidth,
+.ulogiran-vlasnik-main.full-bleed {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .ulogiran-vlasnik-main h1 {
   font-size: 2.4rem;
   color: #2c3e50;

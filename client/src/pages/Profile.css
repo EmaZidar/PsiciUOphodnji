@@ -312,7 +312,7 @@
 }
 
 .modal-btn-cancel {
-  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  background: linear-gradient(135deg, #1fc324 0%, #3f8e32 100%);
   color: white;
   box-shadow: var(--shadow-md);
 }

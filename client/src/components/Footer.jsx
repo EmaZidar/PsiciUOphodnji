@@ -11,9 +11,9 @@ export default function Footer() {
           <div className="col">
             <h4>Brze poveznice</h4>
             <ul>
-              <li><a href="#find">Pronađi šetača</a></li>
-              <li><a href="#become">Postani šetač</a></li>
-              <li><a href="#pricing">Cjenik</a></li>
+              <li>Pronađi šetača</li>
+              <li>Postani šetač</li>
+              <li>Cjenik</li>
             </ul>
           </div>
           <div className="col">

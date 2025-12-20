@@ -14,7 +14,6 @@ export default function Profile() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    // Fetch session + DB user info from server
     const API = 'http://localhost:8000/api/me';
     fetch(API, { credentials: 'include' })
       .then((r) => {
@@ -129,9 +128,10 @@ export default function Profile() {
               pick(user, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
             const avatarFromRole =
               pick(user?.roleData, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
-            const avatarSrc = avatarFromUser || avatarFromRole || '/images/profile.png';
-            const fullAvatarSrc = avatarSrc.startsWith('/uploads/') 
-              ? `http://localhost:8000${avatarSrc}` 
+            const defaultImage = new URL('/images/profile.png', import.meta.url).href;
+            const avatarSrc = avatarFromUser || avatarFromRole || defaultImage;
+            const fullAvatarSrc = (typeof avatarSrc === 'string' && avatarSrc.startsWith('/uploads/'))
+              ? `http://localhost:8000${avatarSrc}`
               : avatarSrc;
 
 
@@ -141,7 +141,12 @@ export default function Profile() {
             return (
               <section className="profile-container">
                 <div className="profile-avatar-wrapper">
-                  <img src={imagePreview || fullAvatarSrc} alt="Profilna fotografija" className="profile-avatar" />
+                  <img
+                    src={imagePreview || fullAvatarSrc}
+                    alt="Profilna fotografija"
+                    className="profile-avatar"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = defaultImage; }}
+                  />
                   <div className="profile-image-upload">
                     <input
                       type="file"

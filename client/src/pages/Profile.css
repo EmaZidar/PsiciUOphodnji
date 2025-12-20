@@ -446,6 +446,11 @@
 .appointment-main { display:flex; flex-direction:column }
 .appointment-date { font-weight:600 }
 .appointment-meta { color:var(--text-light); font-size:0.95rem }
+.appointment-notes { margin-top:6px; color:#243b55; font-size:0.94rem }
+.appointment-meta { display:flex; gap:8px; align-items:center }
+.type-pill{ background: rgba(44,123,229,0.1); color:#2c7be5; padding:4px 8px; border-radius:999px; font-weight:600; font-size:0.88rem }
+.duration-pill{ background: rgba(15,23,36,0.04); color:#0f1724; padding:4px 8px; border-radius:999px; font-size:0.88rem }
+.price-pill{ background: linear-gradient(90deg,#e6f0ff,#d9ecff); color:#2c7be5; padding:6px 10px; border-radius:8px; font-weight:700 }
 .appointment-controls .link { margin-left:8px }
 .appointment-edit label { display:block; margin-bottom:8px }
 .appointment-edit input, .appointment-edit select, .appointment-edit textarea { width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px }

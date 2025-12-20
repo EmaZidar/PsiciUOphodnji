@@ -62,11 +62,9 @@ export default function Profile() {
       if (!response.ok) throw new Error('Greška pri učitavanju slike');
 
       const data = await response.json();
-      // Use updated user returned by the server (avoids refresh/race conditions)
       if (data?.user) {
         setUser(data.user);
       } else {
-        // Fallback: re-fetch user data if not provided
         const userResponse = await fetch('http://localhost:8000/api/me', { credentials: 'include' });
         const userData = await userResponse.json();
         setUser(userData.user ?? userData.session ?? null);

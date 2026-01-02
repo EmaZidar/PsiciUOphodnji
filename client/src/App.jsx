@@ -7,6 +7,11 @@ import Register from "./pages/Register.jsx";
 import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
+import UlogiranAdmin from "./pages/UlogiranAdmin.jsx";
+import Korisnici from "./pages/Korisnici.jsx";
+import Clanarina from "./pages/Clanarina.jsx";
+
+
 function App() {
   return (
     <>
@@ -17,6 +22,10 @@ function App() {
           <Route path="/profil" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<UlogiranAdmin />} />
+          <Route path="/korisnici" element={<Korisnici />} />
+          <Route path="/clanarina" element={<Clanarina />} />
+
         </Routes>
       </BrowserRouter>
     </>

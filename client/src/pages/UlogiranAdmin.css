@@ -1,8 +1,7 @@
-/* Admin Page Styles */
 
-.ulogiran-admin-main {
+
+.main {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 60px 40px;
   display: flex;
   align-items: center;
@@ -11,26 +10,14 @@
 
 .admin-container {
   width: 100%;
-  max-width: 1200px;
 }
 
 .admin-header {
   text-align: center;
   margin-bottom: 60px;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
-.admin-header h1 {
-  font-size: 3rem;
-  margin-bottom: 15px;
-  font-weight: 700;
-}
-
-.admin-header p {
-  font-size: 1.25rem;
-  opacity: 0.95;
-  font-weight: 400;
-}
 
 .admin-content {
   display: grid;
@@ -39,7 +26,7 @@
   margin-bottom: 40px;
 }
 
-.admin-card {
+.upravljanje {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 15px;
   padding: 40px 30px;
@@ -51,33 +38,20 @@
   border-left: 5px solid #3498db;
 }
 
-.admin-card:hover {
+.upravljanje:hover {
   box-shadow: 0 12px 45px rgba(0, 0, 0, 0.25);
   transform: translateY(-5px);
 }
 
-.admin-card.stats-card {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  color: white;
-  border-left: 5px solid #e74c3c;
-}
 
-.admin-card.stats-card h2 {
-  color: white;
-}
-
-.admin-card.stats-card p {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.admin-card h2 {
+.upravljanje h2 {
   font-size: 1.5rem;
   color: #2c3e50;
   margin-bottom: 15px;
   font-weight: 600;
 }
 
-.admin-card p {
+.upravljanje p {
   font-size: 1rem;
   color: #666;
   margin-bottom: 25px;
@@ -102,69 +76,3 @@
   box-shadow: 0 6px 25px rgba(52, 152, 219, 0.6);
 }
 
-.admin-card.stats-card .admin-btn {
-  background: white;
-  color: #3498db;
-}
-
-.admin-card.stats-card .admin-btn:hover {
-  background: rgba(255, 255, 255, 0.9);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .ulogiran-admin-main {
-    padding: 40px 20px;
-  }
-
-  .admin-header h1 {
-    font-size: 2rem;
-  }
-
-  .admin-header p {
-    font-size: 1rem;
-  }
-
-  .admin-content {
-    gap: 20px;
-  }
-
-  .admin-card {
-    padding: 30px 20px;
-  }
-}
-
-@media (max-width: 640px) {
-  .ulogiran-admin-main {
-    padding: 30px 15px;
-  }
-
-  .admin-header {
-    margin-bottom: 40px;
-  }
-
-  .admin-header h1 {
-    font-size: 1.75rem;
-  }
-
-  .admin-header p {
-    font-size: 0.95rem;
-  }
-
-  .admin-content {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  .admin-card {
-    padding: 25px 15px;
-  }
-
-  .admin-card h2 {
-    font-size: 1.25rem;
-  }
-
-  .admin-card p {
-    font-size: 0.95rem;
-  }
-}

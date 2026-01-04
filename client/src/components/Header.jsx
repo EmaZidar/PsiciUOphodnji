@@ -10,14 +10,7 @@ export default function Header() {
           <Link className="brand" to="/">Pawpal</Link>
         </div>
 
-        <div className="header-center">
-          <input
-            className="header-search"
-            type="search"
-            placeholder="Search Pawpal"
-            aria-label="Search"
-          />
-        </div>
+        {/* search removed per request */}
 
         <div className="header-right">
           <nav className="header-nav" aria-label="Glavni izbornik">

@@ -231,6 +231,70 @@ app.get('/api/me', async (req, res) => {
     }
 });
 
+/*
+    TODO: Ocjene i recenzije (pojednostavljeno)
+
+    Trenutna dev implementacija koristi memorijski niz i privremene rute:
+        - GET  /api/reviews?user=<id>  -> vraća recenzije za korisnika
+        - POST /api/reviews            -> dodaje recenziju
+
+    Što napraviti za produkciju (sažeto):
+        1) Dodati tablicu `reviews` ili Mongoose model (polja: user, author, authorName, rating, text, createdAt).
+        2) Implementirati rute i kontrolere (GET list, POST create, opc. DELETE/get).
+        3) Validirati/sanitizirati input (rating 1..5, limit teksta, XSS sanitizacija).
+        4) Zahtijevati autentikaciju za POST/DELETE i postaviti `author` sa servera.
+        5) Dodati agregat/endpoint za `avg` i `count` (ili računati u queryu).
+
+*/
+
+// Simple in-memory reviews store for local development.
+// Production should use a DB model and proper controllers (see above TODO).
+const _inMemoryReviews = [];
+
+// GET /api/reviews?user=<id>
+app.get('/api/reviews', (req, res) => {
+    try {
+        const userId = req.query.user;
+        if (!userId) return res.json({ reviews: [] });
+        const list = _inMemoryReviews.filter(r => String(r.user) === String(userId)).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+        return res.json({ reviews: list });
+    } catch (e) {
+        console.error('GET /api/reviews error', e);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST /api/reviews
+app.post('/api/reviews', (req, res) => {
+    try {
+        const { user, rating, text } = req.body || {};
+        if (!user || typeof rating === 'undefined') return res.status(400).json({ error: 'Missing fields' });
+        const num = Number(rating);
+        if (Number.isNaN(num) || num < 0 || num > 5) return res.status(400).json({ error: 'rating out of range' });
+        if (text && String(text).length > 2000) return res.status(400).json({ error: 'text too long' });
+
+        // derive author from session if available
+        const authorId = req.session?.user?.idkorisnik || req.session?.user?.id || null;
+        const authorName = req.session?.user?.imeKorisnik || req.session?.user?.name || req.session?.user?.email || 'Anon';
+
+        const newReview = {
+            _id: 'r' + Date.now() + '-' + Math.floor(Math.random()*10000),
+            user: String(user),
+            author: authorId,
+            authorName,
+            rating: num,
+            text: text || '',
+            createdAt: new Date().toISOString()
+        };
+
+        _inMemoryReviews.push(newReview);
+        return res.status(201).json(newReview);
+    } catch (e) {
+        console.error('POST /api/reviews error', e);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // TODO: Implementirati endpoint za upload profilne slike
 // POST /api/upload-profile-image
 // - Primiti file iz req.file (multer je već konfiguriran)

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
+import Reviews from '../components/Reviews';
 import './Profile.css';
 
 export default function Profile() {
@@ -12,9 +13,10 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [avgRating, setAvgRating] = useState(null);
+  const [ratingCount, setRatingCount] = useState(0);
 
   useEffect(() => {
-    // Fetch session + DB user info from server
     const API = 'http://localhost:8000/api/me';
     fetch(API, { credentials: 'include' })
       .then((r) => {
@@ -27,10 +29,35 @@ export default function Profile() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
+        // Backend may be offline during development — don't surface an error message.
+        console.warn('Could not load /api/me, continuing with empty profile UI', err);
+        setUser(null);
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    let mounted = true
+    async function loadRating() {
+      try {
+        if (!user || !(user._id || user.id)) return
+        const res = await fetch(`/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
+        if (!res.ok) throw new Error('no reviews')
+        const data = await res.json()
+        const list = data.reviews || data || []
+        if (!Array.isArray(list)) return
+        const c = list.length
+        const a = c ? list.reduce((s,r)=>s+(r.rating||0),0)/c : null
+        if (!mounted) return
+        setAvgRating(a ? Math.round(a*10)/10 : null)
+        setRatingCount(c)
+      } catch (e) {
+        console.warn('Could not load reviews for rating', e)
+      }
+    }
+    loadRating()
+    return () => { mounted = false }
+  }, [user])
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
@@ -63,11 +90,9 @@ export default function Profile() {
       if (!response.ok) throw new Error('Greška pri učitavanju slike');
 
       const data = await response.json();
-      // Use updated user returned by the server (avoids refresh/race conditions)
       if (data?.user) {
         setUser(data.user);
       } else {
-        // Fallback: re-fetch user data if not provided
         const userResponse = await fetch('http://localhost:8000/api/me', { credentials: 'include' });
         const userData = await userResponse.json();
         setUser(userData.user ?? userData.session ?? null);
@@ -129,9 +154,10 @@ export default function Profile() {
               pick(user, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
             const avatarFromRole =
               pick(user?.roleData, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
-            const avatarSrc = avatarFromUser || avatarFromRole || '/images/profile.png';
-            const fullAvatarSrc = avatarSrc.startsWith('/uploads/') 
-              ? `http://localhost:8000${avatarSrc}` 
+            const defaultImage = new URL('/images/profile.png', import.meta.url).href;
+            const avatarSrc = avatarFromUser || avatarFromRole || defaultImage;
+            const fullAvatarSrc = (typeof avatarSrc === 'string' && avatarSrc.startsWith('/uploads/'))
+              ? `http://localhost:8000${avatarSrc}`
               : avatarSrc;
 
 
@@ -139,9 +165,15 @@ export default function Profile() {
             const lastName = pick(user, ['prezKorisnik', 'prezkorisnik', 'prezime', 'prezKorisnik', 'surname', 'family_name']) || '';
 
             return (
-              <section className="profile-container">
+              <>
+                <section className="profile-container">
                 <div className="profile-avatar-wrapper">
-                  <img src={imagePreview || fullAvatarSrc} alt="Profilna fotografija" className="profile-avatar" />
+                  <img
+                    src={imagePreview || fullAvatarSrc}
+                    alt="Profilna fotografija"
+                    className="profile-avatar"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = defaultImage; }}
+                  />
                   <div className="profile-image-upload">
                     <input
                       type="file"
@@ -158,6 +190,16 @@ export default function Profile() {
                         {uploading ? 'Učitavanje...' : 'Spremi sliku'}
                       </button>
                     )}
+                  </div>
+
+                  <div className="profile-rating-below">
+                    <div className="rating-value">{avgRating ?? '—'}</div>
+                    <div className="rating-stars" aria-hidden>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span key={i} className={i < Math.round(avgRating || 0) ? 'star filled' : 'star'}>★</span>
+                      ))}
+                    </div>
+                    <div className="rating-count">{ratingCount} recenzija</div>
                   </div>
                 </div>
 
@@ -179,7 +221,10 @@ export default function Profile() {
                     </button>
                   </div>
                 </div>
-              </section>
+                </section>
+
+                  <Reviews targetUserId={user._id || user.id} canReview={true} />
+              </>
             );
           })()
         )}

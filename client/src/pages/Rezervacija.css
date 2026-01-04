@@ -1,0 +1,69 @@
+.rezervacija-container{
+  padding: 20px;
+  max-width: 720px;
+  margin: 20px auto;
+  color: #334155;
+}
+
+.rezervacija-container h2{
+  margin-bottom: 12px;
+  color: #0097D7;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.rezervacija-form{
+  background: #ffffff;
+  border: 1px solid #e6edf6;
+  border-radius: 10px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.rezervacija-form label{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: bold;
+}
+
+.rezervacija-form input,
+.rezervacija-form select,
+.rezervacija-form textarea{
+  padding: 10px;
+  border: 1px solid #d7dee9;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.rezervacija-form textarea{
+  min-height: 80px;
+}
+
+.rezervacija-actions{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rezervacija-actions button{
+  background: #0097D7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.rezervacija-error{
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) { 
+   .rezervacija-container{ padding: 16px 12px; } 
+   .rezervacija-form{ padding: 14px; } 
+   .rezervacija-actions{ justify-content: stretch; } 
+   .rezervacija-actions button{ width: 100%; } 
+}

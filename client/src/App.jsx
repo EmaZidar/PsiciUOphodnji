@@ -4,6 +4,8 @@ import HomeUlogiran from "./pages/HomeUlogiran.jsx";
 import Profile from "./pages/Profile.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import DostupneSetnje from "./pages/DostupneSetnje.jsx";
+import Rezervacija from "./pages/Rezervacija.jsx";
 import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -17,6 +19,8 @@ function App() {
           <Route path="/profil" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />
+          <Route path="/:idkorisnik/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
         </Routes>
       </BrowserRouter>
     </>

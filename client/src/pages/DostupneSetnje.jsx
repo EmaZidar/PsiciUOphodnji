@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
+import Reviews from '../components/Reviews.jsx';
 import {Link} from 'react-router-dom';
 import './Profile.css';
 import './DostupneSetnje.css';
@@ -115,6 +116,7 @@ export default function DostupneSetnje() {
             </>
          )}
       </main>
+      <Reviews userId={idkorisnik} />
       <Footer />
    </>);
 }

@@ -4,7 +4,6 @@ import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import Reviews from '../components/Reviews.jsx';
 import {Link} from 'react-router-dom';
-import './Profile.css';
 import './DostupneSetnje.css';
 
 export default function DostupneSetnje() {
@@ -50,7 +49,7 @@ export default function DostupneSetnje() {
    return(
    <>
       <HeaderUlogiran />
-      <main className="profile-main">
+      <main className="ds-main">
          {loading && (
             <p>Učitavanje šetača...</p>
          )}
@@ -59,26 +58,26 @@ export default function DostupneSetnje() {
          )}
          {!loading && setac && (
             <>
-               <section className="profile-container">
-                  <div className="profile-avatar-wrapper">
-                     <img src={avatarSrc} alt="Profilna fotografija" className="profile-avatar" />
+               <section className="ds-container">
+                  <div className="ds-avatar-wrapper">
+                     <img src={avatarSrc} alt="Profilna fotografija" className="ds-avatar" />
                   </div>
 
-                  <div className="profile-details">
-                     <div className="profile-info-box">
-                        <div className="profile-row">
+                  <div className="ds-details">
+                     <div className="ds-info-box">
+                        <div className="ds-row">
                            <strong>Ime:</strong> {setac.imekorisnik}
                         </div>
-                        <div className="profile-row">
+                        <div className="ds-row">
                            <strong>Prezime:</strong> {setac.prezkorisnik}
                         </div>
-                        <div className="profile-row">
+                        <div className="ds-row">
                            <strong>Email:</strong> {setac.email}
                         </div>
-                        <div className="profile-row">
+                        <div className="ds-row">
                            <strong>Telefon:</strong> {setac.telefon}
                         </div>
-                        <div className="profile-row">
+                        <div className="ds-row">
                            <strong>Lokacija djelovanja:</strong> {setac.lokdjelovanja}
                         </div>
                      </div>

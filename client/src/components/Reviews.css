@@ -1,0 +1,51 @@
+/* Reviews component styles extracted from Profile.css */
+.reviews-panel {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  margin-top: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.reviews-title {
+  margin: 0 0 12px 0;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+}
+
+.reviews-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reviews-average {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.star { color: #ddd; font-size: 1rem; margin-right: 2px }
+.star.filled { color: #f5b50a }
+
+.reviews-count { color: var(--text-light); font-size: 0.95rem }
+
+.reviews-list { max-height: 260px; overflow: auto; padding-right: 6px; }
+.review-item { padding: 12px 8px; border-bottom: 1px solid #f0f0f0 }
+.review-item:last-child { border-bottom: none }
+.review-header { display:flex; align-items:center; justify-content:space-between; gap:12px }
+.review-author { font-weight:600 }
+.review-text { margin-top:6px; color: var(--text-color) }
+
+.reviews-add { margin-top: 14px; border-top: 1px dashed #eee; padding-top: 12px }
+.reviews-add textarea { width: 100%; min-height: 80px; margin-top:8px; padding:8px; border-radius:6px; border:1px solid var(--border-color) }
+.reviews-add-actions { margin-top:8px }
+.reviews-submit { padding:8px 14px; background:var(--secondary-color); color:#fff; border:none; border-radius:6px }
+
+/* Fractional star styling used by the reviews component */
+.star-row { position: relative; display: inline-block; line-height: 1 }
+.stars-empty { color: #ddd }
+.stars-filled { position: absolute; left: 0; top: 0; overflow: hidden; white-space: nowrap; color: #f5b50a }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import './Reviews.css'
 
 function StarRating({ value = 0, size = '1rem' }) {
   const pct = Math.max(0, Math.min(5, Number(value) || 0)) / 5 * 100

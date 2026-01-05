@@ -10,7 +10,9 @@ import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
 import ProfilRouter from "./pages/ProfilRouter.jsx";
-//u linije 19 sam stavila ProfilVlasnik umjesto profile kad sam gledala to svoje
+import UlogiranAdmin from "./pages/UlogiranAdmin.jsx";
+import Korisnici from "./pages/Korisnici.jsx";
+import Clanarina from "./pages/Clanarina.jsx";
 function App() {
   return (
     <>
@@ -23,6 +25,9 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />
           <Route path="/:idkorisnik/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
+          <Route path="/admin" element={<UlogiranAdmin />} />
+          <Route path="/korisnici" element={<Korisnici />} />
+          <Route path="/clanarina" element={<Clanarina />} />
         </Routes>
       </BrowserRouter>
     </>

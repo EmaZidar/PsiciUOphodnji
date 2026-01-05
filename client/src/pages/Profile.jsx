@@ -3,7 +3,7 @@ import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import Reviews from '../components/Reviews';
 import './Profile.css';
-
+//skroz na dnu returna treba dodat <Footer/> ako ce ovo bit finalna stranica za setaca
 export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -261,7 +261,6 @@ export default function Profile() {
         </div>
       )}
 
-      <Footer />
     </>
   );
 }

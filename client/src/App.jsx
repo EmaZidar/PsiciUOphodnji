@@ -9,6 +9,8 @@ import Rezervacija from "./pages/Rezervacija.jsx";
 import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
+import ProfilVlasnik from "./pages/ProfilVlasnik.jsx";
+//u linije 19 sam stavila ProfilVlasnik umjesto profile kad sam gledala to svoje
 function App() {
   return (
     <>
@@ -16,7 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/main" element={<HomeUlogiran />} />
-          <Route path="/profil" element={<Profile />} />
+          <Route path="/profil" element={<Profile />} />  
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />

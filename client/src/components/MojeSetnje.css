@@ -1,0 +1,27 @@
+
+
+.sveSetnje{
+    display:flex;
+    flex-direction: row;
+}
+
+.basSveSetnje{
+    display:flex;
+    flex-direction: column;
+}
+
+.jednaSetnja{
+    
+  background: white;
+  padding: 30px;
+  margin: 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-3d);
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.jednaSetnja:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}

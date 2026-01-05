@@ -1,0 +1,23 @@
+/* Appointments styles extracted from Profile.css */
+.appointments-panel { margin-top: 20px; background: linear-gradient(180deg,#fff,#fbfdff); padding:16px; border-radius:10px; box-shadow:0 6px 18px rgba(20,40,80,0.04) }
+.appointments-actions { margin-bottom:12px }
+.appointments-list { display:flex; flex-direction:column; gap:8px }
+.appointment-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #f0f4fb; border-radius:8px; background:white }
+.appointment-item.editing { border-color: #2c7be5; box-shadow: 0 6px 20px rgba(44,123,229,0.10); }
+.appointment-main { display:flex; flex-direction:column }
+.appointment-date { font-weight:600 }
+.appointment-meta { color:var(--text-light); font-size:0.95rem }
+.appointment-notes { margin-top:6px; color:#243b55; font-size:0.94rem }
+.appointment-meta { display:flex; gap:8px; align-items:center }
+.type-pill{ background: rgba(44,123,229,0.1); color:#2c7be5; padding:4px 8px; border-radius:999px; font-weight:600; font-size:0.88rem }
+.duration-pill{ background: rgba(15,23,36,0.04); color:#0f1724; padding:4px 8px; border-radius:999px; font-size:0.88rem }
+.price-pill{ background: linear-gradient(90deg,#e6f0ff,#d9ecff); color:#2c7be5; padding:6px 10px; border-radius:8px; font-weight:700 }
+.appointment-controls .link { margin-left:8px }
+.appointment-edit label { display:block; margin-bottom:8px }
+.appointment-edit input, .appointment-edit select, .appointment-edit textarea { width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px }
+.editor-actions { display:flex; gap:8px; margin-top:8px }
+.appointment-item.editing .appointment-edit { border:1px solid rgba(44,123,229,0.08); padding:8px; border-radius:6px; background: linear-gradient(180deg,#fff,#fbfdff); }
+.btn { padding:8px 12px; border-radius:8px; background:var(--secondary-color); color:white; border:none }
+.btn.ghost { background:transparent; color:var(--primary-color); border:1px solid var(--border-color) }
+.link { background:transparent; border:none; color:var(--secondary-color); cursor:pointer }
+.link.danger { color: #c0392b }

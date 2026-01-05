@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
-import './Profile.css';
+import './ProfilVlasnik.css';
 import Profile from './Profile';
 import Psi from '../components/Psi';
 import MojeSetnje from '../components/MojeSetnje';
-import './ProfilVlasnik.css';
 
 
 export default function ProfilVlasnik(){

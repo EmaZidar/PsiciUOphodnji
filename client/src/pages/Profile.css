@@ -395,8 +395,3 @@
     width: 100%;
   }
 }
-
-/* Reviews and Appointments styles moved to component CSS files:
-   - client/src/components/Reviews.css
-   - client/src/components/Appointments.css
-   This keeps page-wide CSS focused on layout. */

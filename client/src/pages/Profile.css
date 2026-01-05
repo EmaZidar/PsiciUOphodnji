@@ -41,6 +41,9 @@
   align-items: start;
 }
 
+/* ensure rows size to their content to avoid visual overlap when elements shift */
+.profile-container { grid-auto-rows: minmax(min-content, auto); }
+
 @media (max-width: 768px) {
   .profile-container {
     grid-template-columns: 1fr;
@@ -62,10 +65,11 @@
   text-align: center;
   position: relative;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  z-index: 2;
 }
 
 .profile-avatar-wrapper:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: 0 10px 26px rgba(20,40,80,0.12);
 }
 
@@ -398,7 +402,9 @@
   padding: 22px;
   border-radius: 12px;
   box-shadow: var(--shadow-md);
-  margin-top: 24px;
+  margin-top: 40px;
+  position: relative;
+  z-index: 1;
 }
 
 .reviews-title {

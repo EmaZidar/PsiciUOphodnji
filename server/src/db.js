@@ -11,7 +11,7 @@ const pool = new Pool({
     },
 });
 
-export async function findUserByEmail(email) {
+export async function getUserByEmail(email) {
     const res = await pool.query("SELECT * FROM korisnik WHERE email = $1", [
         email,
     ]);
@@ -101,6 +101,14 @@ export async function getUserById(idKorisnik) {
 // export async function updateUserProfileImage(userId, imagePath) {
 //     // implementacija...
 // }
+
+export async function deleteUserById(idKorisnik) {
+    const res = await pool.query(
+        "DELETE FROM korisnik WHERE idKorisnik = $1 RETURNING *",
+        [idKorisnik]
+    );
+    return res.rows[0];
+}
 
 export async function testConnection() {
     try {

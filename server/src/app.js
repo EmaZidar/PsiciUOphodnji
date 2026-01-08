@@ -140,7 +140,7 @@ app.get("/google/callback", async (req, res) => {
 
         req.session.user = { email: email, name: name };
 
-        const existingUser = await db.findUserByEmail(email);
+        const existingUser = await db.getUserByEmail(email);
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
 
         if (!existingUser) {
@@ -172,13 +172,6 @@ app.post('/api/register', (req, res) => {
     return
   }
   let requestForm = req.body
-  /*try {
-    requestForm = JSON.parse(req.body)
-  } catch (syntaxError) {
-    console.log('Syntax error in form data: %s', req.body)
-    res.sendStatus(400).send('Syntax error in form data')
-    return
-  }*/
 
   const isSetac = requestForm.uloga === "setac"
   if (!isSetac && requestForm.uloga !== "vlasnik") {
@@ -214,7 +207,7 @@ app.get('/api/me', async (req, res) => {
         }
 
         const sessionUser = req.session.user;
-        const dbUser = await db.findUserByEmail(sessionUser.email);
+        const dbUser = await db.getUserByEmail(sessionUser.email);
         if (!dbUser) {
             console.log('/api/me - no DB user, session:', sessionUser);
             return res.json({ session: sessionUser, user: null });
@@ -317,6 +310,29 @@ app.post('/api/reviews', (req, res) => {
 //
 // Frontend prikazuje modal s "Jeste li sigurni?" i gumbi "Da" i "Ne"
 // Nakon brisanja korisnik se preusmjerava na početnu stranicu
+app.delete('/api/delete-profile', async (req, res) => {
+    try {
+        if (!req.session?.user) {
+            return res.status(401).json({ error: 'Not authenticated' });
+        }
+        const sessionUser = req.session.user;
+        const dbUser = await db.getUserByEmail(sessionUser.email);
+        if (!dbUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const userId = dbUser.idkorisnik;
+        // Destroy session
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session:', err);
+            }
+            return res.status(200).json({ message: 'Profile deleted successfully' });
+        });
+    } catch (err) {
+        console.error('Error in /api/delete-profile:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

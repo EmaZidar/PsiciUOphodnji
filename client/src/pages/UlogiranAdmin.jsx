@@ -3,6 +3,7 @@ import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import './UlogiranAdmin.css';
 
+
 export default function UlogiranAdmin({ user }) {
   return (
     <>
@@ -19,7 +20,7 @@ export default function UlogiranAdmin({ user }) {
               <h2>Korisnici</h2>
               <p>Pregled svih vlasnika i šetača te mogućnost brisanja korisnika.</p>
               <form action="/korisnici">
-                  <input type="submit" value="Upravljaj korisnicima" className="admin-btn"/> 
+                  <input type="submit" value="Upravljaj korisnicima" className="admin-btn"/>
               </form>
             </div>
 
@@ -27,7 +28,7 @@ export default function UlogiranAdmin({ user }) {
               <h2>Članarina</h2>
               <p>Pregledajte trenutnu cijenu mjesečne i godišnje članarine koju šetači plaćaju.</p>
               <form action="/clanarina">
-                  <input type="submit" value="Upravljaj članarinom" className="admin-btn"/> 
+                  <input type="submit" value="Upravljaj članarinom" className="admin-btn"/>
               </form>
             </div>
 

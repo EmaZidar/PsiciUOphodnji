@@ -239,36 +239,6 @@ app.get('/api/reviews', (req, res) => {
     }
 });
 
-// POST /api/reviews
-app.post('/api/reviews', (req, res) => {
-    try {
-        const { user, rating, text } = req.body || {};
-        if (!user || typeof rating === 'undefined') return res.status(400).json({ error: 'Missing fields' });
-        const num = Number(rating);
-        if (Number.isNaN(num) || num < 0 || num > 5) return res.status(400).json({ error: 'rating out of range' });
-        if (text && String(text).length > 2000) return res.status(400).json({ error: 'text too long' });
-
-        // derive author from session if available
-        const authorId = req.session?.user?.idkorisnik || req.session?.user?.id || null;
-        const authorName = req.session?.user?.imeKorisnik || req.session?.user?.name || req.session?.user?.email || 'Anon';
-
-        const newReview = {
-            _id: 'r' + Date.now() + '-' + Math.floor(Math.random()*10000),
-            user: String(user),
-            author: authorId,
-            authorName,
-            rating: num,
-            text: text || '',
-            createdAt: new Date().toISOString()
-        };
-
-        _inMemoryReviews.push(newReview);
-        return res.status(201).json(newReview);
-    } catch (e) {
-        console.error('POST /api/reviews error', e);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
 
 // TODO: Implementirati endpoint za upload profilne slike
 // POST /api/upload-profile-image

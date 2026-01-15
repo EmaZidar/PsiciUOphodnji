@@ -46,7 +46,7 @@ export default function UlogiranSetac({ user }) {
           </div>
 
           <aside className="dashboard-side">
-            {/* sidebar widgets (calendar, stats) can go here */}
+            {}
           </aside>
         </div>
       </main>

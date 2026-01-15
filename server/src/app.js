@@ -5,20 +5,16 @@ import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
-import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
-import fs from "fs";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 db.testConnection();
 
 const app = express();
 app.use(express.json());
 
-
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 
 app.use(
     session({
@@ -280,22 +276,6 @@ app.delete('/api/setnje/:id', async (req, res) => {
 
 */
 
-// Simple in-memory reviews store for local development.
-// Production should use a DB model and proper controllers (see above TODO).
-const _inMemoryReviews = [];
-
-// GET /api/reviews?user=<id>
-app.get('/api/reviews', (req, res) => {
-    try {
-        const userId = req.query.user;
-        if (!userId) return res.json({ reviews: [] });
-        const list = _inMemoryReviews.filter(r => String(r.user) === String(userId)).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
-        return res.json({ reviews: list });
-    } catch (e) {
-        console.error('GET /api/reviews error', e);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-});
 
 
 // TODO: Implementirati endpoint za upload profilne slike
@@ -308,18 +288,6 @@ app.get('/api/reviews', (req, res) => {
 // Frontend je spreman i čeka ovaj endpoint
 // Multer je već konfiguriran na serveru
 
-// TODO: Implementirati endpoint za brisanje profila
-// DELETE /api/delete-profile
-// - Provjeri je li korisnik ulogiran (req.session?.user)
-// - Dohvati korisnika iz baze po email-u
-// - Obriši sve podatke povezane s tim korisnikom:
-//   * Obriši iz korisnik tablice
-//   * Obriši iz setac/vlasnik/administrator tablica (ovisno o ulozi)
-// - Uništi sesiju (req.session.destroy())
-// - Vrati 200 sa porukom ili 500 ako greška
-//
-// Frontend prikazuje modal s "Jeste li sigurni?" i gumbi "Da" i "Ne"
-// Nakon brisanja korisnik se preusmjerava na početnu stranicu
 app.delete('/api/delete-profile', async (req, res) => {
     try {
         if (!req.session?.user) {

@@ -315,19 +315,29 @@ app.delete('/api/delete-profile', async (req, res) => {
         if (!req.session?.user) {
             return res.status(401).json({ error: 'Not authenticated' });
         }
+        
         const sessionUser = req.session.user;
         const dbUser = await db.getUserByEmail(sessionUser.email);
         if (!dbUser) {
             return res.status(404).json({ error: 'User not found' });
         }
+        
         const userId = dbUser.idkorisnik;
-        // Destroy session
+        console.log('Deleting user with ID:', userId);
+        
+        // OBRIŠI KORISNIKA
+        await db.deleteUserWithId(userId);
+        console.log('User deleted successfully');
+        
+        // OBRIŠI SESIJU
         req.session.destroy((err) => {
             if (err) {
                 console.error('Error destroying session:', err);
+                return res.status(500).json({ error: 'Failed to destroy session' });
             }
-            return res.status(200).json({ message: 'Profile deleted successfully' });
+            res.json({ message: 'Profile deleted successfully' });
         });
+        
     } catch (err) {
         console.error('Error in /api/delete-profile:', err);
         res.status(500).json({ error: 'Internal server error' });

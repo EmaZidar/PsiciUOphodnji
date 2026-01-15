@@ -92,6 +92,20 @@ export async function getUserById(idKorisnik) {
     return res.rows[0];
 }
 
+export async function getAllSetaci() {
+    const res = await pool.query(
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja,  
+                COALESCE(MIN(st.cijena), 0) AS cijena,
+                COALESCE(AVG(r.ocjena), 0) AS ocjena
+         FROM korisnik k
+         JOIN setac s ON k.idKorisnik = s.idKorisnik
+         LEFT JOIN setnja st ON s.idKorisnik = st.idSetac
+         LEFT JOIN recenzija r ON s.idKorisnik = r.idSetac
+         GROUP BY k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja`   
+    );
+    return res.rows;
+}
+
 // TODO: Implementirati sprema profilne slike
 // Funkcija treba:
 // 1. Provjeri je li korisnik setac ili vlasnik
@@ -102,7 +116,7 @@ export async function getUserById(idKorisnik) {
 //     // implementacija...
 // }
 
-export async function deleteUserById(idKorisnik) {
+export async function deleteUserWithId(idKorisnik) {
     const res = await pool.query(
         "DELETE FROM korisnik WHERE idKorisnik = $1 RETURNING *",
         [idKorisnik]

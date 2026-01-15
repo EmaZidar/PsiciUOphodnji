@@ -165,6 +165,16 @@ app.post('/api/register', (req, res) => {
   res.sendStatus(200)
 })
 
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await db.getAllUsers();
+        res.status(200).json(users);
+    } catch (err) {
+        console.error('Error in /api/users:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.get('/api/me', async (req, res) => {
     try {
         if (!req.session?.user) {

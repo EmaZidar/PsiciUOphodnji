@@ -114,6 +114,13 @@ export async function getVlasnikWithId(idKorisnik) {
     return res.rows[0];
 }
 
+export async function getAllUsers() {
+    const res = await pool.query(
+        `SELECT * FROM korisnik`
+    );
+    return res.rows;
+}
+
 export async function getDostupneSetnjeSetaca(idKorisnik) {
     const res = await pool.query(
         `SELECT * FROM setnja WHERE idKorisnik = $1 AND dostupnost = TRUE`,

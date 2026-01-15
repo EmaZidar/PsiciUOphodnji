@@ -11,10 +11,15 @@ db.testConnection();
 const app = express();
 app.use(express.json());
 
+// Trust Render's reverse proxy for secure cookies
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://psiciuophodnji-1-zrvs.onrender.com'
+        process.env.CLIENT_URL
     ],
     credentials: true
 }));

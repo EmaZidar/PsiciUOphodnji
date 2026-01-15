@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Forward OAuth start and callback routes to the backend during development
+      // Forward OAuth start and callback routes to the backend
       '/login/auth': {
         target: 'http://localhost:8000',
         changeOrigin: true,
@@ -16,7 +16,7 @@ export default defineConfig({
         changeOrigin: true,
       },
       // Forward any API requests to the backend as well
-      '/api/register': {
+      '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
       },

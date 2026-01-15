@@ -25,38 +25,93 @@ const [loading, setLoading] = useState(true);
     
  // const njegoviPsi = []; // tu nekako s bekenda dobit te podatke
 const firstName =
-  user?.imeKorisnik ||
-  user?.imekorisnik ||
-  user?.ime ||
-  user?.name ||
-  user?.given_name ||
-  '';
+  user?.imeKorisnik ||'';
+const idvlasnika = user?.idKorisnik||'';
 const njegoviPsi=user?.Psi || [{ime: "imamIme"}, { ime: "Rex", pasmina: "Mješanac", dob: 3, energija: "visoka" },
   { ime: "Max" }]
+
+
+  const [prikaziFormu, setPrikaziFormu] = useState(false);
+
+
+  const [pas, setPas] = useState({
+  ime: "",
+  pasmina: "",
+  dob: "",
+  energija: ""
+});
+
+  function spremi(e) {
+  setPas({
+    ...pas,
+    [e.target.name]: e.target.value
+  });
+}
+
+
+function handleSubmit(e) {
+  e.preventDefault();
+  const kojiPas={...pas, idKorisnik: idKorisnik}
+  fetch("http://localhost:3000/psi", {   //TODO link je random stavi pravi a ne localhost3000
+    method: "POST",
+    headers: {
+    "Content-Type": "application/json"
+  },
+    body: JSON.stringify(kojiPas)
+  });
+  setPrikaziFormu(false);
+}
+
+function odustani(){
+  setPrikaziFormu(false)
+  setPas({ime: "", pasmina:"", energija:"", dob:""});
+}
+
+function resetiraj(e){
+  e.preventDefault();
+  setPas({ime: "", pasmina:"", energija:"", dob:""});
+}
+
+function izbrisi(){
+  fetch("http://localhost:3000/psi", {   //TODO link je random stavi pravi a ne localhost3000
+    method: "POST",
+    body: JSON.stringify(pas)
+  });
+}
+
+
 
   return (
     <div className="sviPsi">
         {njegoviPsi.map((pas)=> (<div className="jedanPas"> 
-            <h3 className="imePsa">{pas.ime || "nemam" }</h3>
-            <p>Pasmina:{pas.pasmina || "nemam"}</p>
-            <p>Godine: {pas.dob|| "nemam"}</p>
-            <p>Razina energije: {pas.energija|| "nemam"}</p>
-            <button>Izbriši psa</button>
+            <h3 className="imePsa">{pas.ime || "-" }</h3>
+            <p>Pasmina:{pas.pasmina || "-"}</p>
+            <p>Godine: {pas.dob|| "-"}</p>
+            <p>Razina energije: {pas.energija|| "-"}</p>
+            <button onClick={izbrisi}>Izbriši psa</button>                       
 
          </div>))}
-         <form className="dodajPsa">
-            <label htmlFor="ime">Ime psa:</label>
-            <input type="text" id="ime" name="ime"></input><br></br>
-            <label for="pasmina">Pasmina:</label>
-            <input type="text" id="pasmina" name="pasmina"></input><br></br>
+         <div className="dodajP">
+                    <button onClick={() => setPrikaziFormu(true)}>+</button>
+         </div>
+         {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
+            <label for="ime">Ime psa:</label>
+            <input type="text" id="ime" name="ime"   value={pas.ime}  onChange={spremi}></input><br></br>
+            <label for="pasmina">Pasmina:      </label>
+            <input type="text" id="pasmina" name="pasmina" value={pas.pasmina}  onChange={spremi}></input><br></br>
             <label for="dob">Godine:</label>
-            <input type="number" id="dob" name="dob"></input><br></br>
-            <label for="energija">Razina energije:</label>
-            <input type="text" id="energija" name="energija"></input><br></br>
-            <button type="submit" value="Submit">Dodaj psa</button>
-            <button type="reset" value="Reset">Resetiraj</button>
-            <h1>{firstName || "NEMA IMENA"}</h1>
-        </form>
+            <input type="number" id="dob" name="dob" value={pas.dob}  onChange={spremi}></input><br></br>
+            <label for="energija">Razina energije:    </label>
+            <input type="text" id="energija" name="energija"   value={pas.energija}  onChange={spremi}></input><br></br>
+            <button type="submit" >Dodaj psa</button>
+            <button onClick={resetiraj} >Resetiraj</button>
+            <button onClick={odustani} >Odustani</button>
+
+
+
+        </form>)}
+        
+
     </div>    
     );
 }

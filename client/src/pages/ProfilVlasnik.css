@@ -39,7 +39,6 @@
     letter-spacing: -0.5px;
   }
 
-  /* ====== Profile Container ====== */
   .profile-container {
     width: 100%;
     display: grid;
@@ -48,10 +47,7 @@
     align-items: start;
   }
 
-  /* ensure rows size to their content to avoid visual overlap when elements shift */
   .profile-container { grid-auto-rows: minmax(min-content, auto); }
-
-  /* ====== Avatar Section ====== */
 
   .profile-avatar-wrapper {
     background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
@@ -83,7 +79,6 @@
     transform: scale(1.05);
   }
 
-  /* ====== Image Upload Buttons ====== */
   .profile-image-upload {
     display: flex;
     flex-direction: column;
@@ -159,7 +154,6 @@
     cursor: not-allowed;
   }
 
-  /* ====== Profile Details ====== */
   .profile-details {
     background: linear-gradient(180deg, #ffffff 0%, #fcfeff 100%);
     padding: 36px;
@@ -173,7 +167,6 @@
     box-shadow: 0 14px 34px rgba(20, 40, 80, 0.1);
   }
 
-  /* ====== Info Box ====== */
   .profile-info-box {
     display: flex;
     flex-direction: column;
@@ -212,7 +205,6 @@
     word-break: break-word;
   }
 
-  /* ====== Delete Button ====== */
   .profile-delete-section {
     margin-top: 30px;
     padding-top: 30px;
@@ -248,7 +240,6 @@
   transform: translateY(0);
 }
 
-/* ====== Modal Overlay ====== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -310,7 +301,6 @@
   margin-bottom: 30px;
 }
 
-/* ====== Modal Buttons ====== */
 .modal-buttons {
   display: flex;
   gap: 12px;
@@ -356,7 +346,6 @@
   transform: none;
 }
 
-/* ====== Loading & Error States ====== */
 .profile-main p {
   text-align: center;
   color: var(--text-light);
@@ -373,7 +362,6 @@
   border-left: 4px solid var(--accent-color);
 }
 
-/* ====== Responsive Design ====== */
 @media (max-width: 640px) {
   .profile-main {
     padding: 40px 15px !important;

@@ -19,12 +19,16 @@ export default function Clanarina() {
           
             <div className="upravljanje">    
               <h2>Trenutna mjesečna članarina: {mjclanarina}</h2>
-              <button className='admin-btn'>Promijeni</button>
+              <form action="/clanarina/mjesecna">
+                <input type="submit" value="Promijeni" className='admin-btn' />
+              </form>
             </div>
 
             <div className="upravljanje">    
               <h2>Trenutna godišnja članarina: {godclanarina}</h2>
-              <button className='admin-btn'>Promijeni</button>
+              <form action="/clanarina/godisnja">
+                <input type="submit" value="Promijeni" className='admin-btn' />
+              </form>
             </div>
 
           </div>

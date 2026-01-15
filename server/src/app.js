@@ -140,7 +140,7 @@ app.get("/google/callback", async (req, res) => {
 
         req.session.user = { email: email, name: name };
 
-        const existingUser = await db.getUserByEmail(email);
+        const existingUser = await db.getUserWithEmail(email);
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
 
         if (!existingUser) {
@@ -207,7 +207,7 @@ app.get('/api/me', async (req, res) => {
         }
 
         const sessionUser = req.session.user;
-        const dbUser = await db.getUserByEmail(sessionUser.email);
+        const dbUser = await db.getUserWithEmail(sessionUser.email);
         if (!dbUser) {
             console.log('/api/me - no DB user, session:', sessionUser);
             return res.json({ session: sessionUser, user: null });
@@ -241,6 +241,64 @@ app.get('/api/setaci', async (req, res) => {
         res.status(200).json(setaci)
     } catch (err) {
         console.error('Error in /api/setaci:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/setnje/:idkorisnik', async (req, res) => {
+    try {
+        const idkorisnik = parseInt(req.params.idkorisnik, 10);
+        if (!idkorisnik) {
+            return res.status(400).json({ error: 'Invalid korisnik ID' });
+        }
+        const setac = await db.getSetacWithId(idkorisnik);
+        console.log('Result from getUserWithId:', setac);
+        if (!setac) {
+            return res.status(404).json({ error: 'Šetač nije pronađen' });
+        }
+        const setnje = await db.getDostupneSetnjeSetaca(idkorisnik);
+        console.log('Dostupne šetnje for setac:', setnje);
+        setac.setnje = setnje;
+        res.status(200).json({ setac });
+    } catch (err) {
+        console.error('Error in /api/setnje/:idkorisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Kreiraj novu šetnju
+app.post('/api/setnja', async (req, res) => {
+    try {
+        const { cijena, tipSetnja, trajanje, idKorisnik } = req.body;
+        const setnja = await db.createSetnja(cijena, tipSetnja, trajanje, idKorisnik);
+        res.status(201).json({ setnja });
+    } catch (err) {
+        console.error('Error creating setnja:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Ažuriraj šetnju
+app.put('/api/setnje/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const { cijena, tipsetnja, trajanje } = req.body;
+        const setnja = await db.updateSetnja(id, cijena, tipsetnja, trajanje);
+        res.json({ setnja });
+    } catch (err) {
+        console.error('Error updating setnja:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Obriši šetnju
+app.delete('/api/setnje/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        await db.deleteSetnja(id);
+        res.json({ message: 'Setnja deleted' });
+    } catch (err) {
+        console.error('Error deleting setnja:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -338,7 +396,7 @@ app.delete('/api/delete-profile', async (req, res) => {
         }
         
         const sessionUser = req.session.user;
-        const dbUser = await db.getUserByEmail(sessionUser.email);
+        const dbUser = await db.getUserWithEmail(sessionUser.email);
         if (!dbUser) {
             return res.status(404).json({ error: 'User not found' });
         }

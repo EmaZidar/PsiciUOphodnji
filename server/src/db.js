@@ -11,7 +11,7 @@ const pool = new Pool({
     },
 });
 
-export async function getUserByEmail(email) {
+export async function getUserWithEmail(email) {
     const res = await pool.query("SELECT * FROM korisnik WHERE email = $1", [
         email,
     ]);
@@ -84,12 +84,42 @@ export async function getUserWithRole(userId) {
     };
 }
 
-export async function getUserById(idKorisnik) {
+export async function getUserWithId(idKorisnik) {
     const res = await pool.query(
         "SELECT * FROM korisnik WHERE idKorisnik = $1",
         [idKorisnik]
     );
     return res.rows[0];
+}
+
+export async function getSetacWithId(idKorisnik) {
+    const res = await pool.query(
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.email, k.telefon, s.lokDjelovanja, s.tipClanarina, s.profilFoto
+            FROM korisnik k
+            JOIN setac s ON k.idKorisnik = s.idKorisnik
+            WHERE k.idKorisnik = $1`,
+        [idKorisnik]
+    );
+    return res.rows[0];
+}
+
+export async function getVlasnikWithId(idKorisnik) {
+    const res = await pool.query(
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.email, k.telefon, v.primanjeObavijesti
+            FROM korisnik k
+            JOIN vlasnik v ON k.idKorisnik = v.idKorisnik
+            WHERE k.idKorisnik = $1`,
+        [idKorisnik]
+    );
+    return res.rows[0];
+}
+
+export async function getDostupneSetnjeSetaca(idKorisnik) {
+    const res = await pool.query(
+        `SELECT * FROM setnja WHERE idKorisnik = $1 AND dostupnost = TRUE`,
+        [idKorisnik]
+    );
+    return res.rows;
 }
 
 export async function getAllSetaci() {
@@ -123,6 +153,35 @@ export async function deleteUserWithId(idKorisnik) {
         [idKorisnik]
     );
     return res.rows[0];
+}
+
+export async function createSetnja(cijena, tipSetnja, trajanje, idKorisnik) {
+    const res = await pool.query(
+        `INSERT INTO setnja (cijena, tipSetnja, trajanje, dostupnost, idKorisnik)
+         VALUES ($1, $2, $3, TRUE, $4)
+         RETURNING *`,
+        [cijena, tipSetnja, trajanje, idKorisnik]
+    );
+    return res.rows[0];
+}
+
+export async function updateSetnja(idSetnja, cijena, tipSetnja, trajanje) {
+    const res = await pool.query(
+        `UPDATE setnja 
+         SET cijena = $1, tipSetnja = $2, trajanje = $3
+         WHERE idSetnja = $4
+         RETURNING *`,
+        [cijena, tipSetnja, trajanje, idSetnja]
+    );
+    return res.rows[0];
+}
+
+export async function deleteSetnja(idSetnja) {
+    const res = await pool.query(
+        `DELETE FROM setnja WHERE idSetnja = $1`,
+        [idSetnja]
+    );
+    return res;
 }
 
 export async function testConnection() {

@@ -111,7 +111,7 @@ export default function Profile() {
   const handleDeleteProfile = async () => {
     setDeleting(true);
     try {
-      const response = await fetch('http://localhost:8000/api/delete-profile', {
+      const response = await fetch('/api/delete-profile', {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -122,7 +122,7 @@ export default function Profile() {
       }
 
       alert('Profil je uspješno obrisan. Preusmjeravamo vas na početnu stranicu...');
-      window.location.href = 'http://localhost:5173/';
+      window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
     } catch (err) {
       alert('Greška: ' + err.message);
     } finally {
@@ -150,6 +150,7 @@ export default function Profile() {
               return undefined;
             };
 
+            ///???
             const avatarFromUser =
               pick(user, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
             const avatarFromRole =

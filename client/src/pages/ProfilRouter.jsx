@@ -8,7 +8,7 @@ export default function ProfilRouter() {
 
   useEffect(() => {
     let mounted = true;
-    fetch('http://localhost:8000/api/me', { credentials: 'include' })
+    fetch('/api/me', { credentials: 'include' })
       .then((r) => {
         if (!r.ok) return null;
         return r.json();

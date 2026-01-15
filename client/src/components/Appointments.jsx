@@ -5,98 +5,150 @@ function formatDate(dt) {
   return d.toLocaleString()
 }
 
-function randomFutureDate() {
-  const now = Date.now()
-  const days = Math.floor(Math.random()*14)+1
-  const hour = 8 + Math.floor(Math.random()*9) // 8..16
-  const dt = new Date(now + days*24*60*60*1000)
-  dt.setHours(hour, 0, 0, 0)
-  return dt.toISOString()
-}
-
 export default function Appointments({ userId, userName, showHeader = true }) {
-  const key = `appointments_${userId || 'anon'}`
   const [items, setItems] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [draft, setDraft] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  useEffect(()=>{
-    try{
-      const raw = localStorage.getItem(key)
-      setItems(raw? JSON.parse(raw) : [])
-    }catch(e){ setItems([]) }
-  },[key])
+  // Dohvati šetnje iz baze
+  useEffect(() => {
+    const loadSetnje = async () => {
+      try {
+        setLoading(true)
+        console.log("Fetching setnje for userId:", userId);
+        const response = await fetch(`/api/setnje/${userId}`, {
+          method: 'GET',
+          credentials: 'include'
+        })
+        if (!response.ok) throw new Error('Ne mogu dohvatiti podatke o šetnjama');
+        const data = await response.json()
+        setItems(data?.setac?.setnje || [])
+      } catch (err) {
+        console.error('Error loading setnje:', err)
+        setItems([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    if (userId) loadSetnje()
+  }, [userId])
 
-  useEffect(()=>{
-    localStorage.setItem(key, JSON.stringify(items))
-  },[key, items])
-
+  // Dodaj novu šetnju
   const addDefault = () => {
     const newItem = {
-      id: 'a'+Date.now(),
-      date: randomFutureDate(),
-      type: 'individual',
-      price: 50,
-      duration: 60,
-      notes: ''
+      id: 'draft',
+      cijena: 50,
+      tipsetnja: 'individualna',
+      trajanje: 60
     }
-    // create a draft that is not yet persisted to the appointments list
     setDraft(newItem)
     setEditingId(newItem.id)
   }
 
-  const saveEdit = (id, patch) => {
-    if (draft && draft.id === id) {
-      // persist draft as a real item
-      const saved = { ...draft, ...patch }
-      setItems(prev => [saved, ...prev])
-      setDraft(null)
+  // Spremi šetnju u bazu
+  const saveEdit = async (id, patch) => {
+    try {
+      if (draft && draft.id === id) {
+        // Nova šetnja - POST
+        const response = await fetch('/api/setnja', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            cijena: patch.cijena,
+            tipSetnja: patch.tipsetnja,
+            trajanje: patch.trajanje,
+            idKorisnik: userId
+          })
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setItems(prev => [data.setnja, ...prev])
+        }
+        setDraft(null)
+        setEditingId(null)
+        return
+      }
+      
+      // Ažuriraj postojeću šetnju - PUT
+      const response = await fetch(`/api/setnje/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(patch)
+      })
+      
+      if (response.ok) {
+        setItems(prev => prev.map(i => i.idsetnja === id ? { ...i, ...patch } : i))
+      }
       setEditingId(null)
-      return
+    } catch (err) {
+      console.error('Error saving setnja:', err)
     }
-    setItems(prev=> prev.map(i=> i.id===id ? { ...i, ...patch } : i))
-    setEditingId(null)
   }
 
-  const remove = (id) => {
+  // Obriši šetnju iz baze
+  const remove = async (id) => {
     if (!window.confirm('Obrisati termin?')) return
-    setItems(prev=> prev.filter(i=> i.id!==id))
+    
+    try {
+      const response = await fetch(`/api/setnje/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      
+      if (response.ok) {
+        setItems(prev => prev.filter(i => i.idsetnja !== id))
+      }
+    } catch (err) {
+      console.error('Error deleting setnja:', err)
+    }
   }
+
+  if (loading) return <div>Učitavanje...</div>
 
   return (
     <div className="appointments-panel">
-      {showHeader && <h3>Dobrodošli{userName? ', '+userName : ''}!</h3>}
+      {showHeader && <h3>Dobrodošli{userName ? ', ' + userName : ''}!</h3>}
       <div className="appointments-actions">
         <button onClick={addDefault} className="btn">Dodaj termin šetnje</button>
       </div>
 
       <div className="appointments-list">
-        {draft && editingId===draft.id && (
-          <div className={`appointment-item editing`}>
-            <AppointmentEditor item={draft} onCancel={()=>{ setDraft(null); setEditingId(null) }} onSave={(patch)=>saveEdit(draft.id, patch)} />
+        {draft && editingId === draft.id && (
+          <div className="appointment-item editing">
+            <AppointmentEditor 
+              item={draft} 
+              onCancel={() => { setDraft(null); setEditingId(null) }} 
+              onSave={(patch) => saveEdit(draft.id, patch)} 
+            />
           </div>
         )}
 
-        {items.length===0 && !draft && <div className="muted">Nema termina. Dodajte prvi termin.</div>}
+        {items.length === 0 && !draft && <div className="muted">Nema termina. Dodajte prvi termin.</div>}
 
-        {items.map(item=> (
-          <div key={item.id} className={`appointment-item ${editingId===item.id ? 'editing' : ''}`}>
-            {editingId===item.id ? (
-              <AppointmentEditor item={item} onCancel={()=>setEditingId(null)} onSave={(patch)=>saveEdit(item.id, patch)} />
+        {items.map(item => (
+          <div key={item.idsetnja} className={`appointment-item ${editingId === item.idsetnja ? 'editing' : ''}`}>
+            {editingId === item.idsetnja ? (
+              <AppointmentEditor 
+                item={item} 
+                onCancel={() => setEditingId(null)} 
+                onSave={(patch) => saveEdit(item.idsetnja, patch)} 
+              />
             ) : (
               <>
                 <div className="appointment-main">
-                  <div className="appointment-date">{formatDate(item.date)}</div>
                   <div className="appointment-meta">
-                    <span className="type-pill">{item.type === 'group' ? 'Grupna' : 'Individualna'}</span>
-                    <span className="duration-pill">{item.duration} min</span>
-                    <span className="price-pill">€{item.price}</span>
+                    <span className="type-pill">{item.tipsetnja === 'grupna' ? 'Grupna' : 'Individualna'}</span>
+                    <span className="duration-pill">{item.trajanje} min</span>
+                    <span className="price-pill">€{item.cijena}</span>
                   </div>
-                  {item.notes ? <div className="appointment-notes">{item.notes}</div> : null}
                 </div>
                 <div className="appointment-controls">
-                  <button onClick={()=>setEditingId(item.id)} className="link">Uredi</button>
-                  <button onClick={()=>remove(item.id)} className="link danger">Obriši</button>
+                  <button onClick={() => setEditingId(item.idsetnja)} className="link">Uredi</button>
+                  <button onClick={() => remove(item.idsetnja)} className="link danger">Obriši</button>
                 </div>
               </>
             )}
@@ -107,46 +159,31 @@ export default function Appointments({ userId, userName, showHeader = true }) {
   )
 }
 
-function AppointmentEditor({ item, onSave, onCancel }){
-  const [form, setForm] = useState({ date: item.date, type: item.type, price: item.price, duration: item.duration, notes: item.notes })
+function AppointmentEditor({ item, onSave, onCancel }) {
+  const [form, setForm] = useState({ 
+    cijena: item.cijena, 
+    tipsetnja: item.tipsetnja, 
+    trajanje: item.trajanje 
+  })
+  
   return (
     <div className="appointment-edit">
-      <label>Datum i vrijeme
-        <input type="datetime-local" value={toLocal(form.date)} onChange={e=>setForm(s=>({...s, date: e.target.value}))} />
-      </label>
       <label>Tip
-        <select value={form.type} onChange={e=>setForm(s=>({...s, type: e.target.value}))}>
-          <option value="individual">Individualna</option>
-          <option value="group">Grupna</option>
+        <select value={form.tipsetnja} onChange={e => setForm(s => ({ ...s, tipsetnja: e.target.value }))}>
+          <option value="individualna">Individualna</option>
+          <option value="grupna">Grupna</option>
         </select>
       </label>
       <label>Cijena (€)
-        <input type="number" value={form.price} onChange={e=>setForm(s=>({...s, price: Number(e.target.value)}))} />
+        <input type="number" value={form.cijena} onChange={e => setForm(s => ({ ...s, cijena: Number(e.target.value) }))} />
       </label>
       <label>Trajanje (min)
-        <input type="number" value={form.duration} onChange={e=>setForm(s=>({...s, duration: Number(e.target.value)}))} />
+        <input type="number" value={form.trajanje} onChange={e => setForm(s => ({ ...s, trajanje: Number(e.target.value) }))} />
       </label>
       <div className="editor-actions">
-        <button onClick={()=>onSave({ ...form, date: fromLocal(form.date) })} className="btn">Spremi</button>
+        <button onClick={() => onSave(form)} className="btn">Spremi</button>
         <button onClick={onCancel} className="btn ghost">Otkaži</button>
       </div>
     </div>
   )
-}
-
-function toLocal(iso){
-  // convert ISO to input datetime-local format
-  const d = new Date(iso)
-  const pad = (n)=> String(n).padStart(2,'0')
-  const yyyy = d.getFullYear()
-  const mm = pad(d.getMonth()+1)
-  const dd = pad(d.getDate())
-  const hh = pad(d.getHours())
-  const min = pad(d.getMinutes())
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`
-}
-function fromLocal(val){
-  // val is like 2025-12-20T10:00
-  const d = new Date(val)
-  return d.toISOString()
 }

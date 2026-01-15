@@ -23,6 +23,7 @@ export default function DostupneSetnje() {
          try {
             setLoading(true);
             setError(null);
+            console.log("Fetching setac data for idkorisnik:", idkorisnik);
             const response = await fetch(`/api/setnje/${idkorisnik}`, {
                method: 'GET',
                credentials: 'include',

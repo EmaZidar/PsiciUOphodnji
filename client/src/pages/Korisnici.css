@@ -1,0 +1,78 @@
+
+
+.main {
+  min-height: 100vh;
+  padding: 60px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-container {
+  width: 100%;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 60px;
+  color: rgb(0, 0, 0);
+}
+
+
+.admin-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.upravljanje {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 5px solid #3498db;
+}
+
+.upravljanje:hover {
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.25);
+  transform: translateY(-5px);
+}
+
+
+.upravljanje h2 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.upravljanje p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.admin-btn {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.admin-btn:hover {
+  box-shadow: 0 6px 25px rgba(52, 152, 219, 0.6);
+}
+

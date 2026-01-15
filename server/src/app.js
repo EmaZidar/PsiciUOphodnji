@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: env.process.CLIENT_URL || "http://localhost:5173",
     credentials: true
 }));
 
@@ -34,7 +34,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-const GOOGLE_CALLBACK_URL = "http://localhost:8000/google/callback";
+const GOOGLE_CALLBACK_URL = `${process.env.CLIENT_URL || "http://localhost:5173"}/google/callback`;
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
@@ -323,7 +323,7 @@ app.delete('/api/delete-profile', async (req, res) => {
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {
     app.listen(port, () => {
-        console.log(`Server running on port: http://localhost:${port}`);
+        console.log(`Server running on port: ${port}`);
     });
 };
 

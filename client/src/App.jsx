@@ -13,6 +13,8 @@ import ProfilRouter from "./pages/ProfilRouter.jsx";
 import UlogiranAdmin from "./pages/UlogiranAdmin.jsx";
 import Korisnici from "./pages/Korisnici.jsx";
 import Clanarina from "./pages/Clanarina.jsx";
+import MjesecnaClanarina from "./pages/MjesecnaClanarina.jsx";
+import GodisnjaClanarina from "./pages/GodisnjaClanarina.jsx";
 function App() {
   return (
     <>
@@ -28,6 +30,8 @@ function App() {
           <Route path="/admin" element={<UlogiranAdmin />} />
           <Route path="/korisnici" element={<Korisnici />} />
           <Route path="/clanarina" element={<Clanarina />} />
+          <Route path="/clanarina/mjesecna" element={<MjesecnaClanarina />} />
+          <Route path="/clanarina/godisnja" element={<GodisnjaClanarina />} />
         </Routes>
       </BrowserRouter>
     </>

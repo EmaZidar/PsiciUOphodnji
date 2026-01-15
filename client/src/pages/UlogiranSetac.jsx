@@ -4,6 +4,8 @@ import Footer from '../components/Footer';
 import './UlogiranSetac.css';
 import Appointments from '../components/Appointments';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function UlogiranSetac({ user }) {
   const [remoteUser, setRemoteUser] = useState(user || null);
   const [loading, setLoading] = useState(false);
@@ -12,7 +14,7 @@ export default function UlogiranSetac({ user }) {
     if (user) return; 
     let mounted = true;
     setLoading(true);
-    fetch('/api/me', { credentials: 'include' })
+    fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' })
       .then(r => (r.ok ? r.json() : Promise.reject()))
       .then(data => {
         if (!mounted) return;

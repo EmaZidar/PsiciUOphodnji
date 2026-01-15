@@ -5,6 +5,8 @@ import UlogiranVlasnik from './UlogiranVlasnik';
 import UlogiranSetac from './UlogiranSetac';
 import UlogiranAdmin from './UlogiranAdmin';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function HomeUlogiran() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ export default function HomeUlogiran() {
 
   useEffect(() => {
     // Fetch user info from server
-    const API = 'http://localhost:8000/api/me';
+    const API = `${BACKEND_URL}/api/me`;
     fetch(API, { credentials: 'include' })
       .then((r) => {
         if (!r.ok) throw new Error('Not authenticated');

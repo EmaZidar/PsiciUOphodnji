@@ -3,6 +3,10 @@ import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import Reviews from '../components/Reviews';
 import './Profile.css';
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
+
 //skroz na dnu returna treba dodat <Footer/> ako ce ovo bit finalna stranica za setaca
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -17,7 +21,7 @@ export default function Profile() {
   const [ratingCount, setRatingCount] = useState(0);
 
   useEffect(() => {
-    const API = 'http://localhost:8000/api/me';
+    const API = `${BACKEND_URL}/api/me`;
     fetch(API, { credentials: 'include' })
       .then((r) => {
         if (!r.ok) throw new Error('Not authenticated');
@@ -41,7 +45,7 @@ export default function Profile() {
     async function loadRating() {
       try {
         if (!user || !(user._id || user.id)) return
-        const res = await fetch(`/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
+        const res = await fetch(`${BACKEND_URL}/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
         if (!res.ok) throw new Error('no reviews')
         const data = await res.json()
         const list = data.reviews || data || []
@@ -81,7 +85,7 @@ export default function Profile() {
     formData.append('profileImage', selectedImage);
 
     try {
-      const response = await fetch('http://localhost:8000/api/upload-profile-image', {
+      const response = await fetch(`${BACKEND_URL}/api/upload-profile-image`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -93,7 +97,7 @@ export default function Profile() {
       if (data?.user) {
         setUser(data.user);
       } else {
-        const userResponse = await fetch('http://localhost:8000/api/me', { credentials: 'include' });
+        const userResponse = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
         const userData = await userResponse.json();
         setUser(userData.user ?? userData.session ?? null);
       }
@@ -111,7 +115,7 @@ export default function Profile() {
   const handleDeleteProfile = async () => {
     setDeleting(true);
     try {
-      const response = await fetch('/api/delete-profile', {
+      const response = await fetch(`${BACKEND_URL}/api/delete-profile`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -122,7 +126,7 @@ export default function Profile() {
       }
 
       alert('Profil je uspješno obrisan. Preusmjeravamo vas na početnu stranicu...');
-      window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
+      window.location.href = APP_URL;
     } catch (err) {
       alert('Greška: ' + err.message);
     } finally {
@@ -158,7 +162,7 @@ export default function Profile() {
             const defaultImage = new URL('/images/profile.png', import.meta.url).href;
             const avatarSrc = avatarFromUser || avatarFromRole || defaultImage;
             const fullAvatarSrc = (typeof avatarSrc === 'string' && avatarSrc.startsWith('/uploads/'))
-              ? `http://localhost:8000${avatarSrc}`
+              ? `${BACKEND_URL}${avatarSrc}`
               : avatarSrc;
 
 

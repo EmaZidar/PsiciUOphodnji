@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import './Psi.css';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function Psi() {
 
 const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);    
     useEffect(() => {
-        const API = 'http://localhost:8000/api/me';
+        const API = `${BACKEND_URL}/api/me`;
         fetch(API, { credentials: 'include' })
           .then((r) => {
             if (!r.ok) throw new Error('Not authenticated');

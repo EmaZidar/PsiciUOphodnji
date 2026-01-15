@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Profile from './Profile.jsx';
 import ProfilVlasnik from './ProfilVlasnik.jsx';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function ProfilRouter() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     let mounted = true;
-    fetch('/api/me', { credentials: 'include' })
+    fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' })
       .then((r) => {
         if (!r.ok) return null;
         return r.json();

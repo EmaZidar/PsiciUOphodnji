@@ -11,12 +11,6 @@ export default function PrikazSetaca() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // TODO
-    // treba mergeat tablice korisnik, setac, recenzija, setnja
-    // treba vratiti array setaca s podacima: ime, prez, lokdjelovanja, cijena, ocjena, idkorisnik
-    // ocjena se treba izracunati iz tablice recenzija
-    // ako jedan setac ime vise dostupnih setnji s razlicitim cijenama to moraju bit zasebni zapisi
-    // takoder treba nekako lokacija od vlasnika bit poznata da se moze sortirat po blizini
     const loadSetaci = async () => {
       try {
         setLoading(true);

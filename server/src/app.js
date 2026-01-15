@@ -330,14 +330,12 @@ app.delete('/api/delete-profile', async (req, res) => {
         console.log('User deleted successfully');
         
         // OBRIŠI SESIJU
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('Error destroying session:', err);
-                return res.status(500).json({ error: 'Failed to destroy session' });
-            }
-            res.json({ message: 'Profile deleted successfully' });
+        return await new Promise((resolve, reject) => {
+            req.session.destroy((err) => {
+                if (err) reject(err);
+                else resolve(res.json({ message: 'Profile deleted successfully' }));
+            });
         });
-        
     } catch (err) {
         console.error('Error in /api/delete-profile:', err);
         res.status(500).json({ error: 'Internal server error' });

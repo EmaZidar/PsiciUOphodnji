@@ -224,6 +224,27 @@ app.get('/api/me', async (req, res) => {
     }
 });
 
+app.get('/api/setaci', async (req, res) => {
+    try {
+        // dopustiti da samo vlasnici smiju provjeriti setace il tak nes??
+        /*const user = req.session.user
+        if (!user)
+            return res.status(401).json({ error: 'Not authenticated' })
+
+        db.checkIfVlasnik() ? */
+
+        const setaci = await db.getAllSetaci();
+        if (setaci.length > 0)
+            console.log(setaci[0])
+        else console.log('Empty setaci :(')
+
+        res.status(200).json(setaci)
+    } catch (err) {
+        console.error('Error in /api/setaci:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 /*
     TODO: Ocjene i recenzije (pojednostavljeno)
 

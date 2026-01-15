@@ -99,8 +99,9 @@ export async function getAllSetaci() {
                 COALESCE(AVG(r.ocjena), 0) AS ocjena
          FROM korisnik k
          JOIN setac s ON k.idKorisnik = s.idKorisnik
-         LEFT JOIN setnja st ON s.idKorisnik = st.idSetac
-         LEFT JOIN recenzija r ON s.idKorisnik = r.idSetac
+         LEFT JOIN setnja st ON s.idKorisnik = st.idKorisnik
+         LEFT JOIN rezervacija rz ON st.idSetnja = rz.idSetnja
+         LEFT JOIN recenzija r ON rz.idRezervacija = r.idRezervacija
          GROUP BY k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja`   
     );
     return res.rows;

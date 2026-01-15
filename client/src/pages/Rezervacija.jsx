@@ -4,6 +4,8 @@ import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import './Rezervacija.css'
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function Rezervacija() {
    const navigate = useNavigate();
    const { idkorisnik, idsetnja } = useParams();
@@ -53,7 +55,7 @@ export default function Rezervacija() {
             idSetnja: idsetnja,
             idKorisnik: idkorisnik,
          };
-         const res = await fetch('/api/rezervacije', {
+         const res = await fetch(`${BACKEND_URL}/api/rezervacije`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

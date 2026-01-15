@@ -1,13 +1,15 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function Header() {
   const navigate = useNavigate()
 
   const handleBrandClick = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/me', { credentials: 'include' })
+      const res = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' })
       if (res.ok) {
         navigate('/main')
         return

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './Register.css';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function Register() {
   const [formData, setFormData] = useState({
     // za sve korisnike
@@ -111,7 +113,7 @@ export default function Register() {
       console.log('Result fom', resultForm)
 
      
-      const fetchResult = await fetch('/api/register', {
+      const fetchResult = await fetch(`${BACKEND_URL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

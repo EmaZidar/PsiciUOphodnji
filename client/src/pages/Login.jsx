@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import "./Login.css";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+
 export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = () => {
     setLoading(true);
-    window.location.href = "/login/auth";
+    window.location.href = `${BACKEND_URL}/login/auth`;
   };
 
   return (

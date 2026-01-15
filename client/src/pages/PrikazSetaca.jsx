@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import './PrikazSetaca.css';
 import { Link } from 'react-router-dom';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function PrikazSetaca() {
   const [setaci, setSetaci] = useState([]);
   const [sortBy, setSortBy] = useState('ocjena-silazno');
@@ -19,7 +21,7 @@ export default function PrikazSetaca() {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/setaci', { 
+        const response = await fetch(`${BACKEND_URL}/api/setaci`, { 
           method: 'GET',
           credentials: 'include' });
         if (!response.ok) throw new Error(`Server returned ${response.status}`);

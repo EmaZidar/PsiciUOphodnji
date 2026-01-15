@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import './Reviews.css'
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
+
 function StarRating({ value = 0, size = '1rem' }) {
   const pct = Math.max(0, Math.min(5, Number(value) || 0)) / 5 * 100
   return (
@@ -20,7 +22,7 @@ export default function Reviews({ targetUserId, canReview = false }) {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/api/reviews?user=${encodeURIComponent(targetUserId)}`)
+        const res = await fetch(`${BACKEND_URL}/api/reviews?user=${encodeURIComponent(targetUserId)}`)
         if (!res.ok) throw new Error('Failed')
         const data = await res.json()
         setReviews(data.reviews || data || [])
@@ -39,7 +41,7 @@ export default function Reviews({ targetUserId, canReview = false }) {
 
   const submit = async () => {
     try {
-      const res = await fetch('/api/reviews', { method: 'POST', headers: { 'Content-Type':'application/json' }, credentials: 'include', body: JSON.stringify({ user: targetUserId, rating: newReview.rating, text: newReview.text }) })
+      const res = await fetch(`${BACKEND_URL}/api/reviews`, { method: 'POST', headers: { 'Content-Type':'application/json' }, credentials: 'include', body: JSON.stringify({ user: targetUserId, rating: newReview.rating, text: newReview.text }) })
       if (!res.ok) throw new Error('Failed')
       const data = await res.json()
       setReviews(prev => [data, ...prev])

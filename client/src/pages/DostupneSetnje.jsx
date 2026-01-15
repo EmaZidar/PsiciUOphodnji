@@ -6,6 +6,8 @@ import Reviews from '../components/Reviews.jsx';
 import {Link} from 'react-router-dom';
 import './DostupneSetnje.css';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+
 export default function DostupneSetnje() {
    const { idkorisnik } = useParams();
    const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function DostupneSetnje() {
             setLoading(true);
             setError(null);
             console.log("Fetching setac data for idkorisnik:", idkorisnik);
-            const response = await fetch(`/api/setnje/${idkorisnik}`, {
+            const response = await fetch(`${BACKEND_URL}/api/setnje/${idkorisnik}`, {
                method: 'GET',
                credentials: 'include',
             });
@@ -43,8 +45,8 @@ export default function DostupneSetnje() {
    }, [idkorisnik]);
 
    const avatarSrcRaw = setac?.profilfoto || "/images/profile.png";
-   const avatarSrc = avatarSrcRaw.startsWith('/uploads/setaci/')
-      ? `http://localhost:8000${avatarSrcRaw}`
+   const avatarSrc = avatarSrcRaw.startsWith('/uploads/')
+      ? `${BACKEND_URL}${avatarSrcRaw}`
       : avatarSrcRaw;
 
    return(

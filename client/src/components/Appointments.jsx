@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
+
 function formatDate(dt) {
   const d = new Date(dt)
   return d.toLocaleString()
@@ -17,7 +19,7 @@ export default function Appointments({ userId, userName, showHeader = true }) {
       try {
         setLoading(true)
         console.log("Fetching setnje for userId:", userId);
-        const response = await fetch(`/api/setnje/${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/api/setnje/${userId}`, {
           method: 'GET',
           credentials: 'include'
         })
@@ -51,7 +53,7 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     try {
       if (draft && draft.id === id) {
         // Nova šetnja - POST
-        const response = await fetch('/api/setnja', {
+        const response = await fetch(`${BACKEND_URL}/api/setnja`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -73,7 +75,7 @@ export default function Appointments({ userId, userName, showHeader = true }) {
       }
       
       // Ažuriraj postojeću šetnju - PUT
-      const response = await fetch(`/api/setnje/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/setnje/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -94,7 +96,7 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     if (!window.confirm('Obrisati termin?')) return
     
     try {
-      const response = await fetch(`/api/setnje/${id}`, {
+      const response = await fetch(`${BACKEND_URL}/api/setnje/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       })

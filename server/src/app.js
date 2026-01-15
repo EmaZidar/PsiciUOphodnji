@@ -9,6 +9,7 @@ import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import * as calendar from "./calendar.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -81,6 +82,7 @@ const GOOGLE_CALLBACK_URL = "http://localhost:8000/google/callback";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
+    'https://www.googleapis.com/auth/calendar.events',
 ];
 
 app.get("/login/auth", async (_req, res) => {
@@ -138,7 +140,7 @@ app.get("/google/callback", async (req, res) => {
         const token_info_data = await token_info_response.json();
         const { email, name } = token_info_data;
 
-        req.session.user = { email: email, name: name };
+        req.session.user = { email: email, name: name, token: access_token_data };
 
         const existingUser = await db.findUserByEmail(email);
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
@@ -294,6 +296,8 @@ app.post('/api/reviews', (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.use('/calendar', calendar.router)
 
 // TODO: Implementirati endpoint za upload profilne slike
 // POST /api/upload-profile-image

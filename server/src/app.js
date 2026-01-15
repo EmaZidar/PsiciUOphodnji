@@ -110,7 +110,13 @@ app.get("/google/callback", async (req, res) => {
 
         if (!existingUser) {
             console.log("User doesn't exist");
-            // Ako user ne postoji salje email i name u front za daljnju obradu
+            // Spremi sesiju prije redirecta
+            await new Promise((resolve, reject) => {
+                req.session.save((err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
             res.redirect(
                 `${clientUrl}/register?email=${encodeURIComponent(
                     email
@@ -122,6 +128,14 @@ app.get("/google/callback", async (req, res) => {
             const userWithRole = await db.getUserWithRole(userId);
             const role = userWithRole?.role ?? "unassigned";
             req.session.user = userWithRole;
+            console.log("Saving session for user:", userWithRole?.email);
+            // Spremi sesiju prije redirecta
+            await new Promise((resolve, reject) => {
+                req.session.save((err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
             res.redirect(`${clientUrl}/main?role=${encodeURIComponent(role)}`);
         }
     } catch (error) {

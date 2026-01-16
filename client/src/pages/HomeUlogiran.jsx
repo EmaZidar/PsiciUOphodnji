@@ -17,7 +17,7 @@ export default function HomeUlogiran() {
     const API = `${BACKEND_URL}/api/me`;
     fetch(API, { credentials: 'include' })
       .then((r) => {
-        if (!r.ok) throw new Error('Not authenticated');
+        if (!r.ok) throw new Error(`Response status: ${response.status}`);
         return r.json();
       })
       .then((data) => {

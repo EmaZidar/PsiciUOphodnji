@@ -14,20 +14,27 @@ export default function HomeUlogiran() {
 
   useEffect(() => {
     // Fetch user info from server
-    const API = `${BACKEND_URL}/api/me`;
-    fetch(API, { credentials: 'include' })
-      .then((r) => {
-        if (!r.ok) throw new Error(`Response status: ${response.status}`);
-        return r.json();
-      })
-      .then((data) => {
+    const fetchCall = async () => {
+      const API = `${BACKEND_URL}/api/me`;
+      const response = await fetch(API, { credentials: 'include' });
+      if (!response.ok)
+        throw new Error(`Response status: ${response.status}`);
+
+      const data = await response.json();
+      return data;
+    }
+
+    fetchCall().then(
+      data => {
         setUser(data.user ?? data.session ?? null);
         setLoading(false);
-      })
-      .catch((err) => {
+      },
+      err => {
         setError(err.message);
         setLoading(false);
-      });
+      }
+    )
+    
   }, []);
 
   if (loading) {

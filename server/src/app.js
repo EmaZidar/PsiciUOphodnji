@@ -336,3 +336,5 @@ const start = async (port) => {
 };
 
 start(PORT);
+
+export default app;

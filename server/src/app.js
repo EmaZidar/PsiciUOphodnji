@@ -23,7 +23,7 @@ app.use(cors({
     ],
     credentials: true
 }));
-
+console.log(`NODE_ENV = ${process.env.NODE_ENV}, isProduction = ${process.env.NODE_ENV === "production"}`)
 app.use(
     session({
         secret: "Rainbow feline",

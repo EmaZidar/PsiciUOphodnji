@@ -52,7 +52,7 @@ const njegoviPsi=user?.Psi || [{ime: "imamIme"}, { ime: "Rex", pasmina: "Mješan
 function handleSubmit(e) {
   e.preventDefault();
   const kojiPas={...pas, idKorisnik: idKorisnik}
-  fetch("http://localhost:3000/psi", {   //TODO link je random stavi pravi a ne localhost3000
+  fetch("http://localhost:8000/psi", {   //TODO link provjeri
     method: "POST",
     headers: {
     "Content-Type": "application/json"
@@ -73,9 +73,10 @@ function resetiraj(e){
 }
 
 function izbrisi(){
-  fetch("http://localhost:3000/psi", {   //TODO link je random stavi pravi a ne localhost3000
+  const kojiPas={...pas, idKorisnik: idKorisnik}
+  fetch("http://localhost:8000/psi", {   // link 
     method: "POST",
-    body: JSON.stringify(pas)
+    body: JSON.stringify(kojiPas)
   });
 }
 

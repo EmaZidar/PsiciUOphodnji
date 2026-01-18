@@ -20,17 +20,15 @@ export default function Profile() {
     const API = 'http://localhost:8000/api/me';
     fetch(API, { credentials: 'include' })
       .then((r) => {
-        if (!r.ok) throw new Error('Not authenticated');
+        if (!r.ok) throw new Error('Nije authenticated');
         return r.json();
       })
       .then((data) => {
-        // Prefer DB user (user) then session
         setUser(data.user ?? data.session ?? null);
         setLoading(false);
       })
       .catch((err) => {
-        // Backend may be offline during development — don't surface an error message.
-        console.warn('Could not load /api/me, continuing with empty profile UI', err);
+        console.warn('gresla', err);
         setUser(null);
         setLoading(false);
       });
@@ -42,7 +40,7 @@ export default function Profile() {
       try {
         if (!user || !(user._id || user.id)) return
         const res = await fetch(`/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
-        if (!res.ok) throw new Error('no reviews')
+        if (!res.ok) throw new Error('nema recenzije')
         const data = await res.json()
         const list = data.reviews || data || []
         if (!Array.isArray(list)) return
@@ -52,7 +50,7 @@ export default function Profile() {
         setAvgRating(a ? Math.round(a*10)/10 : null)
         setRatingCount(c)
       } catch (e) {
-        console.warn('Could not load reviews for rating', e)
+        console.warn('greska', e)
       }
     }
     loadRating()
@@ -121,7 +119,7 @@ export default function Profile() {
         throw new Error(errorData.error || 'Greška pri brisanju profila');
       }
 
-      alert('Profil je uspješno obrisan. Preusmjeravamo vas na početnu stranicu...');
+      alert('Profil je uspješno obrisan');
       window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
     } catch (err) {
       alert('Greška: ' + err.message);
@@ -141,7 +139,6 @@ export default function Profile() {
 
         {!loading && !error && user && (
           (() => {
-            // Helper to pick the first existing field from several possible DB/Google names
             const pick = (obj, keys) => {
               if (!obj) return undefined;
               for (const k of keys) {
@@ -152,7 +149,7 @@ export default function Profile() {
 
             ///???
             const avatarFromUser =
-              pick(user, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
+              pick(user, ['profileFoto', 'avatar', 'profil', 'profilfoto']);
             const avatarFromRole =
               pick(user?.roleData, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
             const defaultImage = new URL('/images/profile.png', import.meta.url).href;
@@ -162,8 +159,8 @@ export default function Profile() {
               : avatarSrc;
 
 
-            const firstName = pick(user, ['imeKorisnik', 'imekorisnik', 'imeKorisnik', 'ime', 'name', 'given_name']) || '';
-            const lastName = pick(user, ['prezKorisnik', 'prezkorisnik', 'prezime', 'prezKorisnik', 'surname', 'family_name']) || '';
+            const firstName = pick(user, ['imeKorisnik', 'ime']) || '';
+            const lastName = pick(user, ['prezKorisnik','prezime']) || '';
 
             return (
               <>
@@ -231,16 +228,16 @@ export default function Profile() {
         )}
 
         {!loading && !error && !user && (
-          <p>Nema dostupnih podataka za korisnika.</p>
+          <p>Nema podataka za korisnika.</p>
         )}
       </main>
 
-      {/* Delete Confirmation Modal */}
+      {/*  */}
       {showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Potvrdi brisanje profila</h2>
-            <p>Jeste li sigurni da želite obrisati svoj profil? Ova akcija se ne može vratiti.</p>
+            <p>Jeste li sigurni da želite obrisati svoj profil? </p>
             
             <div className="modal-buttons">
               <button

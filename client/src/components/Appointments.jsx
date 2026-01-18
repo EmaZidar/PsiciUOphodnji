@@ -11,7 +11,6 @@ export default function Appointments({ userId, userName, showHeader = true }) {
   const [draft, setDraft] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Dohvati šetnje iz baze
   useEffect(() => {
     const loadSetnje = async () => {
       try {
@@ -34,7 +33,6 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     if (userId) loadSetnje()
   }, [userId])
 
-  // Dodaj novu šetnju
   const addDefault = () => {
     const newItem = {
       id: 'draft',
@@ -46,11 +44,9 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     setEditingId(newItem.id)
   }
 
-  // Spremi šetnju u bazu
   const saveEdit = async (id, patch) => {
     try {
       if (draft && draft.id === id) {
-        // Nova šetnja - POST
         const response = await fetch('/api/setnja', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -72,7 +68,6 @@ export default function Appointments({ userId, userName, showHeader = true }) {
         return
       }
       
-      // Ažuriraj postojeću šetnju - PUT
       const response = await fetch(`/api/setnje/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -89,7 +84,6 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     }
   }
 
-  // Obriši šetnju iz baze
   const remove = async (id) => {
     if (!window.confirm('Obrisati termin?')) return
     

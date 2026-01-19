@@ -28,7 +28,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />
-          <Route path="/:idkorisnik/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
+          <Route path="/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
           <Route path="/placanje" element={<Placanje />} />
           <Route path="/placanje/:idRezervacija" element={<Placanje />} />
           <Route path="/notifications" element={<Notifications />} />

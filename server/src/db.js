@@ -137,6 +137,14 @@ export async function getAllSetaci() {
     return res.rows;
 }
 
+export async function getAllVlasnici() {
+    const res = await pool.query(
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik
+         FROM korisnik k
+            JOIN vlasnik v ON k.idKorisnik = v.idKorisnik`
+    );
+    return res.rows;
+}
 // TODO: Implementirati sprema profilne slike
 // Funkcija treba:
 // 1. Provjeri je li korisnik setac ili vlasnik

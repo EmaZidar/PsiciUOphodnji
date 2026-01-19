@@ -5,6 +5,7 @@ import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
+import * as calendar from "./calendar.js";
 
 db.testConnection();    
 
@@ -46,6 +47,7 @@ const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
+    'https://www.googleapis.com/auth/calendar.events',
 ];
 
 app.get("/login/auth", async (_req, res) => {
@@ -103,7 +105,7 @@ app.get("/google/callback", async (req, res) => {
         const token_info_data = await token_info_response.json();
         const { email, name } = token_info_data;
 
-        req.session.user = { email: email, name: name };
+        req.session.user = { email: email, name: name, token: access_token_data };
 
         const existingUser = await db.getUserWithEmail(email);
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
@@ -316,6 +318,8 @@ app.delete('/api/setnje/:id', async (req, res) => {
 */
 
 
+
+app.use('/api/calendar', calendar.router)
 
 // TODO: Implementirati endpoint za upload profilne slike
 // POST /api/upload-profile-image

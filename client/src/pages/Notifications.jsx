@@ -29,7 +29,7 @@ export default function Notifications() {
     })
 
     // ovo bi trebalo radit da zadrzi sve osim te poruke
-    setMessages(messages.filter((_, i) => i !== index))
+    setMessages(messages.splice(index, 1))
   }
 
   return (

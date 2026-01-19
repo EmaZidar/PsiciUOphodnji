@@ -3,10 +3,7 @@ import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 //TODO: u 59. liniju dodat uvjet && setac.tipClanarina=="mjesecna" ali nijedan setac nema tipclanarine iz nekog razloga 
 export default function MjesecnaClanarina() {
-	const mjesecne = [
-		{ id: 1, naziv: 'Mjesečna A', cijena: '50kn' },
-		{ id: 2, naziv: 'Mjesečna B', cijena: '80kn' },
-	];
+
 
 	const [setaci, setSetaci] = useState([]);
 	  const [sortBy, setSortBy] = useState('ocjena-silazno');
@@ -40,17 +37,16 @@ export default function MjesecnaClanarina() {
 	return (
 		<>
 		<div className="clanarina-page">
-			<h3>Mjesečne članarine</h3>
+			<h3>Članarine</h3>
 			<div className="clanarina-list">
-				{mjesecne.map((c) => (
-					<div className="clanarina-item" key={c.id}>
-						<span className="clanarina-naziv">{c.naziv}</span>
-						<span className="clanarina-cijena">{c.cijena}</span>
+				
+				
+						<span className="clanarina-naziv">Mjesečna: </span>
+						<span className="clanarina-cijena"> 5 eura</span>
 						<button style={{ marginLeft: 12 }}>Uredi</button>
-						<button style={{ marginLeft: 8 }}>Obriši</button>
 					</div>
-				))}
-			</div>
+			
+			
 		</div>
 
 		<div className="setaci-list">

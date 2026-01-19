@@ -124,7 +124,7 @@ export async function getDostupneSetnjeSetaca(idKorisnik) {
 
 export async function getAllSetaci() {
     const res = await pool.query(
-        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja,  
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja, s.tipClanarina, 
                 COALESCE(MIN(st.cijena), 0) AS cijena,
                 COALESCE(AVG(r.ocjena), 0) AS ocjena
          FROM korisnik k

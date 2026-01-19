@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
-import Footer from '../components/Footer';
-import Reviews from '../components/Reviews';
 import './Profile.css';
-//skroz na dnu returna treba dodat <Footer/> ako ce ovo bit finalna stranica za setaca
-export default function Profile() {
+
+
+export default function PodatciVlasnika() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
@@ -13,8 +12,6 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [avgRating, setAvgRating] = useState(null);
-  const [ratingCount, setRatingCount] = useState(0);
 
   useEffect(() => {
     const API = 'http://localhost:8000/api/me';
@@ -34,29 +31,7 @@ export default function Profile() {
       });
   }, []);
 
-  useEffect(() => {
-    let mounted = true
-    async function loadRating() {
-      try {
-        if (!user || !(user._id || user.id)) return
-        const res = await fetch(`/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
-        if (!res.ok) throw new Error('nema recenzije')
-        const data = await res.json()
-        const list = data.reviews || data || []
-        if (!Array.isArray(list)) return
-        const c = list.length
-        const a = c ? list.reduce((s,r)=>s+(r.rating||0),0)/c : null
-        if (!mounted) return
-        setAvgRating(a ? Math.round(a*10)/10 : null)
-        setRatingCount(c)
-      } catch (e) {
-        console.warn('greska', e)
-      }
-    }
-    loadRating()
-    return () => { mounted = false }
-  }, [user])
-
+  
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (file && (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png')) {
@@ -188,20 +163,10 @@ export default function Profile() {
                         {uploading ? 'Učitavanje...' : 'Spremi sliku'}
                       </button>
                     )}
-                    <br></br>
-                    <button className='upload-btn'>Plati članarinu</button>
                   </div>
 
-                  <div className="profile-rating-below">
-                    <div className="rating-value">{avgRating ?? '—'}</div>
-                    <div className="rating-stars" aria-hidden>
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className={i < Math.round(avgRating || 0) ? 'star filled' : 'star'}>★</span>
-                      ))}
-                    </div>
-                    <div className="rating-count">{ratingCount} recenzija</div>
-                  </div>
-                </div>
+                                  </div>
+
 
                 <div className="profile-details">
                   <div className="profile-info-box">
@@ -223,7 +188,7 @@ export default function Profile() {
                 </div>
                 </section>
 
-                  <Reviews targetUserId={user._id || user.id} canReview={true} />
+                  
               </>
             );
           })()

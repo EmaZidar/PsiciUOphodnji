@@ -139,7 +139,7 @@ export async function getAllSetaci() {
          LEFT JOIN setnja st ON s.idKorisnik = st.idKorisnik
          LEFT JOIN rezervacija rz ON st.idSetnja = rz.idSetnja
          LEFT JOIN recenzija r ON rz.idRezervacija = r.idRezervacija
-         GROUP BY k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja`   
+         GROUP BY k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja, s.tipClanarina`
     );
     return res.rows;
 }

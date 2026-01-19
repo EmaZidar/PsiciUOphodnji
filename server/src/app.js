@@ -177,12 +177,14 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-app.get('/api/me', async (req, res) => {
-    try {
-        if (!req.session?.user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
+function checkIsAuthenticated(req, res, next) {
+    if (req.session.user)
+        return next();
+    return res.status(401).json({ error: 'Not authenticated' });
+}
 
+app.get('/api/me', checkIsAuthenticated, async (req, res) => {
+    try {
         const sessionUser = req.session.user;
         const dbUser = await db.getUserWithEmail(sessionUser.email);
         if (!dbUser) {
@@ -228,12 +230,8 @@ app.get('/api/vlasnici', async (req, res) => {
     }
 });
 
-app.post('/api/rezervacije', async (req, res) => {
+app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const user = req.session?.user;
-        if (!user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
         const { idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
         const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
@@ -331,12 +329,8 @@ app.use('/api/calendar', calendar.router)
 // Frontend je spreman i čeka ovaj endpoint
 // Multer je već konfiguriran na serveru
 
-app.delete('/api/delete-profile', async (req, res) => {
+app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     try {
-        if (!req.session?.user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
-        
         const sessionUser = req.session.user;
         const dbUser = await db.getUserWithEmail(sessionUser.email);
         if (!dbUser) {

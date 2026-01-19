@@ -201,13 +201,6 @@ app.get('/api/me', async (req, res) => {
 
 app.get('/api/setaci', async (req, res) => {
     try {
-        // dopustiti da samo vlasnici smiju provjeriti setace il tak nes??
-        /*const user = req.session.user
-        if (!user)
-            return res.status(401).json({ error: 'Not authenticated' })
-
-        db.checkIfVlasnik() ? */
-
         const setaci = await db.getAllSetaci();
         if (setaci.length > 0)
             console.log(setaci[0])
@@ -223,9 +216,27 @@ app.get('/api/setaci', async (req, res) => {
 app.get('/api/vlasnici', async (req, res) => {
     try {
         const vlasnici = await db.getAllVlasnici();
-        res.status(200).json(vlasnici);
+        if (vlasnici.length > 0)
+            console.log(vlasnici)
+        else console.log('Nema vlasnika')
+        res.status(200).json(vlasnici)
     } catch (err) {
         console.error('Error in /api/vlasnici:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/rezervacije', async (req, res) => {
+    try {
+        const user = req.session?.user;
+        if (!user) {
+            return res.status(401).json({ error: 'Not authenticated' });
+        }
+        const { idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
+        const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
+        res.status(201).json(rezervacija.rows[0]);
+    } catch (err) {
+        console.error('Error creating rezervacija:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

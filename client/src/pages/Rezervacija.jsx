@@ -49,23 +49,31 @@ export default function Rezervacija() {
       //TODO
       // treba insertat u tablicu rezervacija
       // podaci su u rezervacija + idsetnja iz params + idkorisnik iz params
+      
       try {
          const payload = {
             ...rezervacija,
             idSetnja: idsetnja,
             idKorisnik: idkorisnik,
+            status: 'na čekanju',
          };
          const res = await fetch(`${BACKEND_URL}/api/rezervacije`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
          });
+
          if (!res.ok) {
             const text = await res.text();
             throw new Error(text || `Server returned ${res.status}`);
          }
+
+         const created = await res.json();
+         const idRezervacija = created.idRezervacija || created.id || created.insertId || null;
+         if (!idRezervacija) throw new Error('Nije vraćen id rezervacije od servera.');
+
          setLoading(false);
-         navigate('/');
+         navigate(`/placanje/${idRezervacija}`);
       } catch (err) {
          setError('Greška pri slanju rezervacije: ' + err.message);
          setLoading(false);

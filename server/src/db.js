@@ -124,7 +124,7 @@ export async function getDostupneSetnjeSetaca(idKorisnik) {
 
 export async function getAllSetaci() {
     const res = await pool.query(
-        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja,  
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, s.lokDjelovanja, s.tipClanarina, 
                 COALESCE(MIN(st.cijena), 0) AS cijena,
                 COALESCE(AVG(r.ocjena), 0) AS ocjena
          FROM korisnik k
@@ -137,6 +137,23 @@ export async function getAllSetaci() {
     return res.rows;
 }
 
+export async function createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja) {
+    const res = await pool.query(
+        `INSERT INTO rezervacija (idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *`,
+        [idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja]
+    );
+    return res;
+}
+export async function getAllVlasnici() {
+    const res = await pool.query(
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik
+         FROM korisnik k
+            JOIN vlasnik v ON k.idKorisnik = v.idKorisnik`
+    );
+    return res.rows;
+}
 // TODO: Implementirati sprema profilne slike
 // Funkcija treba:
 // 1. Provjeri je li korisnik setac ili vlasnik

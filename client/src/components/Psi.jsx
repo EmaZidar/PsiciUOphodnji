@@ -27,18 +27,20 @@ const [loading, setLoading] = useState(true);
 const firstName =
   user?.imeKorisnik ||'';
 const idvlasnika = user?.idKorisnik||'';
-const njegoviPsi=user?.Psi || [{ime: "imamIme"}, { ime: "Rex", pasmina: "Mješanac", dob: 3, energija: "visoka" },
-  { ime: "Max" }]
+const njegoviPsi=user?.Psi || [{imePas: "imamIme"}, { imePas: "Rex", pasmina: "Mješanac", starost: 3, razinaEnergije: "visoka" },
+  { imePas: "Max" }]
 
 
   const [prikaziFormu, setPrikaziFormu] = useState(false);
 
 
   const [pas, setPas] = useState({
-  ime: "",
+  imePas: "",
   pasmina: "",
-  dob: "",
-  energija: ""
+  starost: "",
+  razinaEnergije: "",
+  zdravNapomene:"",
+  socijalizacija:""
 });
 
   function spremi(e) {
@@ -64,12 +66,20 @@ function handleSubmit(e) {
 
 function odustani(){
   setPrikaziFormu(false)
-  setPas({ime: "", pasmina:"", energija:"", dob:""});
+  setPas({imePas: "",
+  pasmina: "",
+  starost: "",
+  razinaEnergije: "",
+  zdravNapomene:"",
+  socijalizacija:""});
 }
 
 function resetiraj(e){
   e.preventDefault();
-  setPas({ime: "", pasmina:"", energija:"", dob:""});
+  setPas({imePas: "",
+  pasmina: "",
+  starost: "",
+  razinaEnergije: "", zdravNapomene:"", socijalizacija:""});
 }
 
 function izbrisi(){
@@ -85,10 +95,13 @@ function izbrisi(){
   return (
     <div className="sviPsi">
         {njegoviPsi.map((pas)=> (<div className="jedanPas"> 
-            <h3 className="imePsa">{pas.ime || "-" }</h3>
+            <h3 className="imePsa">{pas.imePas || "-" }</h3>
             <p>Pasmina:{pas.pasmina || "-"}</p>
-            <p>Godine: {pas.dob|| "-"}</p>
-            <p>Razina energije: {pas.energija|| "-"}</p>
+            <p>Godine: {pas.starost|| "-"}</p>
+            <p>Socijalizacija s drugim psima:{pas.socijalizacija || "-"}</p>
+            <p>Zdravstvene napomene: {pas.zdravNapomene || "-"}</p>
+            <p>Razina energije: {pas.razinaEnergije|| "-"}</p>
+
             <button onClick={izbrisi}>Izbriši psa</button>                       
 
          </div>))}
@@ -97,13 +110,18 @@ function izbrisi(){
          </div>
          {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
             <label for="ime">Ime psa:</label>
-            <input type="text" id="ime" name="ime"   value={pas.ime}  onChange={spremi}></input><br></br>
+            <input type="text" id="ime" name="ime"   value={pas.imePas}  onChange={spremi}></input><br></br>
             <label for="pasmina">Pasmina:      </label>
             <input type="text" id="pasmina" name="pasmina" value={pas.pasmina}  onChange={spremi}></input><br></br>
-            <label for="dob">Godine:</label>
-            <input type="number" id="dob" name="dob" value={pas.dob}  onChange={spremi}></input><br></br>
+            <label>Godine:</label>
+            <input type="number" id="starost" name="starost" value={pas.starost}  onChange={spremi}></input><br></br>
             <label for="energija">Razina energije:    </label>
-            <input type="text" id="energija" name="energija"   value={pas.energija}  onChange={spremi}></input><br></br>
+            <input type="text" id="razinaEnergije" name="razinaEnergije"   value={pas.razinaEnergije}  onChange={spremi}></input><br></br>
+            <label>Socijalizacija:    </label>
+            <input type="text" id="socijalizacija" name="socijalizacija"   value={pas.socijalizacija}  onChange={spremi}></input><br></br>
+            <label >Zdravstvene napomene: </label>
+            <input type="text" id="zdravNapomene" name="zdravNapomene"   value={pas.zdravNapomene}  onChange={spremi}></input><br></br>
+
             <button type="submit" >Dodaj psa</button>
             <button onClick={resetiraj} >Resetiraj</button>
             <button onClick={odustani} >Odustani</button>

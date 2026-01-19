@@ -50,7 +50,7 @@ export default function Korisnici() {
             setvlasnici(Array.isArray(data) ? data : (data?.vlasnici ?? []));
           } catch (err) {
               setError(err.message || 'Greška pri dohvaćanju podataka');
-              setSetaci([]);
+              setvlasnici([]);
           } finally {
               setLoading(false);
           }

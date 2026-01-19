@@ -137,6 +137,15 @@ export async function getAllSetaci() {
     return res.rows;
 }
 
+export async function createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja) {
+    const res = await pool.query(
+        `INSERT INTO rezervacija (idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *`,
+        [idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja]
+    );
+    return res;
+}
 export async function getAllVlasnici() {
     const res = await pool.query(
         `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik

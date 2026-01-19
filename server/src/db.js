@@ -42,6 +42,11 @@ export async function createVlasnik(primanjeObavijesti, idKorisnik) {
     return res
 }
 
+export async function checkIsSetac(idKorisnik) {
+    const res = await pool.query("SELECT idKorisnik FROM setac WHERE idKorisnik = $1", [idKorisnik]);
+    return res.rows.length !== 0;
+}
+
 export async function getUserWithRole(userId) {
     const userResult = await pool.query(
         "SELECT * FROM KORISNIK WHERE idKorisnik = $1",

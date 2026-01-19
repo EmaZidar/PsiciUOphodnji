@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
-import Footer from '../components/Footer';
-import Reviews from '../components/Reviews';
 import './Profile.css';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
-const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 
-//skroz na dnu returna treba dodat <Footer/> ako ce ovo bit finalna stranica za setaca
-export default function Profile() {
+export default function PodatciVlasnika() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
@@ -17,11 +12,9 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [avgRating, setAvgRating] = useState(null);
-  const [ratingCount, setRatingCount] = useState(0);
 
   useEffect(() => {
-    const API = `${BACKEND_URL}/api/me`;
+    const API = 'http://localhost:8000/api/me';
     fetch(API, { credentials: 'include' })
       .then((r) => {
         if (!r.ok) throw new Error('Nije authenticated');
@@ -38,29 +31,7 @@ export default function Profile() {
       });
   }, []);
 
-  useEffect(() => {
-    let mounted = true
-    async function loadRating() {
-      try {
-        if (!user || !(user._id || user.id)) return
-        const res = await fetch(`${BACKEND_URL}/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
-        if (!res.ok) throw new Error('no reviews')
-        const data = await res.json()
-        const list = data.reviews || data || []
-        if (!Array.isArray(list)) return
-        const c = list.length
-        const a = c ? list.reduce((s,r)=>s+(r.rating||0),0)/c : null
-        if (!mounted) return
-        setAvgRating(a ? Math.round(a*10)/10 : null)
-        setRatingCount(c)
-      } catch (e) {
-        console.warn('greska', e)
-      }
-    }
-    loadRating()
-    return () => { mounted = false }
-  }, [user])
-
+  
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (file && (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png')) {
@@ -83,7 +54,7 @@ export default function Profile() {
     formData.append('profileImage', selectedImage);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/upload-profile-image`, {
+      const response = await fetch('http://localhost:8000/api/upload-profile-image', {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -95,7 +66,7 @@ export default function Profile() {
       if (data?.user) {
         setUser(data.user);
       } else {
-        const userResponse = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
+        const userResponse = await fetch('http://localhost:8000/api/me', { credentials: 'include' });
         const userData = await userResponse.json();
         setUser(userData.user ?? userData.session ?? null);
       }
@@ -113,7 +84,7 @@ export default function Profile() {
   const handleDeleteProfile = async () => {
     setDeleting(true);
     try {
-      const response = await fetch(`${BACKEND_URL}/api/delete-profile`, {
+      const response = await fetch('/api/delete-profile', {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -159,7 +130,7 @@ export default function Profile() {
             const defaultImage = new URL('/images/profile.png', import.meta.url).href;
             const avatarSrc = avatarFromUser || avatarFromRole || defaultImage;
             const fullAvatarSrc = (typeof avatarSrc === 'string' && avatarSrc.startsWith('/uploads/'))
-              ? `${BACKEND_URL}${avatarSrc}`
+              ? `http://localhost:8000${avatarSrc}`
               : avatarSrc;
 
 
@@ -192,20 +163,10 @@ export default function Profile() {
                         {uploading ? 'Učitavanje...' : 'Spremi sliku'}
                       </button>
                     )}
-                    <br></br>
-                    <button className='upload-btn'>Plati članarinu</button>
                   </div>
 
-                  <div className="profile-rating-below">
-                    <div className="rating-value">{avgRating ?? '—'}</div>
-                    <div className="rating-stars" aria-hidden>
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className={i < Math.round(avgRating || 0) ? 'star filled' : 'star'}>★</span>
-                      ))}
-                    </div>
-                    <div className="rating-count">{ratingCount} recenzija</div>
-                  </div>
-                </div>
+                                  </div>
+
 
                 <div className="profile-details">
                   <div className="profile-info-box">
@@ -227,7 +188,7 @@ export default function Profile() {
                 </div>
                 </section>
 
-                  <Reviews targetUserId={user._id || user.id} canReview={true} />
+                  
               </>
             );
           })()

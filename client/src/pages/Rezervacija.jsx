@@ -47,6 +47,7 @@ export default function Rezervacija() {
       //TODO
       // treba insertat u tablicu rezervacija
       // podaci su u rezervacija + idsetnja iz params + idkorisnik iz params
+      
       try {
          const payload = {
             ...rezervacija,

@@ -5,6 +5,7 @@ import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
+import * as calendar from "./calendar.js";
 
 db.testConnection();    
 
@@ -46,6 +47,7 @@ const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
+    'https://www.googleapis.com/auth/calendar.events',
 ];
 
 app.get("/login/auth", async (_req, res) => {
@@ -103,7 +105,7 @@ app.get("/google/callback", async (req, res) => {
         const token_info_data = await token_info_response.json();
         const { email, name } = token_info_data;
 
-        req.session.user = { email: email, name: name };
+        req.session.user = { email: email, name: name, token: access_token_data };
 
         const existingUser = await db.getUserWithEmail(email);
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
@@ -175,12 +177,14 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-app.get('/api/me', async (req, res) => {
-    try {
-        if (!req.session?.user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
+function checkIsAuthenticated(req, res, next) {
+    if (req.session.user)
+        return next();
+    return res.status(401).json({ error: 'Not authenticated' });
+}
 
+app.get('/api/me', checkIsAuthenticated, async (req, res) => {
+    try {
         const sessionUser = req.session.user;
         const dbUser = await db.getUserWithEmail(sessionUser.email);
         if (!dbUser) {
@@ -226,12 +230,8 @@ app.get('/api/vlasnici', async (req, res) => {
     }
 });
 
-app.post('/api/rezervacije', async (req, res) => {
+app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const user = req.session?.user;
-        if (!user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
         const { idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
         const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
@@ -317,6 +317,8 @@ app.delete('/api/setnje/:id', async (req, res) => {
 
 
 
+app.use('/api/calendar', calendar.router)
+
 // TODO: Implementirati endpoint za upload profilne slike
 // POST /api/upload-profile-image
 // - Primiti file iz req.file (multer je već konfiguriran)
@@ -327,12 +329,8 @@ app.delete('/api/setnje/:id', async (req, res) => {
 // Frontend je spreman i čeka ovaj endpoint
 // Multer je već konfiguriran na serveru
 
-app.delete('/api/delete-profile', async (req, res) => {
+app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     try {
-        if (!req.session?.user) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
-        
         const sessionUser = req.session.user;
         const dbUser = await db.getUserWithEmail(sessionUser.email);
         if (!dbUser) {

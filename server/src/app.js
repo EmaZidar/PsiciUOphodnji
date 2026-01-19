@@ -297,7 +297,7 @@ app.post('/api/reviews', (req, res) => {
     }
 });
 
-app.use('/calendar', calendar.router)
+app.use('/api/calendar', calendar.router)
 
 // TODO: Implementirati endpoint za upload profilne slike
 // POST /api/upload-profile-image

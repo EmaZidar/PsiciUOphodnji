@@ -121,7 +121,7 @@ export default function Profile() {
         throw new Error(errorData.error || 'Greška pri brisanju profila');
       }
 
-      alert('Profil je uspješno obrisan. Preusmjeravamo vas na početnu stranicu...');
+      alert('Profil je uspješno obrisan');
       window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
     } catch (err) {
       alert('Greška: ' + err.message);
@@ -152,7 +152,7 @@ export default function Profile() {
 
             ///???
             const avatarFromUser =
-              pick(user, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
+              pick(user, ['profileFoto', 'avatar', 'profil', 'profilfoto']);
             const avatarFromRole =
               pick(user?.roleData, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
             const defaultImage = new URL('/images/profile.png', import.meta.url).href;
@@ -162,8 +162,8 @@ export default function Profile() {
               : avatarSrc;
 
 
-            const firstName = pick(user, ['imeKorisnik', 'imekorisnik', 'imeKorisnik', 'ime', 'name', 'given_name']) || '';
-            const lastName = pick(user, ['prezKorisnik', 'prezkorisnik', 'prezime', 'prezKorisnik', 'surname', 'family_name']) || '';
+            const firstName = pick(user, ['imeKorisnik', 'ime']) || '';
+            const lastName = pick(user, ['prezKorisnik','prezime']) || '';
 
             return (
               <>
@@ -231,30 +231,28 @@ export default function Profile() {
         )}
 
         {!loading && !error && !user && (
-          <p>Nema dostupnih podataka za korisnika.</p>
+          <p>Nema podataka za korisnika.</p>
         )}
       </main>
 
-      {/* Delete Confirmation Modal */}
+      {/*  */}
       {showDeleteConfirm && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Potvrdi brisanje profila</h2>
-            <p>Jeste li sigurni da želite obrisati svoj profil? Ova akcija se ne može vratiti.</p>
+            <p>Jeste li sigurni da želite obrisati svoj profil? Ova akcija ne može se vratiti.</p>
             
             <div className="modal-buttons">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="modal-btn modal-btn-cancel"
-              >
+                className="modal-btn modal-btn-cancel">
                 Ne
               </button>
               <button
                 onClick={handleDeleteProfile}
                 disabled={deleting}
-                className="modal-btn modal-btn-delete"
-              >
+                className="modal-btn modal-btn-delete">
                 {deleting ? 'Brišem...' : 'Da'}
               </button>
             </div>

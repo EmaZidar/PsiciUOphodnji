@@ -357,15 +357,6 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 8000;
-const start = async (port) => {
-    app.listen(port, () => {
-        console.log(`Server running on port: ${port}`);
-    });
-};
-
-start(PORT);
-
 // APIJI ZA NOTIFIKACIJE I PLAĆANJE
 // odite na pageove di se zovu ovi apiji da vidite kontekst i da dodate ono VITE_BACKEND_URL ili sta vec treba jer nisam bila zihi kako
 // ideja: odlucila sam implementirati na nacin da setac ili vlasnik vidi notifikacije tek kad klikne na ikonicu notifikacija u headeru jer mi se polling cini overkill za sad
@@ -380,6 +371,17 @@ start(PORT);
 // idRezervacija, tipSetnja, cijena, trajanje, imeKorisnik, prezKorisnik, datum, vrijeme, polaziste, dodNapomene
 // to se dobije mergeanjem tablica KORISNIK, VLASNIK (jer mi trebaju ime i prezime vlasnika koji je napravio rezervaciju), REZERVACIJA, SETNJA
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "na cekanju" jer su to notifikacije za setaca
+app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
+    try {
+        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const notifications = await db.getSetacNotifikacije(idKorisnik);
+
+        return res.status(200).json(notifications);
+    } catch (err) {
+        console.error('Error in /api/setac/notifikacije:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 //PATCH /api/rezervacija/:idRezervacija/prihvati (zove se u HeaderUlogiran.jsx)
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
@@ -410,5 +412,14 @@ start(PORT);
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
 // ako sve prode, updateat rezervaciju da bude u statusu "placeno"
+
+const PORT = process.env.PORT || 8000;
+const start = async (port) => {
+    app.listen(port, () => {
+        console.log(`Server running on port: ${port}`);
+    });
+};
+
+start(PORT);
 
 export default app;

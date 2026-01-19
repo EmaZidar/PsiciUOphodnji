@@ -208,6 +208,19 @@ export async function deleteSetnja(idSetnja) {
     return res;
 }
 
+export async function getSetacNotifikacije(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, tipSetnja, cijena, trajanje, imeKorisnik, prezKorisnik, datum, vrijeme, polaziste, dodNapomene
+            FROM korisnik k
+                NATURAL JOIN vlasnik
+                JOIN rezervacija r ON k.idKorisnik = r.idKorisnik
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE s.idKorisnik = $1 AND r.status = 'na čekanju'`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");

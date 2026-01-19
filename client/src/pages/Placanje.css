@@ -1,0 +1,90 @@
+.placanje-container{
+  padding: 20px;
+  max-width: 720px;
+  margin: 20px auto;
+  color: #334155;
+}
+
+.placanje-container h2{
+  margin-bottom: 12px;
+  color: #0097D7;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.placanje-card{
+  background: #ffffff;
+  border: 1px solid #e6edf6;
+  border-radius: 10px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  max-width: 680px;
+}
+
+.placanje-label{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: bold;
+}
+
+.placanje-select,
+.placanje-card input,
+.placanje-card textarea{
+  padding: 10px;
+  border: 1px solid #d7dee9;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.placanje-method-label{
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.placanje-method{
+  padding: 10px;
+  border: 1px solid #d7dee9;
+  border-radius: 8px;
+  background: #f9fbfd;
+  font-size: 0.95rem;
+}
+
+.placanje-actions{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.placanje-button{
+  background: #0097D7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.placanje-back{
+  background: transparent;
+  color: #334155;
+  border: 1px solid #e6edf6;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.placanje-error{
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) { 
+   .placanje-container{ padding: 16px 12px; } 
+   .placanje-card{ padding: 14px; } 
+   .placanje-actions{ justify-content: stretch; flex-direction: column-reverse; } 
+   .placanje-button, .placanje-back{ width: 100%; }
+}

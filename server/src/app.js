@@ -47,7 +47,7 @@ const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
-    'https://www.googleapis.com/auth/calendar.events',
+//  "https://www.googleapis.com/auth/calendar.events",
 ];
 
 app.get("/login/auth", async (_req, res) => {

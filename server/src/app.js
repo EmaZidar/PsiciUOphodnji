@@ -374,6 +374,10 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
 app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
     try {
         const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsSetac(idKorisnik))
+            return res.status(403).json({ error: "Nisi setac!!!!!!!!!" });
+
         const notifications = await db.getSetacNotifikacije(idKorisnik);
 
         return res.status(200).json(notifications);
@@ -387,6 +391,18 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
 // provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
 // ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
+app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, async (req, res) => {
+    try {
+        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsSetac(idKorisnik))
+            return res.status(403).json({ error: "Nisi setac!!!!!!!!!" });
+
+        const notifications = await db.getSetacNotifikacije(idKorisnik);
+    } catch (err) {
+
+    }
+})
 
 //PATCH /api/rezervacija/:idRezervacija/odbij (zove se u HeaderUlogiran.jsx)
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"

@@ -19,7 +19,7 @@ export default function HomeUlogiran() {
       const response = await fetch(API, { credentials: 'include' });
       if (!response.ok)
         throw new Error(`Response status: ${response.status}`);
-
+        
       const data = await response.json();
       return data;
     }

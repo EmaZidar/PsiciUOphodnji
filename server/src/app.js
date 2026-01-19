@@ -368,4 +368,49 @@ const start = async (port) => {
 
 start(PORT);
 
+// APIJI ZA NOTIFIKACIJE I PLAĆANJE
+// odite na pageove di se zovu ovi apiji da vidite kontekst i da dodate ono VITE_BACKEND_URL ili sta vec treba jer nisam bila zihi kako
+// ideja: odlucila sam implementirati na nacin da setac ili vlasnik vidi notifikacije tek kad klikne na ikonicu notifikacija u headeru jer mi se polling cini overkill za sad
+// dakle kad korisnik klikne na ikonicu, frontend salje request na backend da dohvati notifikacije
+// onda kad setac prihvati ili odbije rezervaciju, frontend salje request na backend da updatea status rezervacije
+// znaci basically notifikacije su samo filtriranje po statusu rezervacije i vracanje tih rezervacija u frontend ovisno je li u pitanju vlasnik ili setac
+
+//GET /api/setac/notifikacije (zove se u HeaderUlogiran.jsx)
+// prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
+// provjera: korisnik mora biti ulogiran i mora biti setac
+// backend mora vratiti array notifikacija za setaca - svaki objekt notifikacije treba imati:
+// idRezervacija, tipSetnja, cijena, trajanje, imeKorisnik, prezKorisnik, datum, vrijeme, polaziste, dodNapomene
+// to se dobije mergeanjem tablica KORISNIK, VLASNIK (jer mi trebaju ime i prezime vlasnika koji je napravio rezervaciju), REZERVACIJA, SETNJA
+// bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "na cekanju" jer su to notifikacije za setaca
+
+//PATCH /api/rezervacija/:idRezervacija/prihvati (zove se u HeaderUlogiran.jsx)
+// provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
+// provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
+// ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
+
+//PATCH /api/rezervacija/:idRezervacija/odbij (zove se u HeaderUlogiran.jsx)
+// provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
+// provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
+// ako sve prode, updateat rezervaciju da bude u statusu "odbijeno"!!!!
+
+//GET /api/vlasnik/notifikacije (zove se u HeaderUlogiran.jsx)
+// prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
+// provjera: korisnik mora biti ulogiran i mora biti vlasnik
+// backend mora vratiti array notifikacija za vlasnika - svaki objekt notifikacije treba imati:
+// idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
+// to se dobije mergeanjem tablica REZERVACIJA i SETNJA
+// bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
+
+//GET /api/rezervacije/:idRezervacija (zove se u Placanje.jsx)
+// sluzi da se dohvati detalje rezervacije za prikaz na stranici placanja
+// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
+// backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
+// to se sve dobije iz tablice REZERVACIJA
+
+//PATCH /api/rezervacije/:idRezervacija/placanje (zove se u Placanje.jsx)
+// sluzi da se updatea rezervacija kao placena
+// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
+// provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
+// ako sve prode, updateat rezervaciju da bude u statusu "placeno"
+
 export default app;

@@ -220,6 +220,16 @@ app.get('/api/setaci', async (req, res) => {
     }
 });
 
+app.get('/api/vlasnici', async (req, res) => {
+    try {
+        const vlasnici = await db.getAllVlasnici();
+        res.status(200).json(vlasnici);
+    } catch (err) {
+        console.error('Error in /api/vlasnici:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.get('/api/setnje/:idkorisnik', async (req, res) => {
     try {
         const idkorisnik = parseInt(req.params.idkorisnik, 10);

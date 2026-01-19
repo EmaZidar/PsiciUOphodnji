@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 
 export default function Korisnici() {
     const [setaci, setSetaci] = useState([]);
+        const [vlasnici, setvlasnici] = useState([]);
+
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState(null);
     
@@ -34,6 +36,29 @@ export default function Korisnici() {
     loadSetaci();
   }, []);
 
+  useEffect(() => {
+        
+        const loadvlasnici = async () => {
+          try {
+            setLoading(true);
+            setError(null);
+            const response = await fetch('/api/vlasnici', { 
+              method: 'GET',
+              credentials: 'include' });
+            if (!response.ok) throw new Error(`Server returned ${response.status}`);
+            const data = await response.json();
+            setvlasnici(Array.isArray(data) ? data : (data?.vlasnici ?? []));
+          } catch (err) {
+              setError(err.message || 'Greška pri dohvaćanju podataka');
+              setSetaci([]);
+          } finally {
+              setLoading(false);
+          }
+        };
+    
+    loadvlasnici();
+  }, []);
+
     const svikorisnici=[{ime: "snss", prezime: "dnnncvnf"}]
     return(
         <>
@@ -48,6 +73,8 @@ export default function Korisnici() {
         <div className="setaci-list">
         {loading && <p>Učitavanje korisnika...</p>}
         {!loading && error && <p className="error-message">{error}</p>}
+
+        <h2>Šetači</h2>
         {!loading && !error && setaci.map((setac) => (
           <article className="setac-card" key={setac.idkorisnik}>
             <div className="setac-info">
@@ -61,9 +88,26 @@ export default function Korisnici() {
               <p>
                 <span>Ocjena: {setac.ocjena}/5 ⭐</span>
               </p>
+            </div>
+
+            <button>Obriši ga</button>   
+
+          </article>
+        ))}
+
+
+        <h2>Vlasnici</h2>
+        {!loading && !error && vlasnici.map((vl) => (
+          <article className="setac-card" key={vl.idkorisnik}>
+            <div className="setac-info">
+              <h2 className="setac-name">{vl.imekorisnik} {vl.prezkorisnik}</h2>
               <p>
-                <span>Uloga: </span>
+                <span>Prima Obavijesti: {vl.primanjeObavijesti} </span>
               </p>
+              <p>
+                <span>Telefon: {vl.telefon}</span>
+              </p>
+              
             </div>
 
             <button>Obriši ga</button>   

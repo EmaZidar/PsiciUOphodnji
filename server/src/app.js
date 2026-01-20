@@ -548,7 +548,7 @@ export default app;
 // GET /api/setaci/:idkorisnik/recenzije (zove se u Reviews.jsx)
 // svrha: dohvatiti sve recenzije za setaca s idkorisnik
 // nema neke provjere
-// backend treba vratiti array recenzija - svaki objekt recenzije treba imati:
+// backend treba vratiti array recenzija pod imenom "recenzije" - svaki objekt recenzije treba imati:
 // idrecenzija, ocjena, tekst (ako ga ima), fotografija (ako je ima), imekorisnik, prezkorisnik (ime i prezime vlasnika koji je ostavio recenziju)
 // to se dobije mergeanjem tablica SETAC, SETNJA, REZERVACIJA, RECENZIJA, VLASNIK, KORISNIK
 // edge case: ako setac nema recenzija, treba vratiti prazan array

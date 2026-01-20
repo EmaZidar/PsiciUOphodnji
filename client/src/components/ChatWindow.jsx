@@ -1,0 +1,54 @@
+import React, { useEffect, useState } from "react";
+
+export default function ChatWindow({ chat, me }) {
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+
+  const fetchMessages = async () => {
+    const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    setMessages(data);
+  };
+
+  useEffect(() => {
+    if (!chat) return;
+    fetchMessages();
+  }, [chat]);
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ tekst: text }),
+    });
+    if (res.ok) {
+      setText("");
+      fetchMessages();
+    }
+  };
+
+  return (
+    <div className="chat-window">
+      <div className="chat-header">Razgovor s {chat.otherName}</div>
+      <div className="chat-messages">
+        {messages.map((m) => {
+          const isMe = me && (me.idkorisnik === (m.posiljatelj ?? m.posiljatelj));
+          return (
+            <div key={m.idporuka ?? m.idPoruka} className={`chat-message ${isMe ? 'me' : 'them'}`}>
+              <div className="chat-message-text">{m.tekst}</div>
+              <div className="chat-message-time">{new Date(m.vrijemeSlanja ?? m.vrijemeSlanja).toLocaleString()}</div>
+            </div>
+          );
+        })}
+      </div>
+      <form className="chat-input" onSubmit={handleSend}>
+        <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Pošalji poruku..." />
+        <button type="submit">Pošalji</button>
+      </form>
+    </div>
+  );
+}

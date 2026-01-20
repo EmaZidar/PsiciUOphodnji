@@ -120,6 +120,7 @@ export default function Register() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(resultForm),
+        credentials: 'include'
       })
       console.log('Fetch result:', fetchResult)
 

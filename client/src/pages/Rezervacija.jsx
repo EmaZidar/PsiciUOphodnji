@@ -8,7 +8,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Rezervacija() {
    const navigate = useNavigate();
-   const { idkorisnik, idsetnja } = useParams();
+   const { idsetnja } = useParams();
 
    const [rezervacija, setRezervacija] = useState({
       polaziste: '',
@@ -31,7 +31,6 @@ export default function Rezervacija() {
       if (!rezervacija.vrijeme) return 'Vrijeme je obavezno.';
       if (!rezervacija.datum) return 'Datum je obavezan.';
       if (!idsetnja) return 'ID šetnje nije pronađen u URL-u.';
-      if (!idkorisnik) return 'ID korisnika nije pronađen u URL-u.';
       return null;
    }
 
@@ -54,12 +53,12 @@ export default function Rezervacija() {
          const payload = {
             ...rezervacija,
             idSetnja: idsetnja,
-            idKorisnik: idkorisnik,
-            status: 'na čekanju',
+            status: 'na cekanju',
          };
          const res = await fetch(`${BACKEND_URL}/api/rezervacije`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(payload),
          });
 
@@ -68,12 +67,8 @@ export default function Rezervacija() {
             throw new Error(text || `Server returned ${res.status}`);
          }
 
-         const created = await res.json();
-         const idRezervacija = created.idRezervacija || created.id || created.insertId || null;
-         if (!idRezervacija) throw new Error('Nije vraćen id rezervacije od servera.');
-
          setLoading(false);
-         navigate(`/placanje/${idRezervacija}`);
+         navigate('/main');
       } catch (err) {
          setError('Greška pri slanju rezervacije: ' + err.message);
          setLoading(false);
@@ -101,7 +96,6 @@ export default function Rezervacija() {
                Način plaćanja
                <select name="nacinPlacanja" value={rezervacija.nacinPlacanja} onChange={handleChange}>
                   <option value="gotovina">Gotovina</option>
-                  <option value="PayPal">PayPal</option>
                   <option value="kreditna kartica">Kreditna kartica</option>
                </select>
             </label>

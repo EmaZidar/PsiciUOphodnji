@@ -234,7 +234,7 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const idKorisnik = req.session.user.idKorisnik;
+        const idKorisnik = req.session.user.idkorisnik;
         const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
         const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);

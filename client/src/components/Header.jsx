@@ -13,11 +13,6 @@ export default function Header() {
         {/*  */}
 
         <div className="header-right">
-          <nav className="header-nav" aria-label="Glavni izbornik">
-            <a href="#about">O nama</a>
-            <a href="#zasto">Zašto mi?</a>
-            <a href="#kontakt">Kontakt</a>
-          </nav>
           <div className="auth-actions">
             <a href="/login" className="btn signin">Sign in</a>
             <a href="/register" className="btn primary">Sign up</a>

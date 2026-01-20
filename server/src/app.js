@@ -524,6 +524,14 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
 // sortirati po datumu i vremenu (uzlazno)
 
 
+
+// TODO /vlasnik/:id endpoint za dohvat vlasnika i njegovih pasa
+// /api/vlasnik/:id
+// Iz tablica KORISNIK i VLASNIK trebam dohvatiti podatke o vlasniku ime, prezime, email, telefon
+// Iz tablice PAS trebam dohvatiti sve pse tog vlasnika, znaci sve ono sto on opisuje za psa svog
+// idpas, imepas, pasmina, starost, socijalizacija, razinaenergije, zdravnapomene
+// sorturati pse po imenu psa ili idu redom kako su uneseni
+
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {
     app.listen(port, () => {

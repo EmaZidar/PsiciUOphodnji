@@ -72,7 +72,7 @@ export default function NotificationDropdown({
                         <br />
                         Šetnja: <b>{notif.tipsetnja}</b> {notif.cijena} €/sat, {notif.trajanje} min
                         <br />
-                        <b>{notif.datum}</b> u <b>{notif.vrijeme}</b>
+                        <b>{formatDatumHR(notif.datum)}</b> u <b>{formatVrijeme(notif.vrijeme)}</b>
                      </p>
                      {notif.status === 'potvrdeno' && (
                         <div className="notif-actions">

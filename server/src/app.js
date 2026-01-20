@@ -409,12 +409,12 @@ function changeRezervacijaStatus(newStatus) {
     return async (req, res) => {
         try {
             const idRezervacija = req.params.idRezervacija;
-            const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+            const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
-            const success = await db.changeRezervacijaStatus(idKorisnik, idRezervacija, newStatus);
+            const success = await db.changeRezervacijaStatus(idkorisnik, idRezervacija, newStatus);
             if (success)
                 return res.sendStatus(204); // no content
             return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
@@ -446,12 +446,12 @@ app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeR
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
 app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
-        if (!await db.checkIsVlasnik(idKorisnik))
+        if (!await db.checkIsVlasnik(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
 
-        const notifications = await db.getVlasnikNotifikacije(idKorisnik);
+        const notifications = await db.getVlasnikNotifikacije(idkorisnik);
 
         return res.status(200).json(notifications);
     } catch (err) {

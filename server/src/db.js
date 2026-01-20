@@ -233,10 +233,10 @@ export async function getSetacNotifikacije(idKorisnik) {
 export async function changeRezervacijaStatus(idKorisnik, idRezervacija, newStatus) {
     const res = await pool.query(
         `UPDATE rezervacija r
-            SET r.status = $3
+            SET status = $3
             WHERE r.idRezervacija = $1
                 AND r.status = 'na cekanju'
-                AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = i.idSetnja AND s.idKorisnik = $2)
+                AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = r.idSetnja AND s.idKorisnik = $2)
             RETURNING idRezervacija`,
         [idRezervacija, idKorisnik, newStatus]
     );

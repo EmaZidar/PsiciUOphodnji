@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="footer-columns">
           <div className="col">
             <a href="/" aria-label="PawPal home">
-              <img src="images/logo.png" alt="PawPal logo" className="footer-logo" />
+              <img src="/images/logo.png" alt="PawPal logo" className="footer-logo" />
             </a>
           </div>
           <div className="col">

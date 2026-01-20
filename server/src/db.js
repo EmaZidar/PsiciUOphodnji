@@ -42,6 +42,16 @@ export async function createVlasnik(primanjeObavijesti, idKorisnik) {
     return res
 }
 
+export async function checkIsSetac(idKorisnik) {
+    const res = await pool.query("SELECT idKorisnik FROM setac WHERE idKorisnik = $1", [idKorisnik]);
+    return res.rows.length !== 0;
+}
+
+export async function checkIsVlasnik(idKorisnik) {
+    const res = await pool.query("SELECT idKorisnik FROM vlasnik WHERE idKorisnik = $1", [idKorisnik]);
+    return res.rows.length !== 0;
+}
+
 export async function getUserWithRole(userId) {
     const userResult = await pool.query(
         "SELECT * FROM KORISNIK WHERE idKorisnik = $1",
@@ -206,6 +216,69 @@ export async function deleteSetnja(idSetnja) {
         [idSetnja]
     );
     return res;
+}
+
+export async function getSetacNotifikacije(idKorisnik) {
+    const res = await pool.query(
+        `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, k.imeKorisnik, k.prezKorisnik, r.datum, r.vrijeme, r.polaziste, r.dodNapomene
+            FROM rezervacija r
+                JOIN setnja s ON r.idSetnja = s.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
+            WHERE s.idKorisnik = $1 AND r.status = 'na cekanju'`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
+export async function changeRezervacijaStatus(idKorisnik, idRezervacija, newStatus) {
+    const res = await pool.query(
+        `UPDATE rezervacija r
+            SET status = $3
+            WHERE r.idRezervacija = $1
+                AND r.status = 'na cekanju'
+                AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = r.idSetnja AND s.idKorisnik = $2)
+            RETURNING idRezervacija`,
+        [idRezervacija, idKorisnik, newStatus]
+    );
+    return res.rows.length !== 0;
+}
+
+export async function getVlasnikNotifikacije(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE r.idKorisnik = $1 AND (r.status = 'potvrdeno' OR r.status = 'odbijeno')`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
+export async function getRezervacija(idKorisnik, idRezervacija) {
+    const res = await pool.query(
+        `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
+            FROM rezervacija
+            WHERE idRezervacija = $1 AND idKorisnik = $2`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length >= 1 ? res.rows[0] : undefined;
+}
+
+// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
+// provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
+// ako sve prode, updateat rezervaciju da bude u statusu "placeno"
+export async function platiRezervaciju(idKorisnik, idRezervacija) {
+    const res = await pool.query(
+        `UPDATE rezervacija r
+            SET status = 'placeno'
+            WHERE r.idRezervacija = $1
+                AND r.idKorisnik = $2
+                AND r.status = 'potvrdeno'
+                AND r.nacinPlacanja = 'kreditna kartica'
+            RETURNING idRezervacija`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length !== 0;
 }
 
 export async function testConnection() {

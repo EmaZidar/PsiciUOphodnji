@@ -29,11 +29,12 @@
   z-index: 100;
 }
 
-.notif-link{
+.notif-button{
   position: relative;
   display: inline-flex;
   align-items: center;
   padding: 6px;
+  cursor: pointer;
 }
 
 .notif-badge{

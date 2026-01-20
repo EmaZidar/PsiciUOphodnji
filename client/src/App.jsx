@@ -7,7 +7,6 @@ import Register from "./pages/Register.jsx";
 import DostupneSetnje from "./pages/DostupneSetnje.jsx";
 import Rezervacija from "./pages/Rezervacija.jsx";
 import Placanje from "./pages/Placanje.jsx";
-import Notifications from "./pages/Notifications.jsx";
 import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -30,8 +29,7 @@ function App() {
           <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />
           <Route path="/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
           <Route path="/placanje" element={<Placanje />} />
-          <Route path="/placanje/:idRezervacija" element={<Placanje />} />
-          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/placanje/:idrezervacija" element={<Placanje />} />
           <Route path="/admin" element={<UlogiranAdmin />} />
           <Route path="/korisnici" element={<Korisnici />} />
           <Route path="/clanarina" element={<Clanarina />} />

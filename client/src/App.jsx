@@ -29,7 +29,7 @@ function App() {
           <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />
           <Route path="/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
           <Route path="/placanje" element={<Placanje />} />
-          <Route path="/placanje/:idRezervacija" element={<Placanje />} />
+          <Route path="/placanje/:idrezervacija" element={<Placanje />} />
           <Route path="/admin" element={<UlogiranAdmin />} />
           <Route path="/korisnici" element={<Korisnici />} />
           <Route path="/clanarina" element={<Clanarina />} />

@@ -18,15 +18,19 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(cors({
     origin: [
-        'http://localhost:5173',
-        process.env.CLIENT_URL
+        process.env.CLIENT_URL,
+        'http://localhost:5173'
     ],
     credentials: true
 }));
-console.log(`NODE_ENV = ${process.env.NODE_ENV}, isProduction = ${process.env.NODE_ENV === "production"}`)
+
+console.log(`NODE_ENV = ${process.env.NODE_ENV}, isProduction = ${process.env.NODE_ENV === "production"}`);
+console.log(`CLIENT_URL = ${process.env.CLIENT_URL}`);
+console.log(`SESSION_SECRET exists = ${!!process.env.SESSION_SECRET}`);
+
 app.use(
     session({
-        secret: "Rainbow feline",
+        secret: process.env.SESSION_SECRET || "Rainbow feline",
         resave: false,
         saveUninitialized: false,
         cookie: {

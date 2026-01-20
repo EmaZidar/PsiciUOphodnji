@@ -27,7 +27,6 @@ export default function Header() {
   }
 
 
-  async function fetchUnread() {
   const fetchNotifications = async () => {
     if (!user?.role) return;
     setLoading(true);
@@ -47,7 +46,7 @@ export default function Header() {
       setLoading(false);
     }
   };
-  }
+  
   const handleNotifClick = () => {
     const otvaranje = !open;
     setOpen(otvaranje);

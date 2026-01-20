@@ -506,6 +506,32 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 })
+// GET /api/chats
+// TODO: Dohvatiti idkorisnik prijavljenog korisnika
+// Dohvatiti sve rezervacije gdje je korisnik vlasnik ili šetač
+//  Za svaku rezervaciju:
+//  odrediti drugog sudionika chata
+// mapirati podatke (idRezervacija, idSetnja, otherId, otherName, tipSetnja, datum, vrijeme)
+// Sortirati chatove po datumu i vremenu
+//  Vratiti listu chatova kao JSON
+
+// GET api/chats/:idRezervacija/messages 
+//  Dohvatiti idRezervacija iz params
+//  Dohvatiti idkorisnik prijavljenog korisnika
+//  Provjeriti postoji li rezervacija
+//  Provjeriti da je korisnik sudionik rezervacije
+//  Dohvatiti sve poruke za rezervaciju
+//  Sortirati poruke po vrijemeSlanja ASC
+//  Vratiti poruke kao JSON
+
+// POST /api/chats/:idRezervacija/messages ---
+//  Dohvatiti idRezervacija iz params
+//  Dohvatiti tekst poruke iz body-ja
+//  Dohvatiti idkorisnik prijavljenog korisnika
+//  Provjeriti postoji li rezervacija
+//  Provjeriti da je korisnik sudionik rezervacije
+//  Spremiti poruku u bazu (vrijemeSlanja = NOW())
+//  Vratiti kreiranu poruku kao JSON
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

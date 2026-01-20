@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Register.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -119,10 +120,21 @@ export default function Register() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(resultForm),
+        credentials: 'include'
       })
-      console.log('Fetch result:', fetchResult)
 
-      alert('Registracija uspješna!');
+      if (!fetchResult.ok) {
+        const err = await fetchResult.json().catch(() => ({}));
+        throw new Error(err.error || 'Greška na serveru');
+      }
+
+      const body = await fetchResult.json().catch(() => ({}));
+      const role = body.role || 'unassigned';
+
+      alert('Registracija uspješna! Preusmjeravam...');
+  
+      const appUrl = APP_URL || window.location.origin;
+      window.location.href = `${appUrl}/main?role=${encodeURIComponent(role)}`;
       
       
     } catch (error) {

@@ -394,6 +394,7 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
         const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idkorisnik))
+        if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
         const notifications = await db.getSetacNotifikacije(idkorisnik);
@@ -410,7 +411,6 @@ function changeRezervacijaStatus(newStatus) {
         try {
             const idRezervacija = req.params.idRezervacija;
             const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
         if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
@@ -419,7 +419,7 @@ function changeRezervacijaStatus(newStatus) {
                 return res.sendStatus(204); // no content
             return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
         } catch (err) {
-            console.error('Error in /api/rezervacija/*/prihvati:', err);
+            console.error(`Error in /api/rezervacija/*/${newStatus}`, err);
             res.status(500).json({ error: 'Internal server error' });
         }
     }
@@ -465,6 +465,24 @@ app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
 // to se sve dobije iz tablice REZERVACIJA
+app.get('/api/rezervacije/:idRezervacija', async (req, res) => {
+    try {
+        const idRezervacija = req.params.idRezervacija;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsVlasnik(idkorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+
+        const rezervacija = await db.getRezervacija(idkorisnik, idRezervacija);
+
+        if (!rezervacija)
+            return res.status(404).json({ error: "Ne postoji takva rezervacija kod trenutnog vlasnika" });
+        return res.status(200).json(rezervacija);
+    } catch (err) {
+        console.error('Error in /api/rezervacije/*', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 //PATCH /api/rezervacije/:idRezervacija/placanje (zove se u Placanje.jsx)
 // sluzi da se updatea rezervacija kao placena

@@ -8,6 +8,9 @@ export default function ChatWindow({ chat, me }) {
     const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: 'include' });
     if (!res.ok) return;
     const data = await res.json();
+    data.sort(
+      (a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja)
+    );
     setMessages(data);
   };
 
@@ -36,9 +39,9 @@ export default function ChatWindow({ chat, me }) {
       <div className="chat-header">Razgovor s {chat.otherName}</div>
       <div className="chat-messages">
         {messages.map((m) => {
-          const isMe = me && (me.idkorisnik === (m.posiljatelj ?? m.posiljatelj));
+          const isMe = me && me.idkorisnik === m.posiljatelj;
           return (
-            <div key={m.idporuka ?? m.idPoruka} className={`chat-message ${isMe ? 'me' : 'them'}`}>
+            <div key={m.idporuka} className={`chat-message ${isMe ? 'me' : 'them'}`}>
               <div className="chat-message-text">{m.tekst}</div>
               <div className="chat-message-time">{new Date(m.vrijemeSlanja ?? m.vrijemeSlanja).toLocaleString()}</div>
             </div>

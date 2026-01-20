@@ -170,7 +170,6 @@ app.post('/api/register', (req, res) => {
       db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
   })
 
-  res.redirect(`${process.env.CLIENT_URL}/login/auth`)
   res.sendStatus(200)
 })
 

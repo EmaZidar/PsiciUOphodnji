@@ -132,6 +132,8 @@ app.get("/google/callback", async (req, res) => {
     }
 });
 
+
+//TODO ADMIN TIP CLANARINE to mi treba nez jel to na kraju imamo tu ili ne
 app.post('/api/register', (req, res) => {
   console.log("registering....")
   if (req.headers["content-type"] !== "application/json") {
@@ -232,7 +234,8 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const { idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
+        const idKorisnik = req.session.user.idkorisnik;
+        const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
         const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
     } catch (err) {
@@ -240,6 +243,11 @@ app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+//TODO PSI  ja imam fetch("http://localhost:8000/psi", i tamo saljem psa  tj zapravo 
+// saljem objekt koji se zove "kojiPas" jer je u njemu svi atribut od psa ali  i idKorisnik jer bi rekla da bi trebali vi
+//kad se stvori novi pas njemu napravit idPas pa sam poslala i idKorisnik ak bi doslo do problema ak se dva psa zovu isto
+//ugl 
 
 app.get('/api/setnje/:idkorisnik', async (req, res) => {
     try {
@@ -261,6 +269,16 @@ app.get('/api/setnje/:idkorisnik', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
+
+//TODO MOJE SETNJE   moja ideja je da vi filtirate koje setnje su prosle a koje bududce s nekim ono current_date u bazi i 
+//da tako svaki put kad se ispisu setnje vi filtrirate koje se meni salju na  
+//  fetch('/api/prosleSetnje/${idKorisnik}', {  a koje da mi se salju na /buduceSetnje/${idKorisnik} jer ja tako napravim 2 liste pa prek tog radim 
+//al ak mislite da je lakse meni na frontu filtrirat mogu al nekak mi se cinilo lakse da sam napravite neki query bazi 
+// setnja.datum-current_date>0 pa bi mi to bilo idealno i idkorisnik saljem id vlasnika log
+
+
 
 // Kreiraj novu šetnju
 app.post('/api/setnja', async (req, res) => {

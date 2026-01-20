@@ -7,8 +7,10 @@ export default function Psi() {
 
 const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [error, setError] = useState(null);    
-    useEffect(() => {
+  const [error, setError] = useState(null);   
+          const [psi, setpsi] = useState([]);
+  
+  useEffect(() => {
         const API = `${BACKEND_URL}/api/me`;
         fetch(API, { credentials: 'include' })
           .then((r) => {
@@ -24,12 +26,37 @@ const [loading, setLoading] = useState(true);
             setLoading(false);
           });
       }, []);
+
+
+ 
+
+    useEffect(() => {
+            
+            const loadpsi = async () => {
+              try {
+                setLoading(true);
+                setError(null);
+                const response = await fetch('/api/psi', { 
+                  method: 'GET',
+                  credentials: 'include' });
+                if (!response.ok) throw new Error(`Server returned ${response.status}`);
+                const data = await response.json();
+                setpsi(Array.isArray(data) ? data : (data?.psi ?? []));
+              } catch (err) {
+                  setError(err.message || 'Greška pri dohvaćanju podataka');
+                  setpsi([]);
+              } finally {
+                  setLoading(false);
+              }
+            };
+        
+        loadpsi();
+      }, []);
     
  // const njegoviPsi = []; // tu nekako s bekenda dobit te podatke
-const firstName =
-  user?.imeKorisnik ||'';
-const idvlasnika = user?.idKorisnik||'';
-const njegoviPsi=user?.Psi || [{imePas: "imamIme"}, { imePas: "Rex", pasmina: "Mješanac", starost: 3, razinaEnergije: "visoka" },
+
+const idKorisnik = user?.idKorisnik||'';
+const njegoviPsi=psi || [{imePas: "imamIme"}, { imePas: "Rex", pasmina: "Mješanac", starost: 3, razinaEnergije: "visoka" },
   { imePas: "Max" }]
 
 
@@ -56,7 +83,7 @@ const njegoviPsi=user?.Psi || [{imePas: "imamIme"}, { imePas: "Rex", pasmina: "M
 function handleSubmit(e) {
   e.preventDefault();
   const kojiPas={...pas, idKorisnik: idKorisnik}
-  fetch("http://localhost:8000/psi", {   //TODO link provjeri
+  fetch("http://localhost:8000/psi", {   //TODO
     method: "POST",
     headers: {
     "Content-Type": "application/json"
@@ -84,11 +111,9 @@ function resetiraj(e){
   razinaEnergije: "", zdravNapomene:"", socijalizacija:""});
 }
 
-function izbrisi(){
-  const kojiPas={...pas, idKorisnik: idKorisnik}
-  fetch("http://localhost:8000/psi", {   // link 
-    method: "POST",
-    body: JSON.stringify(kojiPas)
+function izbrisi(idPas){
+  fetch("http://localhost:8000/psi/${idPas}", {   // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
+    method: "DELETE",
   });
 }
 
@@ -96,7 +121,7 @@ function izbrisi(){
 
   return (
     <div className="sviPsi">
-        {njegoviPsi.map((pas)=> (<div className="jedanPas"> 
+        {njegoviPsi.map((pas)=> (<div key={pas.idPas} className="jedanPas"> 
             <h3 className="imePsa">{pas.imePas || "-" }</h3>
             <p>Pasmina:{pas.pasmina || "-"}</p>
             <p>Godine: {pas.starost|| "-"}</p>
@@ -104,7 +129,7 @@ function izbrisi(){
             <p>Zdravstvene napomene: {pas.zdravNapomene || "-"}</p>
             <p>Razina energije: {pas.razinaEnergije|| "-"}</p>
 
-            <button onClick={izbrisi}>Izbriši psa</button>                       
+            <button onClick={izbrisi(pas.idPas)}>Izbriši psa</button>                       
 
          </div>))}
          <div className="dodajP">
@@ -112,7 +137,7 @@ function izbrisi(){
          </div>
          {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
             <label for="ime">Ime psa:</label>
-            <input type="text" id="ime" name="ime"   value={pas.imePas}  onChange={spremi}></input><br></br>
+            <input type="text" id="imePas" name="imePas"   value={pas.imePas}  onChange={spremi}></input><br></br>
             <label for="pasmina">Pasmina:      </label>
             <input type="text" id="pasmina" name="pasmina" value={pas.pasmina}  onChange={spremi}></input><br></br>
             <label>Godine:</label>

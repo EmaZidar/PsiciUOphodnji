@@ -122,7 +122,7 @@ export default function Register() {
       })
       console.log('Fetch result:', fetchResult)
 
-      alert('Registracija uspješna!');
+      window.location.href = '/';
       
       
     } catch (error) {

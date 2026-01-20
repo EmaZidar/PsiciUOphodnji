@@ -10,7 +10,7 @@ export default function Header() {
           <Link className="brand" to="/">Pawpal</Link>
         </div>
 
-        {/* search removed per request */}
+        {/*  */}
 
         <div className="header-right">
           <nav className="header-nav" aria-label="Glavni izbornik">

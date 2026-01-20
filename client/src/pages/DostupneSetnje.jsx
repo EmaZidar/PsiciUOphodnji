@@ -106,7 +106,7 @@ export default function DostupneSetnje() {
                                  <strong>Cijena:</strong> {setnja.cijena} €
                               </div>
                               <div className="setnja-action">
-                                 <Link key={setnja.idsetnja} to={`/${setac.idkorisnik}/setnje/${setnja.idsetnja}/rezervacija`}>
+                                 <Link key={setnja.idsetnja} to={`/setnje/${setnja.idsetnja}/rezervacija`}>
                                     <button className="btn-termini">Rezerviraj</button>
                                  </Link>
                               </div>

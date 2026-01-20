@@ -13,7 +13,8 @@ export default function MojeSetnje(){
       
       const [imagePreview, setImagePreview] = useState(null);
       const [uploading, setUploading] = useState(false);
-    
+    const[prosleSetnje,setprosle]=useState([])
+    const[buduceSetnje,setbuduce]=useState([])
 
 
         useEffect(() => {
@@ -32,17 +33,56 @@ export default function MojeSetnje(){
                 setLoading(false);
               });
           }, []);
+
+idKorisnik=user.idKorisnik
+       useEffect(() => {
+               const loadprosle = async () => {
+                 try {
+                   setLoading(true);
+                   setError(null);
+                   const response = await fetch('/api/prosleSetnje/${idKorisnik}', { 
+                     method: 'GET',
+                     credentials: 'include' });
+                   if (!response.ok) throw new Error(`Server returned ${response.status}`);
+                   const data = await response.json();
+                   setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ?? []));
+                 } catch (err) {
+                     setError(err.message || 'Greška pri dohvaćanju podataka');
+                     setprosle([]);
+                 } finally {
+                     setLoading(false);
+                 }
+               };
+           loadprosle();
+         }, []);    
+         
+     useEffect(() => {
+               const loadbuduce = async () => {
+                 try {
+                   setLoading(true);
+                   setError(null);
+                   const response = await fetch('/api/buduceSetnje/${idKorisnik}', { 
+                     method: 'GET',
+                     credentials: 'include' });
+                   if (!response.ok) throw new Error(`Server returned ${response.status}`);
+                   const data = await response.json();
+                   setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? []));
+                 } catch (err) {
+                     setError(err.message || 'Greška pri dohvaćanju podataka');
+                     setbuduce([]);
+                 } finally {
+                     setLoading(false);
+                 }
+               };
+           loadbuduce();
+         }, []);    
         
-    const firstName =
-      user?.imeKorisnik ||
-      '';
-    const njegoveProsleSetnje=user?.prosleSetnje || [{datum: "nema"}, { datum: "1.1.2000.",  recenzija: "-" },]
-    const njegoveBuduceSetnje=user?.buduceSetnje || [{datum: "nema"}, 
+    const njegoveProsleSetnje=prosleSetnje || [{datum: "nema"}, { datum: "1.1.2000.",  recenzija: "-" },]
+    const njegoveBuduceSetnje=buduceSetnje || [{datum: "nema"}, 
       { datum: "1.1.2026.",  otakazan: "0"}]
 
 
       const [prikaziFormu, setPrikaziFormu] = useState(false);
-    
 
 
       const [recenzija, setrecenzija] = useState({
@@ -63,7 +103,7 @@ export default function MojeSetnje(){
       
       function handleSubmit(e) {
         e.preventDefault();
-        fetch("http://localhost:8000/psi", {   //TODO link provjeri
+        fetch("http://localhost:8000/recenzija", {   //TODO link provjeri
           method: "POST",
           headers: {
           "Content-Type": "application/json"
@@ -100,6 +140,11 @@ export default function MojeSetnje(){
       setSelectedImage(null);
       }
       
+      function izbrisi(idRezervacija){
+  fetch("http://localhost:8000/setnje/${idRezervacija}", {   // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
+    method: "DELETE",
+  });
+}
 
       const handleImageUpload = async () => {
     if (!selectedImage) return;
@@ -217,7 +262,7 @@ export default function MojeSetnje(){
         <div className='jednaSetnja'>
             <h3>Šetnja</h3>
             <p>Zakazana: {setnja.datum} </p>
-            <button>Otkaži </button>
+            <button onClick={izbrisi(setnja.idRezervacija)}>Otkaži </button>
 
         </div>
 

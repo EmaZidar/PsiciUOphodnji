@@ -9,7 +9,9 @@ export default function MjesecnaClanarina() {
 	  const [sortBy, setSortBy] = useState('ocjena-silazno');
 	  const [loading, setLoading] = useState(true);
 	  const [error, setError] = useState(null);
-	
+  const [prikaziFormu, setPrikaziFormu] = useState(false);
+const [mjclanarina, setmjclanarina]=useState(0);
+
 	  useEffect(() => {
 		
 		const loadSetaci = async () => {
@@ -34,6 +36,54 @@ export default function MjesecnaClanarina() {
   }, []);
 
 
+  useEffect(() => {
+		
+		const loadmjcl = async () => {
+		  try {
+			setLoading(true);
+			setError(null);
+			const response = await fetch('/api/mjesecna', { 
+			  method: 'GET',
+			  credentials: 'include' });
+			if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			const data = await response.json();
+			setmjclanarina(data.mjesecna?? 0);
+		  } catch (err) {
+			  setError(err.message || 'Greška pri dohvaćanju podataka');
+			  setmjclanarina(0);
+		  } finally {
+			  setLoading(false);
+		  }
+		};
+	
+	loadmjcl();
+  }, []);
+
+
+
+
+  function uredi(){
+	setPrikaziFormu(true);
+
+  }
+
+  function spremi(e){
+	e.preventDefault();
+	setPrikaziFormu(false);
+
+  }
+
+  function spremi1(e){
+	setmjclanarina(e.target.value);
+	fetch("http://localhost:8000/mjesecna", {   //TODO
+    method: "POST",
+    headers: {
+    "Content-Type": "application/json"
+  },
+    body: JSON.stringify(mjclanarina)
+  });
+  };
+
 	return (
 		<>
 		<div className="clanarina-page">
@@ -42,8 +92,23 @@ export default function MjesecnaClanarina() {
 				
 				
 						<span className="clanarina-naziv">Mjesečna: </span>
-						<span className="clanarina-cijena"> 5 eura</span>
-						<button style={{ marginLeft: 12 }}>Uredi</button>
+						<span className="clanarina-cijena"> {mjclanarina}</span>
+						{prikaziFormu && (
+            <form onSubmit={spremi}>
+              <label> Unesi cijenu: </label>
+              <input 
+                type="number" 
+                name="cijena" 
+                value={mjclanarina} 
+                onChange={spremi1} 
+              />
+              <button type="submit">Spremi</button>
+            </form>
+          )}
+
+		  		{!prikaziFormu&&(<button onClick={uredi}   style={{ marginLeft: 12 }}>Uredi</button>)}
+
+						
 					</div>
 			
 			

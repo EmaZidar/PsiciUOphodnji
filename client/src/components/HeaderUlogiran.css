@@ -4,6 +4,31 @@
   display: inline-block;
 }
 
+#neureden{
+  all: unset;
+  background:none;
+  border:none;
+
+}
+
+#x{
+  float: right;   
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-weight: bold;
+  
+}
+
+.maliinfo{
+  position:fixed;
+  background-color: white;
+  top:0;
+  right:0;
+  border-color: gray;
+  z-index: 100;
+}
+
 .notif-link{
   position: relative;
   display: inline-flex;

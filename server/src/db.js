@@ -220,7 +220,7 @@ export async function getSetacNotifikacije(idKorisnik) {
                 NATURAL JOIN vlasnik
                 JOIN rezervacija r ON k.idKorisnik = r.idKorisnik
                 JOIN setnja s ON s.idSetnja = r.idSetnja
-            WHERE s.idKorisnik = $1 AND r.status = 'na čekanju'`,
+            WHERE s.idKorisnik = $1 AND r.status = 'na cekanju'`,
         [idKorisnik]
     );
     return res.rows;

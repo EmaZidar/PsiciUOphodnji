@@ -226,6 +226,19 @@ export async function getSetacNotifikacije(idKorisnik) {
     return res.rows;
 }
 
+export async function acceptRezervacija(idKorisnik, idRezervacija) {
+    const res = await pool.query(
+        `UPDATE rezervacija r
+            SET r.status = 'potvrđeno'
+            WHERE r.idRezervacija = $1
+                AND r.status = 'na čekanju'
+                AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = i.idSetnja AND s.idKorisnik = $2)
+            RETURNING idRezervacija`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length !== 0;
+}
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");

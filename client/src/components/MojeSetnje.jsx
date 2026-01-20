@@ -34,7 +34,7 @@ export default function MojeSetnje(){
               });
           }, []);
 
-idKorisnik=user.idKorisnik
+const idKorisnik= "1"; //user.idKorisnik ||
        useEffect(() => {
                const loadprosle = async () => {
                  try {

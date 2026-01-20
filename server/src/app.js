@@ -444,6 +444,21 @@ app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeR
 // idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
 // to se dobije mergeanjem tablica REZERVACIJA i SETNJA
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
+app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
+    try {
+        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsVlasnik(idKorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+
+        const notifications = await db.getVlasnikNotifikacije(idKorisnik);
+
+        return res.status(200).json(notifications);
+    } catch (err) {
+        console.error('Error in /api/vlasnik/notifikacije:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 //GET /api/rezervacije/:idRezervacija (zove se u Placanje.jsx)
 // sluzi da se dohvati detalje rezervacije za prikaz na stranici placanja

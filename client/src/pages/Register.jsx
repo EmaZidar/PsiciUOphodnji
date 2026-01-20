@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Register.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL || '';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -122,8 +123,7 @@ export default function Register() {
       })
       console.log('Fetch result:', fetchResult)
 
-      window.location.href = '/';
-      
+      window.location.href = `${CLIENT_URL}/main?role=` + formData.uloga;
       
     } catch (error) {
       console.error('Greška pri registraciji:', error);

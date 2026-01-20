@@ -376,7 +376,7 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
         const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idKorisnik))
-            return res.status(403).json({ error: "Nisi setac!!!!!!!!!" });
+            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
         const notifications = await db.getSetacNotifikacije(idKorisnik);
 
@@ -393,14 +393,19 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
 // ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
 app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, async (req, res) => {
     try {
+        const idRezervacija = req.params.idRezervacija;
         const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idKorisnik))
-            return res.status(403).json({ error: "Nisi setac!!!!!!!!!" });
+            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
-        const notifications = await db.getSetacNotifikacije(idKorisnik);
+        const success = await db.acceptRezervacija(idKorisnik, idRezervacija);
+        if (success)
+            return res.sendStatus(204); // no content
+        return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
     } catch (err) {
-
+        console.error('Error in /api/rezervacija/*/prihvati:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 })
 

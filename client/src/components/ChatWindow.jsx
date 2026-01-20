@@ -5,13 +5,17 @@ export default function ChatWindow({ chat, me }) {
   const [text, setText] = useState("");
 
   const fetchMessages = async () => {
-    const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: 'include' });
-    if (!res.ok) return;
-    const data = await res.json();
-    data.sort(
-      (a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja)
-    );
-    setMessages(data);
+    try {
+      const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      data.sort(
+        (a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja)
+      );
+      setMessages(data);
+    } catch (err) {
+      console.error("Error fetching messages:", err);
+    }
   };
 
   useEffect(() => {
@@ -20,8 +24,9 @@ export default function ChatWindow({ chat, me }) {
   }, [chat]);
 
   const handleSend = async (e) => {
-    e.preventDefault();
-    if (!text.trim()) return;
+  e.preventDefault();
+  if (!text.trim()) return;
+  try {
     const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -31,8 +36,14 @@ export default function ChatWindow({ chat, me }) {
     if (res.ok) {
       setText("");
       fetchMessages();
+    } else {
+      console.error("Failed to send message");
     }
-  };
+  } catch (err) {
+    console.error("Error sending message:", err);
+  }
+};
+
 
   return (
     <div className="chat-window">

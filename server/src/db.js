@@ -248,7 +248,7 @@ export async function getVlasnikNotifikacije(idKorisnik) {
         `SELECT idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
             FROM rezervacija r
                 JOIN setnja s ON s.idSetnja = r.idSetnja
-            WHERE r.idKorisnik = $1 AND (r.status = 'placeno' OR r.status = 'odbijeno')`,
+            WHERE r.idKorisnik = $1 AND (r.status = 'potvrdeno' OR r.status = 'odbijeno')`,
         [idKorisnik]
     );
     return res.rows;
@@ -270,7 +270,7 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
 export async function platiRezervaciju(idKorisnik, idRezervacija) {
     const res = await pool.query(
         `UPDATE rezervacija r
-            SET r.status = 'placeno'
+            SET status = 'placeno'
             WHERE r.idRezervacija = $1
                 AND r.idKorisnik = $2
                 AND r.status = 'potvrdeno'

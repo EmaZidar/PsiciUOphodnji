@@ -34,6 +34,24 @@ const validatePayment = ({ brojKartice, datumIsteka, nositelj, cvv }) => {
   return null;
 };
 
+function formatDatumHR(datum) {
+  if (!datum) return '';
+
+  const d = new Date(datum);
+
+  const dan = String(d.getDate()).padStart(2, '0');
+  const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+  const godina = d.getFullYear();
+
+  return `${dan}.${mjesec}.${godina}.`;
+}
+
+function formatVrijeme(vrijeme) {
+  if (!vrijeme) return '';
+
+  return vrijeme.slice(0, 5);
+}
+
 export default function Placanje() {
   const navigate = useNavigate();
   const { idrezervacija } = useParams();
@@ -120,8 +138,8 @@ export default function Placanje() {
             <p className="placanje-error">{error}</p>
           ) : (
             <>
-              <p><strong>Datum:</strong> {rezervacija.datum}</p>
-              <p><strong>Vrijeme:</strong> {rezervacija.vrijeme}</p>
+              <p><strong>Datum:</strong> {formatDatumHR(rezervacija.datum)}</p>
+              <p><strong>Vrijeme:</strong> {formatVrijeme(rezervacija.vrijeme)}</p>
               <p><strong>Polazište:</strong> {rezervacija.polaziste}</p>
               <p><strong>Način plaćanja:</strong> {rezervacija.nacinplacanja}</p>
               <p><strong>Status:</strong> {rezervacija.status}</p>

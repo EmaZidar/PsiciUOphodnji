@@ -45,8 +45,10 @@ export default function SetnjeSetacu() {
             </Link>
           </p>
 
+          <p><strong>Dodatne napomene:</strong> {s.dodnapomene || 'Nema dodatnih napomena'}</p>
         </div>
       ))}
     </div>
+
   );
 }

@@ -507,6 +507,23 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
     }
 })
 
+
+// API – setnje-setaca
+// setac na svom home pageu (UlogiranSetac) treba vidjeti sve setnje koje ga cekaju u buducnosti
+// pogledajte SetnjeSetacu.jsx da vidite kako frontend salje request i sta ocekuje kao odgovor
+// mislim da sam sve navela tu al za svaki slucaj 
+// koraci na backendu:
+// provjeriti je li korisnik ulogiran i je li setac, ID SETACA (nisam ziher) 
+// dohvatiti sve setnje za tog setaca:
+//    - tablica SETNJA -> idKorisnik = ulogirani setac
+//    - filtrirati samo one gdje postoji rezervacija u tablici REZERVACIJA
+//      koja je u statusu "placeno" ili "potvrdeno"
+//    - datum rezervacije >= danas (buduce setnje)
+//    - spajati s tablicom KORISNIK (VLASNIK) da dobijemo imekorisnik i prezKorisnik vlasnika
+//    - spajati s tablicom REZERVACIJA da dobijemo polaziste, datum, vrijeme, nacinPlacanja i dodNapomene
+// sortirati po datumu i vremenu (uzlazno)
+
+
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {
     app.listen(port, () => {

@@ -124,7 +124,7 @@ export default function Register() {
       })
       console.log('Fetch result:', fetchResult)
 
-      window.location.href = `${CLIENT_URL}/main?role=` + formData.uloga;
+      //window.location.href = `${CLIENT_URL}/main?role=` + formData.uloga;
       
     } catch (error) {
       console.error('Greška pri registraciji:', error);

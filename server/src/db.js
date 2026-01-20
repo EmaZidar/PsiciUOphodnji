@@ -254,6 +254,19 @@ export async function getVlasnikNotifikacije(idKorisnik) {
     return res.rows;
 }
 
+// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
+// backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
+// to se sve dobije iz tablice REZERVACIJA
+export async function getRezervacija(idKorisnik, idRezervacija) {
+    const res = await pool.query(
+        `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
+            FROM rezervacija
+            WHERE idRezervacija = $1 AND idKorisnik = $2`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length >= 1 ? res.rows[0] : undefined;
+}
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");

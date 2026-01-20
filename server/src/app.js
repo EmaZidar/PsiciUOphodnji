@@ -234,9 +234,9 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const idKorisnik = req.session.user.idkorisnik;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
         const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
-        const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
+        const rezervacija = await db.createRezervacija(idSetnja, idkorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
     } catch (err) {
         console.error('Error creating rezervacija:', err);
@@ -394,6 +394,7 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
         const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idkorisnik))
+        if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
         const notifications = await db.getSetacNotifikacije(idkorisnik);
@@ -410,9 +411,8 @@ function changeRezervacijaStatus(newStatus) {
         try {
             const idRezervacija = req.params.idRezervacija;
             const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-            if (!await db.checkIsSetac(idkorisnik))
-                return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
+        if (!await db.checkIsSetac(idkorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
             const success = await db.changeRezervacijaStatus(idkorisnik, idRezervacija, newStatus);
             if (success)

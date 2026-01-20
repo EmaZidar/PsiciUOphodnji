@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import NotificationDropdown from './NotificationDropdown'
 import './HeaderUlogiran.css'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Header() {
   const navigate = useNavigate()
-  const [unread, setUnread] = useState(0)
+  const [user, setUser] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleBrandClick = async (e) => {
     e.preventDefault()
@@ -21,35 +26,59 @@ export default function Header() {
     navigate('/')
   }
 
-  async function fetchUnread() {
+  const fetchNotifications = async () => {
+    if (!user?.role) return;
+    setLoading(true);
+    setError("");
+
+    const endpoint = user.role === 'setac'
+      ? '/api/setac/notifikacije'
+      : '/api/vlasnik/notifikacije';
+
     try {
-      let res = await fetch('/api/notifications', { credentials: 'include' })
-      if (!res.ok) {
-        res = await fetch('/api/poruke', { credentials: 'include' })
-      }
-      if (!res.ok) return
-      const data = await res.json()
-      if (Array.isArray(data)) {
-        const count = data.filter(n => !n.read).length || data.length
-        setUnread(count)
-        return
-      }
-      if (typeof data.unreadCount === 'number') {
-        setUnread(data.unreadCount)
-        return
-      }
-      if (typeof data.count === 'number') {
-        setUnread(data.count)
-        return
-      }
-    } catch (err) {
+      const res = await fetch(endpoint, { credentials: 'include' });
+      const data = await res.json();
+      setNotifications(data);
+    } catch {
+      setError("Greška pri dohvaćanju notifikacija");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleNotifClick = () => {
+    const otvaranje = !open;
+    setOpen(otvaranje);
+    if (otvaranje) fetchNotifications();
   }
 
+  const handleAccept = async (idRezervacija) => {
+    await fetch(`/api/rezervacija/${idRezervacija}/prihvati`, {
+      method: 'PATCH',
+      credentials: 'include',
+    });
+    fetchNotifications();
+  };
+
+  const handleReject = async (idRezervacija) => {
+    await fetch(`/api/rezervacija/${idRezervacija}/odbij`, {
+      method: 'PATCH',
+      credentials: 'include',
+    });
+    fetchNotifications();
+  };
+
+  const handlePay = (idRezervacija) => {
+    navigate(`/placanje/${idRezervacija}`);
+  };
+
   useEffect(() => {
-    fetchUnread()
-    const iv = setInterval(fetchUnread, 20000)
-    return () => clearInterval(iv)
+    (async () => {
+      const res = await fetch('/api/me', { credentials: 'include' })
+      if (!res.ok) return;
+      const data = await res.json();
+      setUser(data.user);
+    })();
   }, [])
 
   return (
@@ -57,12 +86,22 @@ export default function Header() {
       <div className="header-inner">
         <div className="brand"><a className="brand" href="/" onClick={handleBrandClick}>Pawpal</a></div>
         <nav className="header-nav" aria-label="Glavni izbornik">
-          <Link to="/notifications" aria-label="Obavijesti" title="Obavijesti" className="notif-link">
+          <button type="button" aria-label="Obavijesti" title="Obavijesti" className="notif-button" onClick={handleNotifClick}>
             <img src="/images/notification.png" alt="Obavijesti" className="nav-icon" />
-            {unread > 0 && (
-              <span className="notif-badge">{unread}</span>
-            )}
-          </Link>
+          </button>
+          {open && (
+            <NotificationDropdown
+              role={user?.role}
+              notifications={notifications}
+              loading={loading}
+              error={error}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              onPay={handlePay}
+              onRefresh={fetchNotifications}
+              onClose={() => setOpen(false)}
+            />
+          )}
           <Link to="/chat" aria-label="Chat" title="Chat">
             <img src="/images/chaticon.png" alt="Chat" className="nav-icon" />
           </Link>

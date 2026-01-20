@@ -234,9 +234,9 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const idKorisnik = req.session.user.idkorisnik;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
         const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
-        const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
+        const rezervacija = await db.createRezervacija(idSetnja, idkorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
     } catch (err) {
         console.error('Error creating rezervacija:', err);
@@ -391,12 +391,12 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "na cekanju" jer su to notifikacije za setaca
 app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
-        if (!await db.checkIsSetac(idKorisnik))
+        if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
-        const notifications = await db.getSetacNotifikacije(idKorisnik);
+        const notifications = await db.getSetacNotifikacije(idkorisnik);
 
         return res.status(200).json(notifications);
     } catch (err) {
@@ -412,12 +412,12 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
 app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
-        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
-        if (!await db.checkIsSetac(idKorisnik))
+        if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
-        const success = await db.acceptRezervacija(idKorisnik, idRezervacija);
+        const success = await db.acceptRezervacija(idkorisnik, idRezervacija);
         if (success)
             return res.sendStatus(204); // no content
         return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });

@@ -47,6 +47,11 @@ export async function checkIsSetac(idKorisnik) {
     return res.rows.length !== 0;
 }
 
+export async function checkIsVlasnik(idKorisnik) {
+    const res = await pool.query("SELECT idKorisnik FROM vlasnik WHERE idKorisnik = $1", [idKorisnik]);
+    return res.rows.length !== 0;
+}
+
 export async function getUserWithRole(userId) {
     const userResult = await pool.query(
         "SELECT * FROM KORISNIK WHERE idKorisnik = $1",
@@ -237,6 +242,17 @@ export async function changeRezervacijaStatus(idKorisnik, idRezervacija, newStat
         [idRezervacija, idKorisnik, newStatus]
     );
     return res.rows.length !== 0;
+}
+
+export async function getVlasnikNotifikacije(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE r.idKorisnik = $1 AND r.status <> 'na cekanju'`,
+        [idKorisnik]
+    );
+    return res.rows;
 }
 
 export async function testConnection() {

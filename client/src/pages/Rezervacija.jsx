@@ -60,6 +60,7 @@ export default function Rezervacija() {
          const res = await fetch(`${BACKEND_URL}/api/rezervacije`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(payload),
          });
 

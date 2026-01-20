@@ -10,7 +10,7 @@ export default function ChatWindow({ chat, me }) {
       if (!res.ok) return;
       const data = await res.json();
       data.sort(
-        (a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja)
+        (a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja) // da decki ne sortiraju po vremenu 
       );
       setMessages(data);
     } catch (err) {

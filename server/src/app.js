@@ -512,7 +512,7 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
 //  Za svaku rezervaciju:
 //  odrediti drugog sudionika chata
 // mapirati podatke (idRezervacija, idSetnja, otherId, otherName, tipSetnja, datum, vrijeme)
-// Sortirati chatove po datumu i vremenu
+// Sortirati chatove po datumu i vremenu, mislim da cak ne morate jer sam stavila da se sorta po vremenu pa sad da znate
 //  Vratiti listu chatova kao JSON
 
 // GET api/chats/:idRezervacija/messages 

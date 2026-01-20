@@ -10,7 +10,9 @@ export default function GodisnjaClanarina() {
 	  const [sortBy, setSortBy] = useState('ocjena-silazno');
 	  const [loading, setLoading] = useState(true);
 	  const [error, setError] = useState(null);
-	
+	 const [prikaziFormu, setPrikaziFormu] = useState(false);
+const [godclanarina, setgodclanarina]=useState(0);
+
 	  useEffect(() => {
 		
 		const loadSetaci = async () => {
@@ -35,6 +37,53 @@ export default function GodisnjaClanarina() {
   }, []);
 
 
+  useEffect(() => {
+		
+		const loadgodcl = async () => {
+		  try {
+			setLoading(true);
+			setError(null);
+			const response = await fetch('/api/godisnja', { 
+			  method: 'GET',
+			  credentials: 'include' });
+			if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			const data = await response.json();
+			setgodclanarina(data.godisnja?? 0);
+		  } catch (err) {
+			  setError(err.message || 'Greška pri dohvaćanju podataka');
+			  setgodclanarina(0);
+		  } finally {
+			  setLoading(false);
+		  }
+		};
+	
+	loadgodcl();
+  }, []);
+
+
+
+  function uredi(){
+	setPrikaziFormu(true);
+
+  }
+
+  function spremi(e){
+	e.preventDefault();
+	setPrikaziFormu(false);
+
+  }
+
+  function spremi1(e){
+	setgodclanarina(e.target.value);
+	fetch("http://localhost:8000/godisnja", {   //TODO
+    method: "POST",
+    headers: {
+    "Content-Type": "application/json"
+  },
+    body: JSON.stringify(godclanarina)
+  });
+  };
+
 	return (
 		<>
 		<div className="clanarina-page">
@@ -42,8 +91,21 @@ export default function GodisnjaClanarina() {
 			<div className="clanarina-list">
 					<div className="clanarina-item">
 						<span className="clanarina-naziv">Godišnja: </span>
-						<span className="clanarina-cijena"> 20 eura</span>
-						<button style={{ marginLeft: 12 }}>Uredi</button>
+						<span className="clanarina-cijena"> {godclanarina}</span>
+						{prikaziFormu && (
+            <form onSubmit={spremi}>
+              <label> Unesi cijenu: </label>
+              <input 
+                type="number" 
+                name="cijena" 
+                value={godclanarina} 
+                onChange={spremi1} 
+              />
+              <button type="submit">Spremi</button>
+            </form>
+          )}
+
+		  		{!prikaziFormu&&(<button onClick={uredi}   style={{ marginLeft: 12 }}>Uredi</button>)}
 					</div>
 			</div>
 		</div>

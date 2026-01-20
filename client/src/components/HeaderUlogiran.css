@@ -4,11 +4,47 @@
   display: inline-block;
 }
 
-.notif-link{
+#neureden{
+  all: unset;
+  background:none;
+  border:none;
+
+}
+
+#x{
+  position:fixed; 
+  top:0;
+  right:0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-weight: bold;
+  font-size:25px;
+
+  
+}
+
+.maliinfo{
+  padding:30px;
+  position:fixed;
+  background-color: white;
+  top:0;
+  right:0;
+  border-color: gray;
+  z-index: 100;
+  border-radius: 10%;
+}
+
+.maliinfo h3{
+  color: #1A4196
+;
+}
+.notif-button{
   position: relative;
   display: inline-flex;
   align-items: center;
   padding: 6px;
+  cursor: pointer;
 }
 
 .notif-badge{

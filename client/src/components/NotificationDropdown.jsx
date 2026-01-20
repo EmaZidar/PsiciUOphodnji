@@ -1,6 +1,26 @@
 import React from "react";
 import './NotificationDropdown.css'
 
+function formatDatumHR(datum) {
+  if (!datum) return '';
+
+  const d = new Date(datum);
+
+  const dan = String(d.getDate()).padStart(2, '0');
+  const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+  const godina = d.getFullYear();
+
+  return `${dan}.${mjesec}.${godina}.`;
+}
+
+function formatVrijeme(vrijeme) {
+  if (!vrijeme) return '';
+
+  return vrijeme.slice(0, 5);
+}
+
+
+
 export default function NotificationDropdown({ 
    role, 
    notifications,
@@ -26,21 +46,21 @@ export default function NotificationDropdown({
          )}
 
          {!loading && !error && notifications.map((notif) => (
-            <div key={notif.idRezervacija} className="notif-item">
+            <div key={notif.idrezervacija} className="notif-item">
                {role === 'setac' && (
                   <>
                      <p>
-                        Nova rezervacija - <b>{notif.tipSetnja}</b> {notif.cijena} €/sat, {notif.trajanje} min
+                        Nova rezervacija - <b>{notif.tipsetnja}</b> {notif.cijena} €/sat, {notif.trajanje} min
                         <br />
-                        Zahtjev šalje: <b>{notif.imeKorisnik} {notif.prezKorisnik}</b>
+                        Zahtjev šalje: <b>{notif.imekorisnik} {notif.prezkorisnik}</b>
                         <br />
-                        <b>{notif.datum}</b> u <b>{notif.vrijeme}</b> s polazišta <b>{notif.polaziste}</b>
+                        <b>{formatDatumHR(notif.datum)}</b> u <b>{formatVrijeme(notif.vrijeme)}</b> s polazišta <b>{notif.polaziste}</b>
                         <br />
-                        Dodatne napomene: {notif.dodNapomene || 'Nema'}
+                        Dodatne napomene: {notif.dodnapomene || 'Nema'}
                      </p>
                      <div className="notif-actions">
-                        <button onClick={() => onAccept(notif.idRezervacija)}>Prihvati</button>
-                        <button onClick={() => onReject(notif.idRezervacija)}>Odbij</button>
+                        <button onClick={() => onAccept(notif.idrezervacija)}>Prihvati</button>
+                        <button onClick={() => onReject(notif.idrezervacija)}>Odbij</button>
                      </div>
                   </>
                )}
@@ -50,13 +70,13 @@ export default function NotificationDropdown({
                      <p>
                         Rezervacija <b>{notif.status}</b>
                         <br />
-                        Šetnja: <b>{notif.tipSetnja}</b> {notif.cijena} €/sat, {notif.trajanje} min
+                        Šetnja: <b>{notif.tipsetnja}</b> {notif.cijena} €/sat, {notif.trajanje} min
                         <br />
                         <b>{notif.datum}</b> u <b>{notif.vrijeme}</b>
                      </p>
                      {notif.status === 'potvrdeno' && (
                         <div className="notif-actions">
-                           <button onClick={() => onPay(notif.idRezervacija)}>Plati</button>
+                           <button onClick={() => onPay(notif.idrezervacija)}>Plati</button>
                         </div>
                      )}
                   </>

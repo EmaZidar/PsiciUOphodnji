@@ -215,11 +215,10 @@ export async function deleteSetnja(idSetnja) {
 
 export async function getSetacNotifikacije(idKorisnik) {
     const res = await pool.query(
-        `SELECT idRezervacija, tipSetnja, cijena, trajanje, imeKorisnik, prezKorisnik, datum, vrijeme, polaziste, dodNapomene
-            FROM korisnik k
-                NATURAL JOIN vlasnik
-                JOIN rezervacija r ON k.idKorisnik = r.idKorisnik
-                JOIN setnja s ON s.idSetnja = r.idSetnja
+        `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, k.imeKorisnik, k.prezKorisnik, r.datum, r.vrijeme, r.polaziste, r.dodNapomene
+            FROM rezervacija r
+                JOIN setnja s ON r.idSetnja = s.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
             WHERE s.idKorisnik = $1 AND r.status = 'na cekanju'`,
         [idKorisnik]
     );
@@ -229,10 +228,10 @@ export async function getSetacNotifikacije(idKorisnik) {
 export async function acceptRezervacija(idKorisnik, idRezervacija) {
     const res = await pool.query(
         `UPDATE rezervacija r
-            SET r.status = 'potvrđeno'
+            SET status = 'potvrdeno'
             WHERE r.idRezervacija = $1
-                AND r.status = 'na čekanju'
-                AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = i.idSetnja AND s.idKorisnik = $2)
+                AND r.status = 'na cekanju'
+                AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = r.idSetnja AND s.idKorisnik = $2)
             RETURNING idRezervacija`,
         [idRezervacija, idKorisnik]
     );

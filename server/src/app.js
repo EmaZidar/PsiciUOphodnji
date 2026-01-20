@@ -405,32 +405,37 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-//PATCH /api/rezervacija/:idRezervacija/prihvati (zove se u HeaderUlogiran.jsx)
-// provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
-// provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
-// ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
-app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, async (req, res) => {
-    try {
-        const idRezervacija = req.params.idRezervacija;
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+function changeRezervacijaStatus(newStatus) {
+    return async (req, res) => {
+        try {
+            const idRezervacija = req.params.idRezervacija;
+            const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
-        const success = await db.acceptRezervacija(idkorisnik, idRezervacija);
-        if (success)
-            return res.sendStatus(204); // no content
-        return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
-    } catch (err) {
-        console.error('Error in /api/rezervacija/*/prihvati:', err);
-        res.status(500).json({ error: 'Internal server error' });
+            const success = await db.changeRezervacijaStatus(idKorisnik, idRezervacija, newStatus);
+            if (success)
+                return res.sendStatus(204); // no content
+            return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
+        } catch (err) {
+            console.error('Error in /api/rezervacija/*/prihvati:', err);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
-})
+}
+
+//PATCH /api/rezervacija/:idRezervacija/prihvati (zove se u HeaderUlogiran.jsx)
+// provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
+// provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
+// ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
+app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, changeRezervacijaStatus('potvrdeno'));
 
 //PATCH /api/rezervacija/:idRezervacija/odbij (zove se u HeaderUlogiran.jsx)
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
 // provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
 // ako sve prode, updateat rezervaciju da bude u statusu "odbijeno"!!!!
+app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeRezervacijaStatus('odbijeno'));
 
 //GET /api/vlasnik/notifikacije (zove se u HeaderUlogiran.jsx)
 // prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
@@ -439,6 +444,21 @@ app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, asyn
 // idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
 // to se dobije mergeanjem tablica REZERVACIJA i SETNJA
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
+app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
+    try {
+        const { idKorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsVlasnik(idKorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+
+        const notifications = await db.getVlasnikNotifikacije(idKorisnik);
+
+        return res.status(200).json(notifications);
+    } catch (err) {
+        console.error('Error in /api/vlasnik/notifikacije:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 //GET /api/rezervacije/:idRezervacija (zove se u Placanje.jsx)
 // sluzi da se dohvati detalje rezervacije za prikaz na stranici placanja

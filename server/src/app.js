@@ -489,6 +489,23 @@ app.get('/api/rezervacije/:idRezervacija', async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
 // ako sve prode, updateat rezervaciju da bude u statusu "placeno"
+app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
+    try {
+        const idRezervacija = req.params.idRezervacija;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsVlasnik(idkorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+
+        const success = await db.platiRezervaciju(idkorisnik, idRezervacija);
+        if (success)
+            return res.sendStatus(204); // no content
+        return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
+    } catch (err) {
+        console.error('Error in /api/rezervacije/*/placanje', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+})
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

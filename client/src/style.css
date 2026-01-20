@@ -77,7 +77,7 @@ body {
 }
 
 .btn.primary {
-  background: #2ea44f; /* GitHub green-ish for sign up */
+  background: var(--c-2); /* PawPal blue for sign up */
   color: #fff;
 }
 

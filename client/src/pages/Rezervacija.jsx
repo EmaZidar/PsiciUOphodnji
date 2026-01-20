@@ -67,12 +67,8 @@ export default function Rezervacija() {
             throw new Error(text || `Server returned ${res.status}`);
          }
 
-         const created = await res.json();
-         const idRezervacija = created.idRezervacija || created.id || created.insertId || null;
-         if (!idRezervacija) throw new Error('Nije vraćen id rezervacije od servera.');
-
          setLoading(false);
-         navigate(`/placanje/${idRezervacija}`);
+         navigate('/main');
       } catch (err) {
          setError('Greška pri slanju rezervacije: ' + err.message);
          setLoading(false);
@@ -100,7 +96,6 @@ export default function Rezervacija() {
                Način plaćanja
                <select name="nacinPlacanja" value={rezervacija.nacinPlacanja} onChange={handleChange}>
                   <option value="gotovina">Gotovina</option>
-                  <option value="PayPal">PayPal</option>
                   <option value="kreditna kartica">Kreditna kartica</option>
                </select>
             </label>

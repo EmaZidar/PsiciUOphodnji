@@ -317,23 +317,6 @@ app.delete('/api/setnje/:id', async (req, res) => {
     }
 });
 
-/*
-    TODO: Ocjene i recenzije (pojednostavljeno)
-
-    Trenutna dev implementacija koristi memorijski niz i privremene rute:
-        - GET  /api/reviews?user=<id>  -> vraća recenzije za korisnika
-        - POST /api/reviews            -> dodaje recenziju
-
-    Što napraviti za produkciju (sažeto):
-        1) Dodati tablicu `reviews` ili Mongoose model (polja: user, author, authorName, rating, text, createdAt).
-        2) Implementirati rute i kontrolere (GET list, POST create, opc. DELETE/get).
-        3) Validirati/sanitizirati input (rating 1..5, limit teksta, XSS sanitizacija).
-        4) Zahtijevati autentikaciju za POST/DELETE i postaviti `author` sa servera.
-        5) Dodati agregat/endpoint za `avg` i `count` (ili računati u queryu).
-
-*/
-
-
 
 app.use('/api/calendar', calendar.router)
 
@@ -515,7 +498,7 @@ export default app;
 
 // provjerite jel sam dobro stavila ovaj BACKEND_URL u fetchove
 
-// GET /api/setaci/${user.idkorisnik}/rating-summary (zove se u Profile.jsx i Reviews.jsx (kasnije))
+// GET /api/setaci/:idkorisnik/rating-summary (zove se u Profile.jsx i Reviews.jsx (kasnije))
 // svrha: dohvatiti srednju ocjenu i broj recenzija za setaca
 // provjera: korisnik mora biti ulogiran i mora biti setac
 // backend treba vratiti objekt: {ukocjena: float, brojrecenzija: int}
@@ -556,3 +539,16 @@ export default app;
 // korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
 // slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
 // edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"
+
+
+
+// API ZA RECENZIJE
+// provjerite jel sam dobro stavila ovaj BACKEND_URL u fetch
+
+// GET /api/setaci/:idkorisnik/recenzije (zove se u Reviews.jsx)
+// svrha: dohvatiti sve recenzije za setaca s idkorisnik
+// nema neke provjere
+// backend treba vratiti array recenzija - svaki objekt recenzije treba imati:
+// idrecenzija, ocjena, tekst (ako ga ima), fotografija (ako je ima), imekorisnik, prezkorisnik (ime i prezime vlasnika koji je ostavio recenziju)
+// to se dobije mergeanjem tablica SETAC, SETNJA, REZERVACIJA, RECENZIJA, VLASNIK, KORISNIK
+// edge case: ako setac nema recenzija, treba vratiti prazan array

@@ -91,7 +91,7 @@ export default function Profile() {
         const res = await fetch(`${BACKEND_URL}/api/setaci/${user.idkorisnik}/rating-summary`, {
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Greška pri dohvaćanju ocjena");
+        if (!res.ok) throw new Error("Greška pri dohvaćanju sažetka ocjena");
 
         const data = await res.json();
         if (!cancelled) {

@@ -234,9 +234,9 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const idKorisnik = req.session.user.idkorisnik;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
         const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
-        const rezervacija = await db.createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
+        const rezervacija = await db.createRezervacija(idSetnja, idkorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
     } catch (err) {
         console.error('Error creating rezervacija:', err);
@@ -337,15 +337,6 @@ app.delete('/api/setnje/:id', async (req, res) => {
 
 app.use('/api/calendar', calendar.router)
 
-// TODO: Implementirati endpoint za upload profilne slike
-// POST /api/upload-profile-image
-// - Primiti file iz req.file (multer je već konfiguriran)
-// - Spremi putanju /uploads/... u DB (koristiti db.updateUserProfileImage())
-// - Vrati updated user kao JSON
-// - Klijent će tada prikazati novu sliku
-//
-// Frontend je spreman i čeka ovaj endpoint
-// Multer je već konfiguriran na serveru
 
 app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     try {
@@ -394,6 +385,7 @@ app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
         const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
         if (!await db.checkIsSetac(idkorisnik))
+        if (!await db.checkIsSetac(idkorisnik))
             return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
         const notifications = await db.getSetacNotifikacije(idkorisnik);
@@ -410,9 +402,8 @@ function changeRezervacijaStatus(newStatus) {
         try {
             const idRezervacija = req.params.idRezervacija;
             const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-            if (!await db.checkIsSetac(idkorisnik))
-                return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
+        if (!await db.checkIsSetac(idkorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
 
             const success = await db.changeRezervacijaStatus(idkorisnik, idRezervacija, newStatus);
             if (success)
@@ -517,3 +508,51 @@ const start = async (port) => {
 start(PORT);
 
 export default app;
+
+
+//APIJI ZA UREDIVANJE OSOBNIH PODATAKA VLASNIKA I SETACA
+// + UPLOAD PROFILNE SLIKE + PRIKAZ SREDNJE OCJENE I BROJA RECENZIJA ZA SETACA
+
+// provjerite jel sam dobro stavila ovaj BACKEND_URL u fetchove
+
+// GET /api/setaci/${user.idkorisnik}/rating-summary (zove se u Profile.jsx i Reviews.jsx (kasnije))
+// svrha: dohvatiti srednju ocjenu i broj recenzija za setaca
+// provjera: korisnik mora biti ulogiran i mora biti setac
+// backend treba vratiti objekt: {ukocjena: float, brojrecenzija: int}
+// edge case: ako setac nema recenzija, ukocjena treba biti null, brojrecenzija treba biti 0
+// tu se mora neki veliki merge tablica napravit: SETAC, SETNJA, REZERVACIJA, RECENZIJA tak da se moze doc do ocjena
+// znaci treba se izracunat prosjek ocjena iz recenzija za sve setnje tog setaca i prebrojat koliko taj setac ima recenzija i poslat nam u response
+
+// POST /api/me/profile-image (zove se u Profile.jsx)
+// svrha: setac uploada novu profilnu sliku -> front salje multipart/form-data s fieldom "profilfoto" (File - vrsta Bloba)
+// provjera: korisnik mora biti ulogiran i mora bit setac, idkorisnik se dobije iz sessiona
+// dozvoljeni mime: image/jpeg, image/png, image/jpg
+// backend treba spremiti sliku u object storage i dobiti URL/key koji se sprema u bazu
+// napomena za URL: ak se vraca puni url front moze direkt prikazat a ak se vraca relativna putanja front mora znat prefiks
+// backend treba updateat putanju profilne slike u tablici SETAC za tog korisnika
+// frontend ocekuje da se odmah osvjezi user
+// sad cu tu copy pasteat TODO koji mi je chatgpt dao jer ne znam kak se to treba raditi tocno pa ak vam treba helper
+//TODO koraci:
+//Pročitati datoteku iz requesta (multer memory storage ili stream).
+//Generirati jedinstveni key npr: profile-images/{idKorisnik}/{timestamp}-{random}.{ext}
+//Upload u object storage bucket (S3/MinIO/Azure Blob… ovisi što koristite):
+    //postaviti Content-Type na mime filea
+    //opcionalno Cache-Control (npr. public, max-age=31536000 ako su verzionirani keyevi)
+//Spremiti rezultat:
+    //ili public URL (npr. https://.../bucket/...)
+    //ili key + vi ga kasnije mapirate na URL
+//Ako imate staru sliku: opcionalno obrisati stari objekt u storage-u (da se ne gomila).
+//DB update
+    //Upisati novu putanju u tablicu šetača (ili gdje već držite profilnu):
+    //Paziti da ovo radi samo za šetače (ako vlasnici nemaju profilnu ili drugačije).
+
+
+// PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)
+// svrha: azuriranje osobnih podataka za oba korisnika
+// vlasnik: ime, prezime, email, telefon, setac: ime, prezime, email, telefon, lokDjelovanja
+// znaci ak je vlasnik u pitanju updatea se samo tablica KORISNIK, ak je setac onda se updatea KORISNIK i SETAC
+// ako nije setac nego vlasnik lokdjelovanja se ignorira
+// provjera: korisnik mora biti ulogiran
+// korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
+// slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
+// edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"

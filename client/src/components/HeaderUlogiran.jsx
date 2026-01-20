@@ -52,24 +52,42 @@ export default function Header() {
     if (otvaranje) fetchNotifications();
   }
 
-  const handleAccept = async (idRezervacija) => {
-    await fetch(`/api/rezervacija/${idRezervacija}/prihvati`, {
+  const handleAccept = async (idrezervacija) => {
+    setError("");
+    
+    const res = await fetch(`/api/rezervacija/${idrezervacija}/prihvati`, {
       method: 'PATCH',
       credentials: 'include',
     });
-    fetchNotifications();
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body?.error || "Prihvaćanje nije uspjelo");
+      return;
+    }
+
+    await fetchNotifications();
   };
 
-  const handleReject = async (idRezervacija) => {
-    await fetch(`/api/rezervacija/${idRezervacija}/odbij`, {
+  const handleReject = async (idrezervacija) => {
+    setError("");
+    
+    const res = await fetch(`/api/rezervacija/${idrezervacija}/odbij`, {
       method: 'PATCH',
       credentials: 'include',
     });
-    fetchNotifications();
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body?.error || "Odbijanje nije uspjelo");
+      return;
+    }
+
+    await fetchNotifications();
   };
 
-  const handlePay = (idRezervacija) => {
-    navigate(`/placanje/${idRezervacija}`);
+  const handlePay = (idrezervacija) => {
+    navigate(`/placanje/${idrezervacija}`);
   };
 
   useEffect(() => {

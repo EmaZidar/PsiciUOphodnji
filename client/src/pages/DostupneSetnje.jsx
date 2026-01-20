@@ -118,7 +118,7 @@ export default function DostupneSetnje() {
             </>
          )}
       </main>
-      <Reviews userId={idkorisnik} />
+      <Reviews targetUserId={idkorisnik} />
       <Footer />
    </>);
 }

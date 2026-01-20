@@ -36,7 +36,7 @@ const validatePayment = ({ brojKartice, datumIsteka, nositelj, cvv }) => {
 
 export default function Placanje() {
   const navigate = useNavigate();
-  const { idRezervacija } = useParams();
+  const { idrezervacija } = useParams();
 
   const [rezervacija, setRezervacija] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +55,7 @@ export default function Placanje() {
   useEffect(() => {
     async function fetchRezervacija() {
       try {
-        const res = await fetch(`/api/rezervacije/${idRezervacija}`, {
+        const res = await fetch(`/api/rezervacije/${idrezervacija}`, {
           credentials: 'include',
         });
         if (!res.ok) throw new Error(`Server vratio ${res.status}`);
@@ -72,7 +72,7 @@ export default function Placanje() {
       }
     }
     fetchRezervacija();
-  }, [idRezervacija]);
+  }, [idrezervacija]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,11 +88,10 @@ export default function Placanje() {
     await new Promise((r) => setTimeout(r, 2000)); // "procesiranje placanja"
 
     try {
-      const res = await fetch(`/api/rezervacije/${idRezervacija}/placanje`, {
+      const res = await fetch(`/api/rezervacije/${idrezervacija}/placanje`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'placeno' }),
       });
       if (!res.ok) throw new Error();
 
@@ -105,7 +104,7 @@ export default function Placanje() {
   };
 
   const karticnoPlacanje =
-    rezervacija?.nacinPlacanja === 'kreditna kartica';
+    rezervacija?.nacinplacanja === 'kreditna kartica';
 
   return (
     <>
@@ -124,7 +123,7 @@ export default function Placanje() {
               <p><strong>Datum:</strong> {rezervacija.datum}</p>
               <p><strong>Vrijeme:</strong> {rezervacija.vrijeme}</p>
               <p><strong>Polazište:</strong> {rezervacija.polaziste}</p>
-              <p><strong>Način plaćanja:</strong> {rezervacija.nacinPlacanja}</p>
+              <p><strong>Način plaćanja:</strong> {rezervacija.nacinplacanja}</p>
               <p><strong>Status:</strong> {rezervacija.status}</p>
             </>
           )}

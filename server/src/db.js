@@ -226,15 +226,15 @@ export async function getSetacNotifikacije(idKorisnik) {
     return res.rows;
 }
 
-export async function acceptRezervacija(idKorisnik, idRezervacija) {
+export async function changeRezervacijaStatus(idKorisnik, idRezervacija, newStatus) {
     const res = await pool.query(
         `UPDATE rezervacija r
-            SET r.status = 'potvrđeno'
+            SET r.status = $3
             WHERE r.idRezervacija = $1
-                AND r.status = 'na čekanju'
+                AND r.status = 'na cekanju'
                 AND EXISTS (SELECT * FROM setnja s WHERE s.idSetnja = i.idSetnja AND s.idKorisnik = $2)
             RETURNING idRezervacija`,
-        [idRezervacija, idKorisnik]
+        [idRezervacija, idKorisnik, newStatus]
     );
     return res.rows.length !== 0;
 }

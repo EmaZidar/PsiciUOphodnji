@@ -249,15 +249,12 @@ export async function getVlasnikNotifikacije(idKorisnik) {
         `SELECT idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
             FROM rezervacija r
                 JOIN setnja s ON s.idSetnja = r.idSetnja
-            WHERE r.idKorisnik = $1 AND r.status <> 'na cekanju'`,
+            WHERE r.idKorisnik = $1 AND (r.status = 'placeno' OR r.status = 'odbijeno')`,
         [idKorisnik]
     );
     return res.rows;
 }
 
-// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
-// backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
-// to se sve dobije iz tablice REZERVACIJA
 export async function getRezervacija(idKorisnik, idRezervacija) {
     const res = await pool.query(
         `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
@@ -266,6 +263,23 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
         [idRezervacija, idKorisnik]
     );
     return res.rows.length >= 1 ? res.rows[0] : undefined;
+}
+
+// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
+// provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
+// ako sve prode, updateat rezervaciju da bude u statusu "placeno"
+export async function platiRezervaciju(idKorisnik, idRezervacija) {
+    const res = await pool.query(
+        `UPDATE rezervacija r
+            SET r.status = 'placeno'
+            WHERE r.idRezervacija = $1
+                AND r.idKorisnik = $2
+                AND r.status = 'potvrdeno'
+                AND r.nacinPlacanja = 'kreditna kartica'
+            RETURNING idRezervacija`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length !== 0;
 }
 
 export async function testConnection() {

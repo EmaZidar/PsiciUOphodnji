@@ -194,7 +194,7 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
             return res.json({ session: sessionUser, user: null });
         }
 
-        const userId = dbUser.idkorisnik ?? dbUser.idKorisnik ?? dbUser.id ?? dbUser.id_korisnik;
+        const userId = dbUser.idkorisnik ?? dbUser.idKorisnik;
         const userWithRole = await db.getUserWithRole(userId);
         console.log('/api/me - returning userWithRole:', userWithRole);
 
@@ -250,10 +250,22 @@ app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
 //ugl 
 app.post('/api/psi', async (req, res) => {
     try {
-        const idKorisnik = req.body.idKorisnik;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email).catch(() => {
+            throw new Error('User not found')
+            });
+
         const { imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene } = req.body;
-        const pas = await db.createPas(imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idKorisnik);
-        res.status(201).json({ pas });
+        const pas = await db.createPas(
+            imePas,
+            pasmina,
+            parseInt(socijalizacija, 10),
+            parseInt(razinaEnergije, 10),
+            parseInt(starost, 10),
+            zdravNapomene,
+            idkorisnik
+        );
+        const idPas = pas?.idPas ?? pas?.idpas; // ne znam jel vraca idPas ili idpas
+        res.status(201).json({ idPas, pas });
     } catch (err) {
         console.error('Error creating pas:', err);
         res.status(500).json({ error: 'Internal server error' });
@@ -273,8 +285,11 @@ app.delete('/api/psi/:idPas', async (req, res) => {
 
 app.get('/api/psi', async (req, res) => {
     try {
-        const idKorisnik = parseInt(req.session.idKorisnik, 10);
-        const psi = await db.getPsiByKorisnikId(idKorisnik);
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email).catch(() => {
+            throw new Error('User not found')
+            });
+        const psi = await db.getPsiByKorisnikId(idkorisnik);
+        console.log('Svi psi korisnika:', psi); 
         res.status(200).json(psi);
     } catch (err) {
         console.error('Error in /api/psi:', err);

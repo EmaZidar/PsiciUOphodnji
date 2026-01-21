@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Hero from '../components/Hero';
 import Steps from '../components/Steps';
 import Feature from '../components/Feature';
-import Footer from '../components/Footer';
+import FooterMain from '../components/FooterMain';
 import './Home.css';
 
 export default function Home() {
@@ -56,7 +56,7 @@ export default function Home() {
           align="center"
         />
       </main>
-      <Footer />
+      <FooterMain />
     </>
   );
 }

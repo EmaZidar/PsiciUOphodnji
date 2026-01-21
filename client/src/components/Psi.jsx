@@ -137,17 +137,17 @@ function izbrisi(idPas){
          </div>
          {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
             <label >Ime psa:</label>
-            <input type="text" id="imePas" name="imePas"   value={pas.imePas}  onChange={spremi}></input><br></br>
+            <input type="text" id="imePas" name="imePas"  required value={pas.imePas} maxLength={50} onChange={spremi} ></input><br></br>
             <label >Pasmina:      </label>
-            <input type="text" id="pasmina" name="pasmina" value={pas.pasmina}  onChange={spremi}></input><br></br>
+            <input type="text" id="pasmina" name="pasmina" required value={pas.pasmina} maxLength={50} onChange={spremi}></input><br></br>
             <label>Godine:</label>
-            <input type="number" id="starost" name="starost" value={pas.starost}  onChange={spremi}></input><br></br>
+            <input type="number" id="starost" required name="starost" value={pas.starost} max={20} onChange={spremi}></input><br></br>
             <label >Razina energije:    </label>
-            <input type="text" id="razinaEnergije" name="razinaEnergije"   value={pas.razinaEnergije}  onChange={spremi}></input><br></br>
+            <input type="number" id="razinaEnergije" name="razinaEnergije"  max={5} required value={pas.razinaEnergije}  onChange={spremi}></input><br></br>
             <label>Socijalizacija:    </label>
-            <input type="text" id="socijalizacija" name="socijalizacija"   value={pas.socijalizacija}  onChange={spremi}></input><br></br>
+            <input type="number" id="socijalizacija" required name="socijalizacija"  max={5} value={pas.socijalizacija}  onChange={spremi}></input><br></br>
             <label >Zdravstvene napomene: </label>
-            <input type="text" id="zdravNapomene" name="zdravNapomene"   value={pas.zdravNapomene}  onChange={spremi}></input><br></br>
+            <input type="text" id="zdravNapomene"  name="zdravNapomene" maxLength={500}  value={pas.zdravNapomene}  onChange={spremi}></input><br></br>
 
             <button type="submit" >Dodaj psa</button>
             <button onClick={resetiraj} >Resetiraj</button>

@@ -15,7 +15,6 @@ export default function Header() {
         <div className="header-right">
           <div className="auth-actions">
             <a href="/login" className="btn signin">Sign in</a>
-            <a href="/register" className="btn primary">Sign up</a>
           </div>
         </div>
       </div>

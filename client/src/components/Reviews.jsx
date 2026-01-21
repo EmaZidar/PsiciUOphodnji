@@ -41,7 +41,16 @@ export default function Reviews({ targetUserId, canReview = false }) {
 
   const submit = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/api/reviews`, { method: 'POST', headers: { 'Content-Type':'application/json' }, credentials: 'include', body: JSON.stringify({ user: targetUserId, rating: newReview.rating, text: newReview.text }) })
+      const res = await fetch(`${BACKEND_URL}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          user: targetUserId,
+          rating: newReview.rating,
+          text: newReview.text
+        })
+      })
       if (!res.ok) throw new Error('Failed')
       const data = await res.json()
       setReviews(prev => [data, ...prev])

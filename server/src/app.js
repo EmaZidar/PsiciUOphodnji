@@ -332,6 +332,13 @@ app.delete('/api/setnje/:id', async (req, res) => {
         5) Dodati agregat/endpoint za `avg` i `count` (ili računati u queryu).
 
 */
+app.get('/api/reviews', async (req, res) => {
+    const user = req.query.user;
+    if (!user)
+        return res.status(400).json({ error: "No user id given" });
+
+    
+})
 
 
 

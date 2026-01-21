@@ -1,67 +1,107 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+
+// sample poruke za lokalni test
+const SAMPLE_MESSAGES = {
+  "test-1": [
+    { idPoruka: "m1", vrijemeSlanja: new Date().toISOString(), posiljatelj: 999, tekst: "Bok! Ovo je testna poruka." },
+    { idPoruka: "m2", vrijemeSlanja: new Date().toISOString(), posiljatelj: 1, tekst: "Super, vidim test chat!" },
+  ],
+  "test-2": [
+    { idPoruka: "d1", vrijemeSlanja: new Date().toISOString(), posiljatelj: 998, tekst: "Hej, imaš slobodno večeras?" },
+  ],
+};
 
 export default function ChatWindow({ chat, me }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const containerRef = useRef(null);
+
+  const userId = me?.idKorisnik;
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: 'include' });
-      if (!res.ok) return;
-      const data = await res.json();
-      data.sort(
-        (a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja) // da decki ne sortiraju po vremenu 
-      );
+      const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: "include" });
+      let data = [];
+      if (res.ok) {
+        data = await res.json();
+      } else if (SAMPLE_MESSAGES[chat.idRezervacija]) {
+        data = SAMPLE_MESSAGES[chat.idRezervacija];
+      }
+      data.sort((a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja));
       setMessages(data);
-    } catch (err) {
-      console.error("Error fetching messages:", err);
+    } catch {
+      if (SAMPLE_MESSAGES[chat.idRezervacija]) setMessages(SAMPLE_MESSAGES[chat.idRezervacija]);
     }
   };
 
   useEffect(() => {
-    if (!chat) return;
-    fetchMessages();
+    if (chat) fetchMessages();
   }, [chat]);
 
-  const handleSend = async (e) => {
-  e.preventDefault();
-  if (!text.trim()) return;
-  try {
-    const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ tekst: text }),
-    });
-    if (res.ok) {
+  useEffect(() => {
+    if (containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight;
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!text.trim()) return;
+    try {
+      await fetch(`/api/chats/${chat.idRezervacija}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ tekst: text }),
+      });
       setText("");
       fetchMessages();
-    } else {
-      console.error("Failed to send message");
+    } catch {
+      // za sada nis 
     }
-  } catch (err) {
-    console.error("Error sending message:", err);
-  }
-};
+  };
 
+  const handleSend = (e) => {
+    e.preventDefault();
+    sendMessage();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const formatTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   return (
     <div className="chat-window">
-      <div className="chat-header">Razgovor s {chat.otherName}</div>
-      <div className="chat-messages">
+      <div className="chat-header">
+        <div className="name">{chat.otherName}</div>
+        <div className="sub">{chat.tipSetnja} • {chat.datum} {chat.vrijeme}</div>
+      </div>
+
+      <div className="chat-messages" ref={containerRef}>
         {messages.map((m) => {
-          const isMe = me && me.idkorisnik === m.posiljatelj;
+          const isMe = userId === m.posiljatelj;
           return (
-            <div key={m.idporuka} className={`chat-message ${isMe ? 'me' : 'them'}`}>
-              <div className="chat-message-text">{m.tekst}</div>
-              <div className="chat-message-time">{new Date(m.vrijemeSlanja ?? m.vrijemeSlanja).toLocaleString()}</div>
+            <div key={m.idPoruka} className={`message-row ${isMe ? "me" : ""}`}>
+              <div className={`message-bubble ${isMe ? "me" : "them"}`}>
+                <div className="message-text">{m.tekst}</div>
+                <div className="message-meta">{formatTime(m.vrijemeSlanja)}</div>
+              </div>
             </div>
           );
         })}
       </div>
+
       <form className="chat-input" onSubmit={handleSend}>
-        <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Pošalji poruku..." />
-        <button type="submit">Pošalji</button>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Pošalji poruku..."
+          rows={2}
+        />
+        <button type="submit" disabled={!text.trim()}>Pošalji</button>
       </form>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ChatList from "../components/ChatList";
 import ChatWindow from "../components/ChatWindow";
-import "./Chat.css";
+import "../components/Chat.css";
 
 const SAMPLE_CHATS = [
   {

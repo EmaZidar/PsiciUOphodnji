@@ -1,106 +1,131 @@
-import React, { useEffect, useState } from 'react'
-import './Reviews.css'
+import React, { useEffect, useState } from "react";
+import "./Reviews.css";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
-function StarRating({ value = 0, size = '1rem' }) {
-  const pct = Math.max(0, Math.min(5, Number(value) || 0)) / 5 * 100
-  return (
-    <span className="star-row" style={{ fontSize: size }} aria-hidden>
-      <span className="stars-empty">★★★★★</span>
-      <span className="stars-filled" style={{ width: `${pct}%` }}>★★★★★</span>
-    </span>
-  )
-}
+export default function Reviews({ targetUserId }) {
+  const [reviews, setReviews] = useState([]);
 
-export default function Reviews({ targetUserId, canReview = false }) {
-  const [reviews, setReviews] = useState([])
-  const [avg, setAvg] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [newReview, setNewReview] = useState({ rating: 5, text: '' })
+  const [rating, setRating] = useState({ukOcjena: null, brojRecenzija: 0});
+  const [ratingLoading, setRatingLoading] = useState(false);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/reviews?user=${encodeURIComponent(targetUserId)}`)
-        if (!res.ok) throw new Error('Failed')
-        const data = await res.json()
-        setReviews(data.reviews || data || [])
-        if (Array.isArray(data.reviews)) {
-          const a = data.reviews.reduce((s,r)=>s+r.rating,0)/Math.max(1,data.reviews.length)
-          setAvg(Math.round(a*10)/10)
-        } else {
-          const a = (data.reduce? data.reduce((s,r)=>s+r.rating,0)/data.length : 0)
-          setAvg(a? Math.round(a*10)/10 : null)
-        }
-      } catch (e) { console.error(e) }
-      setLoading(false)
-    }
-    if (targetUserId) load()
-  }, [targetUserId])
+    if (!targetUserId) return;
 
-  const submit = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/reviews`, { method: 'POST', headers: { 'Content-Type':'application/json' }, credentials: 'include', body: JSON.stringify({ user: targetUserId, rating: newReview.rating, text: newReview.text }) })
-      if (!res.ok) throw new Error('Failed')
-      const data = await res.json()
-      setReviews(prev => [data, ...prev])
-      setNewReview({ rating:5, text:'' })
-    } catch (e) { console.warn('Failed to submit review', e) }
-  }
+    async function loadRatingSummary() {
+      try {
+        setRatingLoading(true);
+        setError("");
+
+        const res = await fetch(
+          `${BACKEND_URL}/api/setaci/${targetUserId}/rating-summary`,
+          { credentials: "include" }
+        );
+
+        if (!res.ok) {
+          throw new Error("Greška pri dohvaćanju sažetka ocjena");
+        }
+
+        const data = await res.json();
+        setRating({
+          ukOcjena: data.ukocjena ?? null,
+          brojRecenzija: data.brojrecenzija ?? 0,
+        });
+
+      } catch (err) {
+        setError(err.message);
+        setRating({ ukOcjena: null, brojRecenzija: 0 });
+      } finally {
+        setRatingLoading(false);
+      }
+    }
+
+    loadRatingSummary();
+  }, [targetUserId]);
+
+  useEffect(() => {
+    if (!targetUserId) return;
+
+    async function fetchReviews() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch(
+          `${BACKEND_URL}/api/setaci/${targetUserId}/recenzije`,
+          { credentials: "include" }
+        );
+
+        if (!res.ok) {
+          throw new Error("Ne mogu dohvatiti recenzije");
+        }
+
+        const data = await res.json();
+        setReviews(Array.isArray(data.recenzije) ? data.recenzije : []);
+      } catch (err) {
+        setError(err.message);
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchReviews();
+  }, [targetUserId]);
 
   return (
-    <div className="reviews-panel">
-      <h3 className="reviews-title">Recenzije</h3>
+    <section className="reviews-section">
+      <h2>Recenzije</h2>
 
-      {loading && <div className="reviews-loading">Učitavanje recenzija...</div>}
-
-      {!loading && (
-        <>
-          <div className="reviews-summary">
-            <div className="reviews-average">{avg ?? '—'}</div>
-            <div className="reviews-stars"><StarRating value={avg ?? 0} size="1rem" /></div>
-            <div className="reviews-count">{reviews.length} recenzija</div>
-          </div>
-
-          <div className="reviews-list">
-            {reviews.map((r) => (
-              <div key={r.id || r._id} className="review-item">
-                <div className="review-header">
-                  <div className="review-author">{r.authorName || r.author || 'Korisnik'}</div>
-                  <div className="review-stars"><StarRating value={r.rating || 0} size="0.95rem" /></div>
-                </div>
-                <div className="review-text">{r.text}</div>
-              </div>
-            ))}
-          </div>
-
-          {canReview && (
-            <div className="reviews-add">
-              <h4>Dodaj recenziju</h4>
-              <div className="reviews-add-row">
-                <label>
-                  Ocjena
-                  <select value={newReview.rating} onChange={(e) => setNewReview((s) => ({ ...s, rating: Number(e.target.value) }))}>
-                    {[5, 4, 3, 2, 1].map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <label className="reviews-add-comment">
-                Komentar
-                <textarea value={newReview.text} onChange={(e) => setNewReview((s) => ({ ...s, text: e.target.value }))} />
-              </label>
-              <div className="reviews-add-actions">
-                <button className="reviews-submit" onClick={submit}>Pošalji recenziju</button>
-              </div>
-            </div>
-          )}
-        </>
+      {ratingLoading ? (
+        <p>Učitavanje sažetka...</p>
+      ) : rating.ukOcjena ? (
+        <p className="reviews-summary">
+          {rating.ukOcjena}/5 ⭐ ({rating.brojRecenzija} recenzija)
+        </p>
+      ) : (
+        <p>Još nema recenzija</p>
       )}
-    </div>
-  )
+
+      {error && <p className="reviews-error">{error}</p>}
+
+      {loading && <p>Učitavanje recenzija...</p>}
+
+      {!loading && !error && reviews.length === 0 && (
+        <p>Nema recenzija za prikaz.</p>
+      )}
+
+      {!loading && !error && reviews.length > 0 && (
+        <div className="reviews-list">
+          {reviews.map((r) => (
+            <article key={r.idrecenzija} className="review-card">
+              <div className="review-top">
+                <strong>
+                  {r.imekorisnik} {r.prezkorisnik}
+                </strong>
+                <span>{r.ocjena}/5 ⭐</span>
+              </div>
+
+              {r.tekst && <p className="review-text">{r.tekst}</p>}
+
+              {r.fotografija && (
+                <div className="review-photo">
+                  <img
+                    src={r.fotografija}
+                    alt="Fotografija recenzije"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }

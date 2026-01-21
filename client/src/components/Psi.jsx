@@ -168,9 +168,9 @@ export default function Psi() {
                     <p>Zdravstvene napomene: {pas.zdravNapomene || "-"}</p>
                     <p>Razina energije: {pas.razinaEnergije || "-"}</p>
 
-                    <button onClick={() => izbrisi(pas.idPas)}>Izbriši psa</button>
+            <button onClick={izbrisi(pas.idPas)}>Izbriši psa</button>                       
 
-                </div>))}
+         </div>))}
          <div className="dodajP">
                     <button onClick={() => setPrikaziFormu(true)}>+</button>
          </div>

@@ -31,18 +31,17 @@ export default function MojeSetnje() {
             });
     }, []);
 
-const idKorisnik= "1"; //user.idKorisnik ||
        useEffect(() => {
                const loadprosle = async () => {
                  try {
                    setLoading(true);
                    setError(null);
-                   const response = await fetch('/api/prosleSetnje/${idKorisnik}', { 
+                   const response = await fetch(`/api/prosleSetnje/${idKorisnik}`, { 
                      method: 'GET',
                      credentials: 'include' });
                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
                    const data = await response.json();
-                   setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ?? []));
+                   setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ??data?.proslesetnje ?? []));
                  } catch (err) {
                      setError(err.message || 'Greška pri dohvaćanju podataka');
                      setprosle([]);
@@ -58,12 +57,12 @@ const idKorisnik= "1"; //user.idKorisnik ||
                  try {
                    setLoading(true);
                    setError(null);
-                   const response = await fetch('/api/buduceSetnje/${idKorisnik}', { 
+                   const response = await fetch(`/api/buduceSetnje/${idKorisnik}`, { 
                      method: 'GET',
                      credentials: 'include' });
                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
                    const data = await response.json();
-                   setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? []));
+                   setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? data?.buducesetnje ?? []));
                  } catch (err) {
                      setError(err.message || 'Greška pri dohvaćanju podataka');
                      setbuduce([]);

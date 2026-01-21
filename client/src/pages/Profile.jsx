@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { redirect, useNavigate } from 'react-router-dom';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import Reviews from '../components/Reviews';
@@ -9,6 +10,8 @@ const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 
 //skroz na dnu returna treba dodat <Footer/> ako ce ovo bit finalna stranica za setaca
 export default function Profile() {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
@@ -124,7 +127,8 @@ export default function Profile() {
       }
 
       alert('Profil je uspješno obrisan');
-      window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
+      //window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
+      navigate('/');
     } catch (err) {
       alert('Greška: ' + err.message);
     } finally {

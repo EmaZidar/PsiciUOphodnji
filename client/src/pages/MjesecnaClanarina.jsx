@@ -42,12 +42,11 @@ const [mjclanarina, setmjclanarina]=useState(0);
 		  try {
 			setLoading(true);
 			setError(null);
-			const response = await fetch('/api/mjesecna', { 
-			  method: 'GET',
-			  credentials: 'include' });
-			if (!response.ok) throw new Error(`Server returned ${response.status}`);
-			const data = await response.json();
-			setmjclanarina(data.mjesecna?? 0);
+			//TODO VRATI OVO KAD POPRAVE NA BEKU
+			//const response = await fetch('/api/mjesecna', {  method: 'GET',credentials: 'include' });
+			//if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			//const data = await response.json();
+			//setmjclanarina(data.mjesecna?? 0);
 		  } catch (err) {
 			  setError(err.message || 'Greška pri dohvaćanju podataka');
 			  setmjclanarina(0);
@@ -84,6 +83,9 @@ const [mjclanarina, setmjclanarina]=useState(0);
   });
   };
 
+    const mjesecnisetaci=setaci.filter((setac)=>{ return setac.tipclanarina==="mjesečna"});
+
+
 	return (
 		<>
 		<div className="clanarina-page">
@@ -117,7 +119,7 @@ const [mjclanarina, setmjclanarina]=useState(0);
 		<div className="setaci-list">
         {loading && <p>Učitavanje šetača...</p>}
         {!loading && error && <p className="error-message">{error}</p>}
-        {!loading  &&!error && setaci.map((setac) => (
+        {!loading  &&!error && mjesecnisetaci.map((setac) => (
           <article className="setac-card" key={setac.idkorisnik}>
             <div className="setac-info">
               <h2 className="setac-name">{setac.imekorisnik} {setac.prezkorisnik}</h2>
@@ -132,7 +134,7 @@ const [mjclanarina, setmjclanarina]=useState(0);
               </p>
             </div>
 
-            <div>Tip članarine:  Mjesečna {setac.tipClanarina}</div>
+            <div>Tip članarine:  {setac.tipclanarina}</div>
 
           </article>
         ))}

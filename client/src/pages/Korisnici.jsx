@@ -88,6 +88,10 @@ export default function Korisnici() {
               <p>
                 <span>Ocjena: {setac.ocjena}/5 ⭐</span>
               </p>
+              <p>
+                <span>Tip članarine:  {setac.tipclanarina}</span>
+              </p>
+              
             </div>
 
             <button>Obriši ga</button>   

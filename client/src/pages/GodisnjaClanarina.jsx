@@ -43,12 +43,11 @@ const [godclanarina, setgodclanarina]=useState(0);
 		  try {
 			setLoading(true);
 			setError(null);
-			const response = await fetch('/api/godisnja', { 
-			  method: 'GET',
-			  credentials: 'include' });
-			if (!response.ok) throw new Error(`Server returned ${response.status}`);
-			const data = await response.json();
-			setgodclanarina(data.godisnja?? 0);
+			//TODO VRATI I OVO KAD POSALJU S BEAKA
+			//const response = await fetch('/api/godisnja', {   method: 'GET', credentials: 'include' });
+			//if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			//const data = await response.json();
+			//setgodclanarina(data.godisnja?? 0);
 		  } catch (err) {
 			  setError(err.message || 'Greška pri dohvaćanju podataka');
 			  setgodclanarina(0);
@@ -84,6 +83,8 @@ const [godclanarina, setgodclanarina]=useState(0);
   });
   };
 
+  const godisnjisetaci=setaci.filter((setac)=>{ return setac.tipclanarina==="godišnja"});
+
 	return (
 		<>
 		<div className="clanarina-page">
@@ -113,7 +114,8 @@ const [godclanarina, setgodclanarina]=useState(0);
 		<div className="setaci-list">
 		{loading && <p>Učitavanje šetača...</p>}
 		{!loading && error && <p className="error-message">{error}</p>}
-		{!loading  &&!error && setaci.map((setac) => (
+
+		{!loading  &&!error && godisnjisetaci.map((setac) => (
 		  <article className="setac-card" key={setac.idkorisnik}>
 			<div className="setac-info">
 			  <h2 className="setac-name">{setac.imekorisnik} {setac.prezkorisnik}</h2>
@@ -128,7 +130,7 @@ const [godclanarina, setgodclanarina]=useState(0);
 			  </p>
 			</div>
 
-			<div>Tip članarine:  Godišnja {setac.tipClanarina}</div>
+			<div>Tip članarine:  {setac.tipclanarina}</div>
 
 		  </article>
 		))}

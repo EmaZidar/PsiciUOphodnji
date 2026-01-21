@@ -37,7 +37,7 @@ router.get('/', checkIsAuthenticated, async (req, res) => {
         else
             return res.status(401).json({ error: 'Invalid user role' });
 
-        return chatParticipants;
+        return res.status(200).json(chatParticipants);
     } catch (err) {
         console.error('Error in /api/chats', err);
         res.status(500).json({ error: 'Internal server error' });

@@ -247,6 +247,40 @@ app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
 // saljem objekt koji se zove "kojiPas" jer je u njemu svi atribut od psa ali  i idKorisnik jer bi rekla da bi trebali vi
 //kad se stvori novi pas njemu napravit idPas pa sam poslala i idKorisnik ak bi doslo do problema ak se dva psa zovu isto
 //ugl 
+app.post('/api/psi', async (req, res) => {
+    try {
+        const idKorisnik = req.body.idKorisnik;
+        const { imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene } = req.body;
+        const pas = await db.createPas(imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idKorisnik);
+        res.status(201).json({ pas });
+    } catch (err) {
+        console.error('Error creating pas:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.delete('/api/psi/:idPas', async (req, res) => {
+    try {
+        const idPas = parseInt(req.params.idPas, 10);
+        await db.deletePas(idPas);
+        res.json({ message: 'Pas deleted' });
+    } catch (err) {
+        console.error('Error deleting pas:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/psi', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.session.idKorisnik, 10);
+        const psi = await db.getPsiByKorisnikId(idKorisnik);
+        res.status(200).json(psi);
+    } catch (err) {
+        console.error('Error in /api/psi:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+        
 
 app.get('/api/setnje/:idkorisnik', async (req, res) => {
     try {

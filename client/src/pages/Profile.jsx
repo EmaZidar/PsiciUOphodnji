@@ -1,270 +1,370 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import Reviews from '../components/Reviews';
 import './Profile.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
-const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 
-//skroz na dnu returna treba dodat <Footer/> ako ce ovo bit finalna stranica za setaca
+// preview slike prije slanja na backend
+function buildUploadPreview(file) {
+  return URL.createObjectURL(file);
+}
+
 export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
+
+  const [rating, setRating] = useState({ukOcjena: null, brojRecenzija: 0});
+  const [ratingLoading, setRatingLoading] = useState(false);
+
   const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [avgRating, setAvgRating] = useState(null);
-  const [ratingCount, setRatingCount] = useState(0);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState({
+    imekorisnik: "",
+    prezkorisnik: "",
+    email: "",
+    telefon: "",
+    lokdjelovanja: "",
+  });
+
+  const imagePreviewUrl = useMemo(() => {
+    if (!selectedImage) return null;
+    return buildUploadPreview(selectedImage);
+  }, [selectedImage]);
+  
 
   useEffect(() => {
-    const API = `${BACKEND_URL}/api/me`;
-    fetch(API, { credentials: 'include' })
-      .then((r) => {
-        if (!r.ok) throw new Error('Nije authenticated');
-        return r.json();
-      })
-      .then((data) => {
-        setUser(data.user ?? data.session ?? null);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.warn('gresla', err);
-        setUser(null);
-        setLoading(false);
-      });
+    let cancelled = false;
+
+    async function loadMe() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await fetch(`${BACKEND_URL}/api/me`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) throw new Error("Nije authenticated");
+
+        const data = await res.json();
+        if (!cancelled) setUser(data.user);
+      } catch (e) {
+        if (!cancelled) {
+          setUser(null);
+          setError(e?.message || "Greška pri dohvaćanju profila");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadMe();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    let mounted = true
-    async function loadRating() {
+    if (!user) return;
+    setForm({
+      imekorisnik: user.imekorisnik ?? "",
+      prezkorisnik: user.prezkorisnik ?? "",
+      email: user.email ?? "",
+      telefon: user.telefon ?? "",
+      lokdjelovanja: user.roleData?.lokdjelovanja ?? "",
+    });
+  }, [user]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.idkorisnik) return;
+
+    async function loadRatingSummary() {
       try {
-        if (!user || !(user._id || user.id)) return
-        const res = await fetch(`${BACKEND_URL}/api/reviews?user=${encodeURIComponent(user._id || user.id)}`)
-        if (!res.ok) throw new Error('no reviews')
-        const data = await res.json()
-        const list = data.reviews || data || []
-        if (!Array.isArray(list)) return
-        const c = list.length
-        const a = c ? list.reduce((s,r)=>s+(r.rating||0),0)/c : null
-        if (!mounted) return
-        setAvgRating(a ? Math.round(a*10)/10 : null)
-        setRatingCount(c)
-      } catch (e) {
-        console.warn('greska', e)
+        setRatingLoading(true);
+        const res = await fetch(`${BACKEND_URL}/api/setaci/${user.idkorisnik}/rating-summary`, {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Greška pri dohvaćanju sažetka ocjena");
+
+        const data = await res.json();
+        if (!cancelled) {
+          setRating({
+            ukOcjena: data.ukocjena ?? null,
+            brojRecenzija: data.brojrecenzija ?? 0,
+          });
+        }
+      } catch {
+        if (!cancelled) setRating({ ukOcjena: null, brojRecenzija: 0 });
+      } finally {
+        if (!cancelled) setRatingLoading(false);
       }
     }
-    loadRating()
-    return () => { mounted = false }
-  }, [user])
 
-  const handleImageSelect = (e) => {
-    const file = e.target.files[0];
-    if (file && (file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png')) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      alert('Molimo odaberite JPG, JPEG ili PNG datoteku');
+    loadRatingSummary();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.idkorisnik])
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
     }
-  };
+  }, [imagePreviewUrl]);
 
-  const handleImageUpload = async () => {
+  function handleImageSelect(e) {
+    const file = e.target.files[0] ?? null;
+    if (!file) return;
+
+    const allowed = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowed.includes(file.type)) {
+      setError("Molimo odaberite JPG/JPEG ili PNG datoteku.");
+      setSelectedImage(null);
+      return;
+    }
+
+    setError("");
+    setSelectedImage(file);
+  }
+
+  async function handleImageUpload() {
     if (!selectedImage) return;
 
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('profileImage', selectedImage);
-
     try {
-      const response = await fetch(`${BACKEND_URL}/api/upload-profile-image`, {
-        method: 'POST',
-        credentials: 'include',
+      setUploading(true);
+      setError("");
+
+      const formData = new FormData();
+      formData.append("profilfoto", selectedImage);
+
+      const res = await fetch(`${BACKEND_URL}/api/me/profile-image`, {
+        method: "POST",
+        credentials: "include",
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Greška pri učitavanju slike');
-
-      const data = await response.json();
-      if (data?.user) {
-        setUser(data.user);
-      } else {
-        const userResponse = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
-        const userData = await userResponse.json();
-        setUser(userData.user ?? userData.session ?? null);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Greška pri učitavanju slike");
       }
-      setImagePreview(null);
+
+      const data = await res.json();
+      setUser(data.user);
       setSelectedImage(null);
-      alert('Slika uspješno učitana!');
-    } catch (err) {
-      alert('Greška: ' + err.message);
+    } catch (e) {
+      setError(e?.message || "Greška pri uploadu slike");
     } finally {
       setUploading(false);
     }
-  };
+  }
 
-  // dio sa brisanjem profila
-  const handleDeleteProfile = async () => {
-    setDeleting(true);
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleEdit() {
+    setError("");
+    setIsEditing(true);
+  }
+
+  function handleCancel() {
+    setError("");
+    setForm({
+      imekorisnik: user?.imekorisnik ?? "",
+      prezkorisnik: user?.prezkorisnik ?? "",
+      email: user?.email ?? "",
+      telefon: user?.telefon ?? "",
+      lokdjelovanja: user?.roleData?.lokdjelovanja ?? "",
+    });
+    setIsEditing(false);
+  }
+
+  async function handleSave() {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/delete-profile`, {
-        method: 'DELETE',
-        credentials: 'include',
+      setError("");
+
+      const payload = {
+        imekorisnik: form.imekorisnik,
+        prezkorisnik: form.prezkorisnik,
+        email: form.email,
+        telefon: form.telefon,
+        lokdjelovanja: form.lokdjelovanja, 
+      };
+
+      const res = await fetch(`${BACKEND_URL}/api/me`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Greška pri brisanju profila');
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Spremanje nije uspjelo");
       }
 
-      alert('Profil je uspješno obrisan');
-      window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
-    } catch (err) {
-      alert('Greška: ' + err.message);
-    } finally {
-      setDeleting(false);
-      setShowDeleteConfirm(false);
+      const data = await res.json();
+      setUser(data.user ?? data);
+      setIsEditing(false);
+    } catch (e) {
+      setError(e?.message || "Greška pri spremanju");
     }
-  };
+  }
+
+  // dio sa brisanjem profila
+  async function handleDeleteProfile() {
+    const ok = window.confirm("Jeste sigurni da želite obrisati profil?");
+    if (!ok) return;
+
+    try {
+      setError("");
+      const res = await fetch(`${BACKEND_URL}/api/delete-profile`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Greška pri brisanju profila");
+      }
+
+      window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
+    } catch (e) {
+      setError(e?.message || "Greška pri brisanju profila");
+    }
+  }
+
+  const defaultImage = new URL('/images/profile.png', import.meta.url).href;
+  const avatarSrc = imagePreviewUrl || (user?.roleData?.profilfoto ? `${BACKEND_URL}${user.roleData.profilfoto}` : defaultImage);
 
   return (
     <>
       <HeaderUlogiran />
-      <main className="profile-main" style={{ padding: '32px 18px' }}>
+      <main className="profile-main">
         <h1>Pregled profila</h1>
+
         {loading && <p>Učitavanje...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {!loading && error && <p className="error-message">{error}</p>}
 
         {!loading && !error && user && (
-          (() => {
-            const pick = (obj, keys) => {
-              if (!obj) return undefined;
-              for (const k of keys) {
-                if (typeof obj[k] !== 'undefined' && obj[k] !== null && String(obj[k]).trim() !== '') return obj[k];
-              }
-              return undefined;
-            };
+          <>
+            <section className="profile-container">
+              <div className="profile-avatar-wrapper">
+                <img src={avatarSrc} alt="Profilna fotografija" className="profile-avatar"
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = defaultImage; }} />
 
-            ///???
-            const avatarFromUser =
-              pick(user, ['profileFoto', 'avatar', 'profil', 'profilfoto']);
-            const avatarFromRole =
-              pick(user?.roleData, ['profileFoto', 'profilFoto', 'profileFoto', 'avatar', 'profil', 'profilfoto']);
-            const defaultImage = new URL('/images/profile.png', import.meta.url).href;
-            const avatarSrc = avatarFromUser || avatarFromRole || defaultImage;
-            const fullAvatarSrc = (typeof avatarSrc === 'string' && avatarSrc.startsWith('/uploads/'))
-              ? `${BACKEND_URL}${avatarSrc}`
-              : avatarSrc;
-
-
-            const firstName = pick(user, ['imeKorisnik', 'ime']) || '';
-            const lastName = pick(user, ['prezKorisnik','prezime']) || '';
-
-            return (
-              <>
-                <section className="profile-container">
-                <div className="profile-avatar-wrapper">
-                  <img
-                    src={imagePreview || fullAvatarSrc}
-                    alt="Profilna fotografija"
-                    className="profile-avatar"
-                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = defaultImage; }}
-                  />
-                  <div className="profile-image-upload">
-                    <input
-                      type="file"
-                      id="profileImageInput"
-                      accept="image/jpeg,image/jpg,image/png"
-                      onChange={handleImageSelect}
-                      style={{ display: 'none' }}
-                    />
-                    <label htmlFor="profileImageInput" className="upload-btn">
-                      Odaberi sliku
-                    </label>
-                    {selectedImage && (
-                      <button onClick={handleImageUpload} disabled={uploading} className="save-btn">
-                        {uploading ? 'Učitavanje...' : 'Spremi sliku'}
-                      </button>
-                    )}
-                    <br></br>
-                    <button className='upload-btn'>Plati članarinu</button>
-                  </div>
-
-                  <div className="profile-rating-below">
-                    <div className="rating-value">{avgRating ?? '—'}</div>
-                    <div className="rating-stars" aria-hidden>
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className={i < Math.round(avgRating || 0) ? 'star filled' : 'star'}>★</span>
-                      ))}
-                    </div>
-                    <div className="rating-count">{ratingCount} recenzija</div>
-                  </div>
-                </div>
-
-                <div className="profile-details">
-                  <div className="profile-info-box">
-                    <div className="profile-row"><strong>Ime:</strong> {firstName || '—'}</div>
-                    <div className="profile-row"><strong>Prezime:</strong> {lastName || '—'}</div>
-                    <div className="profile-row"><strong>Email:</strong> {user.email ?? '—'}</div>
-                    <div className="profile-row"><strong>Telefon:</strong> {user.telefon ?? user.phone ?? '—'}</div>
-                    <div className="profile-row"><strong>Uloga:</strong> {user.role ?? '—'}</div>
-                  </div>
-
-                  <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #ddd' }}>
-                    <button 
-                      onClick={() => setShowDeleteConfirm(true)}
-                      className="delete-btn"
-                    >
-                      Obriši profil
+                <div className="profile-image-upload">
+                  <input type="file" id="profileImageInput" accept="image/jpeg, image/jpg, image/png" onChange={handleImageSelect} />
+                  <label htmlFor="profileImageInput" className="profile-upload-button">
+                    Odaberi sliku
+                  </label>
+                  {selectedImage && (
+                    <button onClick={handleImageUpload} disabled={uploading} className="save-button">
+                      {uploading ? 'Učitavanje...' : 'Spremi sliku'}
                     </button>
-                  </div>
+                  )}
+                  <button className="upload-btn">Plati članarinu</button>
                 </div>
-                </section>
 
-                  <Reviews targetUserId={user._id || user.id} canReview={true} />
-              </>
-            );
-          })()
+                <div className="profile-rating">
+                  <div className="rating-value">
+                    {ratingLoading ? (
+                      <span>Učitavanje ocjene…</span>
+                    ) : rating.ukOcjena ? (
+                      <span>
+                        {rating.ukOcjena}/5 ⭐ ({rating.brojRecenzija} recenzija)
+                      </span>
+                    ) : (
+                      <span>Još nema recenzija</span>
+                    )}
+                  </div>
+                  <div className="rating-count">{rating.brojRecenzija} recenzija</div>
+                </div>
+              </div>
+
+              <div className="profile-details">
+                <div className="profile-info-box">
+                  <div className="profile-row">
+                    <strong>Ime:</strong>{" "}
+                    {isEditing ? (
+                      <input type="text" name="imekorisnik" value={form.imekorisnik} onChange={handleChange} className="profile-input"/>
+                    ) : (
+                      user.imekorisnik || '—'
+                    )}
+                  </div>
+                  <div className="profile-row">
+                    <strong>Prezime:</strong>{" "}
+                    {isEditing ? (
+                      <input type="text" name="prezkorisnik" value={form.prezkorisnik} onChange={handleChange} className="profile-input"/>
+                    ) : (
+                      user.prezkorisnik || '—'
+                    )}
+                  </div>
+                  <div className="profile-row">
+                    <strong>Email:</strong>{" "}
+                    {isEditing ? (
+                      <input type="email" name="email" value={form.email} onChange={handleChange} className="profile-input"/>
+                    ) : (
+                      user.email || '—'
+                    )}
+                  </div>
+                  <div className="profile-row">
+                    <strong>Telefon:</strong>{" "}
+                    {isEditing ? (
+                      <input type="tel" name="telefon" value={form.telefon} onChange={handleChange} className="profile-input"/>
+                    ) : (
+                      user.telefon || '—'
+                    )}
+                  </div>
+                  <div className="profile-row">
+                    <strong>Lokacija djelovanja:</strong>{" "}
+                    {isEditing ? (
+                      <input type="text" name="lokdjelovanja" value={form.lokdjelovanja} onChange={handleChange} className="profile-input"/>
+                    ) : (
+                      user.roleData.lokdjelovanja || '—'
+                    )}
+                  </div>
+                  <div className="profile-row"><strong>Tip članarine:</strong> {user.roleData.tipclanarina || '—'}</div>
+                </div>
+
+                <div className="profile-actions">
+                  {!isEditing ? (
+                    <button onClick={handleEdit} className="save-button">
+                      Uredi
+                    </button>
+                  ) : (
+                    <>
+                      <button onClick={handleSave} className="save-button">
+                        Spremi
+                      </button>
+                      <button onClick={handleCancel} className="delete-btn">
+                        Odustani
+                      </button>
+                    </>
+                  )}
+                  <button onClick={handleDeleteProfile} className="delete-btn">
+                    Obriši profil
+                  </button>
+                </div>
+              </div>
+            </section>
+            <Reviews targetUserId={user.idkorisnik} />
+          </>
         )}
 
         {!loading && !error && !user && (
           <p>Nema podataka za korisnika.</p>
         )}
       </main>
-
-      {/*  */}
-      {showDeleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Potvrdi brisanje profila</h2>
-            <p>Jeste li sigurni da želite obrisati svoj profil? </p>
-            
-            <div className="modal-buttons">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleting}
-                className="modal-btn modal-btn-cancel"
-              >
-                Ne
-              </button>
-              <button
-                onClick={handleDeleteProfile}
-                disabled={deleting}
-                className="modal-btn modal-btn-delete"
-              >
-                {deleting ? 'Brišem...' : 'Da'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <Footer />
     </>
   );
 }

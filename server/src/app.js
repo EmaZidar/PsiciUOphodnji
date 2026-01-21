@@ -6,6 +6,7 @@ import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
 import * as calendar from "./calendar.js";
+import * as chat from "./chat.js";
 
 db.testConnection();    
 
@@ -480,34 +481,9 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 })
-// GET /api/chats
-// TODO: Dohvatiti idkorisnik prijavljenog korisnika
-// Dohvatiti sve rezervacije gdje je korisnik vlasnik ili šetač
-//  Za svaku rezervaciju:
-//  odrediti drugog sudionika chata
-// mapirati podatke (idRezervacija, idSetnja, otherId, otherName, otherProfilFoto(ako je other setac), tipSetnja, datum, vrijeme)
-// Sortirati chatove po datumu i vremenu, mislim da cak ne morate jer sam stavila da se sorta po vremenu pa sad da znate
-//  Vratiti listu chatova kao JSON
 
-// GET api/chats/:idrezervacija/messages 
-//  Dohvatiti idRezervacija iz params
-//  Dohvatiti idkorisnik prijavljenog korisnika
-//  Provjeriti postoji li rezervacija
-//  Provjeriti da je korisnik sudionik rezervacije
-//  Dohvatiti sve poruke za rezervaciju
-//  Sortirati poruke po vrijemeSlanja ASC
-//  Vratiti poruke kao JSON
-// trebat ces nac tocno kak se zovu polja u tablicama iz fronta u ChatWindow.jsx
+app.use('/api/chats', chat);
 
-// POST /api/chats/:idrezervacija/messages ---
-//  Dohvatiti idRezervacija iz params
-//  Dohvatiti tekst poruke iz body-ja
-//  Dohvatiti idkorisnik prijavljenog korisnika
-//  Provjeriti postoji li rezervacija
-//  Provjeriti da je korisnik sudionik rezervacije
-//  Spremiti poruku u bazu (vrijemeSlanja = NOW())
-//  Vratiti kreiranu poruku kao JSON
- 
 
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {

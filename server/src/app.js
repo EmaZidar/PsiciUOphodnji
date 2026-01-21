@@ -123,7 +123,8 @@ app.get("/google/callback", async (req, res) => {
             const userId = existingUser.idkorisnik ?? existingUser.idKorisnik ?? existingUser.id ?? existingUser.id_korisnik;
             const userWithRole = await db.getUserWithRole(userId);
             const role = userWithRole?.role ?? "unassigned";
-            req.session.user = userWithRole;
+            req.session.user.id = userId;
+            req.session.user.role = role;
             res.redirect(`${clientUrl}/main?role=${encodeURIComponent(role)}`);
         }
     } catch (error) {
@@ -160,6 +161,8 @@ app.post('/api/register', (req, res) => {
     console.log('Created user:', user)
     const idKorisnik = user.rows[0].idkorisnik // TODO treba vidjet jel postoji lol
     console.log('id korisnik:', idKorisnik)
+    req.session.user.id = idKorisnik;
+    req.session.user.role = isSetac ? 'setac' : 'vlasnik';
     if (isSetac)
       db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
     else
@@ -169,7 +172,7 @@ app.post('/api/register', (req, res) => {
   res.sendStatus(200)
 })
 
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', async (_req, res) => {
     try {
         const users = await db.getAllUsers();
         res.status(200).json(users);
@@ -205,13 +208,9 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/api/setaci', async (req, res) => {
+app.get('/api/setaci', async (_req, res) => {
     try {
         const setaci = await db.getAllSetaci();
-        if (setaci.length > 0)
-            console.log(setaci[0])
-        else console.log('Empty setaci :(')
-
         res.status(200).json(setaci)
     } catch (err) {
         console.error('Error in /api/setaci:', err);
@@ -219,12 +218,9 @@ app.get('/api/setaci', async (req, res) => {
     }
 });
 
-app.get('/api/vlasnici', async (req, res) => {
+app.get('/api/vlasnici', async (_req, res) => {
     try {
         const vlasnici = await db.getAllVlasnici();
-        if (vlasnici.length > 0)
-            console.log(vlasnici)
-        else console.log('Nema vlasnika')
         res.status(200).json(vlasnici)
     } catch (err) {
         console.error('Error in /api/vlasnici:', err);
@@ -234,7 +230,7 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const idkorisnik = req.session.user.id;
         const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
         const rezervacija = await db.createRezervacija(idSetnja, idkorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
@@ -349,13 +345,7 @@ app.use('/api/calendar', calendar.router)
 
 app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     try {
-        const sessionUser = req.session.user;
-        const dbUser = await db.getUserWithEmail(sessionUser.email);
-        if (!dbUser) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        
-        const userId = dbUser.idkorisnik;
+        const userId = req.session.user.id;
         console.log('Deleting user with ID:', userId);
         
         // OBRIŠI KORISNIKA
@@ -375,29 +365,21 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-// APIJI ZA NOTIFIKACIJE I PLAĆANJE
-// odite na pageove di se zovu ovi apiji da vidite kontekst i da dodate ono VITE_BACKEND_URL ili sta vec treba jer nisam bila zihi kako
-// ideja: odlucila sam implementirati na nacin da setac ili vlasnik vidi notifikacije tek kad klikne na ikonicu notifikacija u headeru jer mi se polling cini overkill za sad
-// dakle kad korisnik klikne na ikonicu, frontend salje request na backend da dohvati notifikacije
-// onda kad setac prihvati ili odbije rezervaciju, frontend salje request na backend da updatea status rezervacije
-// znaci basically notifikacije su samo filtriranje po statusu rezervacije i vracanje tih rezervacija u frontend ovisno je li u pitanju vlasnik ili setac
+function checkIsSetac(req, res, next) {
+    if (req.session.user?.role === 'setac')
+        return next();
+    return res.status(403).json({ error: 'Pristup dozvoljen samo setacima' });
+}
 
-//GET /api/setac/notifikacije (zove se u HeaderUlogiran.jsx)
-// prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
-// provjera: korisnik mora biti ulogiran i mora biti setac
-// backend mora vratiti array notifikacija za setaca - svaki objekt notifikacije treba imati:
-// idRezervacija, tipSetnja, cijena, trajanje, imeKorisnik, prezKorisnik, datum, vrijeme, polaziste, dodNapomene
-// to se dobije mergeanjem tablica KORISNIK, VLASNIK (jer mi trebaju ime i prezime vlasnika koji je napravio rezervaciju), REZERVACIJA, SETNJA
-// bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "na cekanju" jer su to notifikacije za setaca
-app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
+function checkIsVlasnik(req, res, next) {
+    if (req.session.user?.role === 'vlasnik')
+        return next();
+    return res.status(403).json({ error: 'Pristup dozvoljen samo vlasnicima' });
+}
+
+app.get('/api/setac/notifikacije', checkIsAuthenticated, checkIsSetac, async (req, res) => {
     try {
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsSetac(idkorisnik))
-        if (!await db.checkIsSetac(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
-
-        const notifications = await db.getSetacNotifikacije(idkorisnik);
+        const notifications = await db.getSetacNotifikacije(req.session.user.id);
 
         return res.status(200).json(notifications);
     } catch (err) {
@@ -410,9 +392,7 @@ function changeRezervacijaStatus(newStatus) {
     return async (req, res) => {
         try {
             const idRezervacija = req.params.idRezervacija;
-            const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-        if (!await db.checkIsSetac(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
+            const idkorisnik = req.session.user.id;
 
             const success = await db.changeRezervacijaStatus(idkorisnik, idRezervacija, newStatus);
             if (success)
@@ -429,13 +409,13 @@ function changeRezervacijaStatus(newStatus) {
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
 // provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
 // ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
-app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, changeRezervacijaStatus('potvrdeno'));
+app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('potvrdeno'));
 
 //PATCH /api/rezervacija/:idRezervacija/odbij (zove se u HeaderUlogiran.jsx)
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
 // provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
 // ako sve prode, updateat rezervaciju da bude u statusu "odbijeno"!!!!
-app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeRezervacijaStatus('odbijeno'));
+app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('odbijeno'));
 
 //GET /api/vlasnik/notifikacije (zove se u HeaderUlogiran.jsx)
 // prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
@@ -444,14 +424,9 @@ app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeR
 // idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
 // to se dobije mergeanjem tablica REZERVACIJA i SETNJA
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
-app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
+app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsVlasnik(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
-
-        const notifications = await db.getVlasnikNotifikacije(idkorisnik);
+        const notifications = await db.getVlasnikNotifikacije(req.session.user.id);
 
         return res.status(200).json(notifications);
     } catch (err) {
@@ -465,13 +440,10 @@ app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
 // to se sve dobije iz tablice REZERVACIJA
-app.get('/api/rezervacije/:idRezervacija', async (req, res) => {
+app.get('/api/rezervacije/:idRezervacija', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsVlasnik(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+        const idkorisnik = req.session.user.id;
 
         const rezervacija = await db.getRezervacija(idkorisnik, idRezervacija);
 
@@ -489,13 +461,10 @@ app.get('/api/rezervacije/:idRezervacija', async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
 // ako sve prode, updateat rezervaciju da bude u statusu "placeno"
-app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
+app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsVlasnik(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+        const idkorisnik = req.session.user.id;
 
         const success = await db.platiRezervaciju(idkorisnik, idRezervacija);
         if (success)

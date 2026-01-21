@@ -52,6 +52,7 @@ export default function Korisnici() {
             if (!response.ok) throw new Error(`Server returned ${response.status}`);
             const data = await response.json();
             setvlasnici(Array.isArray(data) ? data : (data?.vlasnici ?? []));
+            console.log("Podaci iz baze:", data[0]);
           } catch (err) {
               setError(err.message || 'Greška pri dohvaćanju podataka');
               setvlasnici([]);
@@ -155,7 +156,7 @@ export default function Korisnici() {
             <div className="setac-info">
               <h2 className="setac-name">{vl.imekorisnik} {vl.prezkorisnik} (ID: {vl.idkorisnik})</h2>
               <p>
-                <span>Prima Obavijesti: {vl.primanjeObavijesti} </span>
+                <span>Prima Obavijesti: {vl.primanjeobavijesti && ("da")} {!vl.primanjeobavijesti && ("ne")}  </span>
               </p>
               <p>
                 <span>Telefon: {vl.telefon}</span>

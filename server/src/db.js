@@ -165,7 +165,7 @@ export async function createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme
 }
 export async function getAllVlasnici() {
     const res = await pool.query(
-        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.telefon, v.primanjeObavijesti
          FROM korisnik k
             JOIN vlasnik v ON k.idKorisnik = v.idKorisnik`
     );

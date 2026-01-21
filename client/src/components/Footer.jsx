@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Footer() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setUser(data.user ?? data.session ?? null);
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => { mounted = false };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -32,9 +49,11 @@ export default function Footer() {
           </div>
 
           <div className="col footer-col-logout">
-            <button onClick={handleLogout} className="footer-logout" aria-label="Odjavi se" title="Odjavi se">
-              <img src="/images/logout.png" alt="Odjavi se" className="logout-icon" />
-            </button>
+            {user && (
+              <button onClick={handleLogout} className="footer-logout" aria-label="Odjavi se" title="Odjavi se">
+                <img src="/images/logout.png" alt="Odjavi se" className="logout-icon" />
+              </button>
+            )}
           </div>
         </div>
       </div>

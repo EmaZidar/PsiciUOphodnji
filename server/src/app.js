@@ -24,6 +24,16 @@ app.use(cors({
     ],
     credentials: true
 }));
+// ovo kao prevencija cachea za api zahtjeve
+const noCache = (req, res, next) => {
+    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.header('Expires', '-1');
+    res.header('Pragma', 'no-cache');
+    next();
+};
+
+// da nema starog sessiona kad se salje api zahtjev
+app.use('/api', noCache);
 console.log(`NODE_ENV = ${process.env.NODE_ENV}, isProduction = ${process.env.NODE_ENV === "production"}`)
 app.use(
     session({
@@ -202,6 +212,40 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
     } catch (err) {
         console.error('Error in /api/me:', err);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Logout endpoint: destroy session and clear cookie
+app.post('/api/logout', (req, res) => {
+    try {
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session on logout:', err);
+                return res.status(500).json({ error: 'Failed to logout' });
+            }
+            res.clearCookie('connect.sid');
+            return res.json({ message: 'Logged out' });
+        });
+    } catch (err) {
+        console.error('Error in /api/logout:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Compatibility route: plain /logout (matches your snippet)
+app.post('/logout', (req, res) => {
+    try {
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session on /logout:', err);
+                return res.status(500).send('Greška pri odjavi');
+            }
+            res.clearCookie('connect.sid');
+            return res.status(200).send('Odjavljeni ste.');
+        });
+    } catch (err) {
+        console.error('Error in /logout:', err);
+        return res.status(500).send('Internal server error');
     }
 });
 

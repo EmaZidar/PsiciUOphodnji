@@ -517,7 +517,7 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
 // dohvatiti sve setnje za tog setaca:
 //    - tablica SETNJA -> idKorisnik = ulogirani setac
 //    - filtrirati samo one gdje postoji rezervacija u tablici REZERVACIJA
-//      koja je u statusu "placeno" ili "potvrdeno"
+//      koja je u statusu ("placeno") ILI ("potvrdeno" + da je nacin placanja "gotovina")
 //    - datum rezervacije >= danas (buduce setnje)
 //    - spajati s tablicom KORISNIK (VLASNIK) da dobijemo imekorisnik i prezKorisnik vlasnika
 //    - spajati s tablicom REZERVACIJA da dobijemo polaziste, datum, vrijeme, nacinPlacanja i dodNapomene

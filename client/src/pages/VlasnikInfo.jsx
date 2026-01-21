@@ -3,14 +3,14 @@ import { useParams } from 'react-router-dom';
 import './VlasnikInfo.css';
 
 export default function VlasnikInfo() {
-  const { id } = useParams();
+  const { idkorisnik } = useParams();
   const [vlasnik, setVlasnik] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchVlasnik() {
       try {
-        const res = await fetch(`/api/vlasnik/${id}`, { credentials: 'include' });
+        const res = await fetch(`/api/vlasnik/${idkorisnik}`, { credentials: 'include' });
         if (!res.ok) throw new Error('Greška pri dohvaćanju vlasnika');
         const data = await res.json();
         setVlasnik(data);
@@ -32,7 +32,7 @@ export default function VlasnikInfo() {
       <h2>Profil vlasnika</h2>
 
       <p><strong>Ime:</strong> {vlasnik.imekorisnik}</p>
-      <p><strong>Prezime:</strong> {vlasnik.prezimekorisnik}</p>
+      <p><strong>Prezime:</strong> {vlasnik.prezkorisnik}</p>
       <p><strong>Email:</strong> {vlasnik.email}</p>
       <p><strong>Telefon:</strong> {vlasnik.telefon}</p>
 

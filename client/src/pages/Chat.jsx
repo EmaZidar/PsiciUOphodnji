@@ -63,11 +63,11 @@ export default function Chat() {
       <div className="chat-container">
         <div className="chat-list-column">
           <h3>Razgovori</h3>
-          <ChatList chats={chats} onSelect={handleSelect} selectedId={selected?.idRezervacija} />
+          <ChatList chats={chats} onSelect={handleSelect} selectedId={selected?.idrezervacija} />
         </div>
         <div className="chat-window-column">
           {selected ? (
-            <ChatWindow key={selected.idRezervacija} chat={selected} me={me} />
+            <ChatWindow key={selected.idrezervacija} chat={selected} me={me} />
           ) : (
             <div className="placeholder">Odaberite razgovor s lijeve strane</div>
           )}

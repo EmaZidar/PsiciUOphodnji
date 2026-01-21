@@ -3,11 +3,11 @@ import React, { useEffect, useState, useRef } from "react";
 // sample poruke za lokalni test
 const SAMPLE_MESSAGES = {
   "test-1": [
-    { idPoruka: "m1", vrijemeSlanja: new Date().toISOString(), posiljatelj: 999, tekst: "Bok! Ovo je testna poruka." },
-    { idPoruka: "m2", vrijemeSlanja: new Date().toISOString(), posiljatelj: 1, tekst: "Super, vidim test chat!" },
+    { idporuka: "m1", vrijemeslanja: new Date().toISOString(), posiljatelj: 999, tekst: "Bok! Ovo je testna poruka." },
+    { idporuka: "m2", vrijemeslanja: new Date().toISOString(), posiljatelj: 1, tekst: "Super, vidim test chat!" },
   ],
   "test-2": [
-    { idPoruka: "d1", vrijemeSlanja: new Date().toISOString(), posiljatelj: 998, tekst: "Hej, imaš slobodno večeras?" },
+    { idporuka: "d1", vrijemeslanja: new Date().toISOString(), posiljatelj: 998, tekst: "Hej, imaš slobodno večeras?" },
   ],
 };
 
@@ -16,21 +16,21 @@ export default function ChatWindow({ chat, me }) {
   const [text, setText] = useState("");
   const containerRef = useRef(null);
 
-  const userId = me?.idKorisnik;
+  const userId = me?.idkorisnik;
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch(`/api/chats/${chat.idRezervacija}/messages`, { credentials: "include" });
+      const res = await fetch(`/api/chats/${chat.idrezervacija}/messages`, { credentials: "include" });
       let data = [];
       if (res.ok) {
         data = await res.json();
-      } else if (SAMPLE_MESSAGES[chat.idRezervacija]) {
-        data = SAMPLE_MESSAGES[chat.idRezervacija];
+      } else if (SAMPLE_MESSAGES[chat.idrezervacija]) {
+        data = SAMPLE_MESSAGES[chat.idrezervacija];
       }
-      data.sort((a, b) => new Date(a.vrijemeSlanja) - new Date(b.vrijemeSlanja));
+      data.sort((a, b) => new Date(a.vrijemeslanja) - new Date(b.vrijemeslanja));
       setMessages(data);
     } catch {
-      if (SAMPLE_MESSAGES[chat.idRezervacija]) setMessages(SAMPLE_MESSAGES[chat.idRezervacija]);
+      if (SAMPLE_MESSAGES[chat.idrezervacija]) setMessages(SAMPLE_MESSAGES[chat.idrezervacija]);
     }
   };
 
@@ -45,7 +45,7 @@ export default function ChatWindow({ chat, me }) {
   const sendMessage = async () => {
     if (!text.trim()) return;
     try {
-      await fetch(`/api/chats/${chat.idRezervacija}/messages`, {
+      await fetch(`/api/chats/${chat.idrezervacija}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -76,17 +76,17 @@ export default function ChatWindow({ chat, me }) {
     <div className="chat-window">
       <div className="chat-header">
         <div className="name" style={{ fontWeight: "bold" , fontSize: "1.2rem"}}>{chat.otherName}</div>
-        <div className="sub">{chat.tipSetnja} • {chat.datum} {chat.vrijeme}</div>
+        <div className="sub">{chat.tipsetnja} • {chat.datum} {chat.vrijeme}</div>
       </div>
 
       <div className="chat-messages" ref={containerRef}>
         {messages.map((m) => {
           const isMe = userId === m.posiljatelj;
           return (
-            <div key={m.idPoruka} className={`message-row ${isMe ? "me" : ""}`}>
+            <div key={m.idporuka} className={`message-row ${isMe ? "me" : ""}`}>
               <div className={`message-bubble ${isMe ? "me" : "them"}`}>
                 <div className="message-text">{m.tekst}</div>
-                <div className="message-meta">{formatTime(m.vrijemeSlanja)}</div>
+                <div className="message-meta">{formatTime(m.vrijemeslanja)}</div>
               </div>
             </div>
           );

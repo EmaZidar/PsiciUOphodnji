@@ -11,6 +11,24 @@ const SAMPLE_MESSAGES = {
   ],
 };
 
+function formatDatumHR(datum) {
+  if (!datum) return '';
+
+  const d = new Date(datum);
+
+  const dan = String(d.getDate()).padStart(2, '0');
+  const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+  const godina = d.getFullYear();
+
+  return `${dan}.${mjesec}.${godina}.`;
+}
+
+function formatVrijeme(vrijeme) {
+  if (!vrijeme) return '';
+
+  return vrijeme.slice(0, 5);
+}
+
 export default function ChatWindow({ chat, me }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -70,13 +88,11 @@ export default function ChatWindow({ chat, me }) {
     }
   };
 
-  const formatTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
   return (
     <div className="chat-window">
       <div className="chat-header">
         <div className="name" style={{ fontWeight: "bold" , fontSize: "1.2rem"}}>{chat.otherName}</div>
-        <div className="sub">{chat.tipsetnja} • {chat.datum} {chat.vrijeme}</div>
+        <div className="sub">{chat.tipsetnja} • {formatDatumHR(chat.datum)} {formatVrijeme(chat.vrijeme)}</div>
       </div>
 
       <div className="chat-messages" ref={containerRef}>
@@ -86,7 +102,7 @@ export default function ChatWindow({ chat, me }) {
             <div key={m.idporuka} className={`message-row ${isMe ? "me" : ""}`}>
               <div className={`message-bubble ${isMe ? "me" : "them"}`}>
                 <div className="message-text">{m.tekst}</div>
-                <div className="message-meta">{formatTime(m.vrijemeslanja)}</div>
+                <div className="message-meta">{formatVrijeme(m.vrijemeslanja)}</div>
               </div>
             </div>
           );

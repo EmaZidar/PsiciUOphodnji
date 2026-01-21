@@ -75,7 +75,7 @@ export default function ChatWindow({ chat, me }) {
   return (
     <div className="chat-window">
       <div className="chat-header">
-        <div className="name">{chat.otherName}</div>
+        <div className="name" style={{ fontWeight: "bold" , fontSize: "1.2rem"}}>{chat.otherName}</div>
         <div className="sub">{chat.tipSetnja} • {chat.datum} {chat.vrijeme}</div>
       </div>
 

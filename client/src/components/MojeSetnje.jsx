@@ -133,7 +133,7 @@ export default function MojeSetnje() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        fetch("http://localhost:8000/recenzija", {
+        fetch(`${BACKEND_URL}/recenzija`, {
             //TODO link provjeri
             method: "POST",
             headers: {
@@ -171,7 +171,7 @@ export default function MojeSetnje() {
     }
 
     function izbrisi(idRezervacija) {
-        fetch("http://localhost:8000/setnje/${idRezervacija}", {
+        fetch(`${BACKEND_URL}/setnje/${idRezervacija}`, {
             // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
             method: "DELETE",
         });

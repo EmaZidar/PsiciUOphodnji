@@ -15,7 +15,7 @@ const [loading, setLoading] = useState(true);
         fetch(API, { credentials: 'include' })
           .then((r) => {
             if (!r.ok) throw new Error('Not authenticated');
-            return r.json();
+            return r.json();    
           })
           .then((data) => {
             setUser(data.user ?? data.session ?? null);
@@ -36,7 +36,7 @@ const [loading, setLoading] = useState(true);
               try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch('/api/psi', { 
+                const response = await fetch(`${BACKEND_URL}/api/psi`, { 
                   method: 'GET',
                   credentials: 'include' });
                 if (!response.ok) throw new Error(`Server returned ${response.status}`);
@@ -83,7 +83,7 @@ const njegoviPsi=psi || [{imePas: "imamIme"}, { imePas: "Rex", pasmina: "Mješan
 function handleSubmit(e) {
   e.preventDefault();
   const kojiPas={...pas, idKorisnik: idKorisnik}
-  fetch("http://localhost:8000/psi", {   //TODO
+  fetch(`${BACKEND_URL}/api/psi`, {   //TODO
     method: "POST",
     headers: {
     "Content-Type": "application/json"
@@ -112,7 +112,7 @@ function resetiraj(e){
 }
 
 function izbrisi(idPas){
-  fetch("http://localhost:8000/psi/${idPas}", {   // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
+  fetch(`${BACKEND_URL}/api/psi/${idPas}`, {   // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
     method: "DELETE",
   });
 }

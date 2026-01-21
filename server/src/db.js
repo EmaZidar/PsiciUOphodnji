@@ -189,6 +189,33 @@ export async function deleteUserWithId(idKorisnik) {
     return res.rows[0];
 }
 
+export async function createPas(imePas, pasmina, socijalizacija, razinaEnergije,starost, zdravNapomene, idKorisnik) {
+    const res = await pool.query(
+        `INSERT INTO pas (imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idKorisnik)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+        [imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idKorisnik]
+    );
+    return res.rows[0];
+}
+
+export async function deletePas(idPas) {
+    const res = await pool.query(
+        `DELETE FROM pas WHERE idPas = $1`,
+        [idPas]
+    );
+    return res;
+}
+
+export async function getPsiByKorisnikId(idKorisnik) {
+    const res = await pool.query(
+        `SELECT * FROM pas WHERE idKorisnik = $1`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
+
 export async function createSetnja(cijena, tipSetnja, trajanje, idKorisnik) {
     const res = await pool.query(
         `INSERT INTO setnja (cijena, tipSetnja, trajanje, dostupnost, idKorisnik)

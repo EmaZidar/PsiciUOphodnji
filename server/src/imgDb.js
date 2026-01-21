@@ -2,7 +2,7 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
 require("dotenv").config();
 
-async function initializeBlobStorage() {
+export async function initializeBlobStorage() {
     try {
         console.log("Azure Blob storage v12 - JavaScript quickstart sample");
 
@@ -19,7 +19,7 @@ async function initializeBlobStorage() {
         );
 
         // Create a unique name for the container
-        const containerName = "profilneSlike" + uuidv1();
+        const containerName = "profilneSlike";
 
         console.log("\nCreating container...");
         console.log("\t", containerName);
@@ -38,7 +38,7 @@ async function initializeBlobStorage() {
     return containerClient;
 }
 
-async function uploadImage(blobName, containerClient) {
+export async function uploadImage(blobName, containerClient, imageBuffer) {
     // Create a unique name for the blob
     const blobName = "quickstart" + uuidv1() + ".txt";
 
@@ -49,10 +49,8 @@ async function uploadImage(blobName, containerClient) {
     console.log(
         `\nUploading to Azure storage as blob\n\tname: ${blobName}:\n\tURL: ${blockBlobClient.url}`,
     );
-
     // Upload data to the blob
-    const data = "Hello, World!";
-    const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
+    const uploadBlobResponse = await blockBlobClient.upload(imageBuffer, imageBuffer.length);
     console.log(
         `Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`,
     );

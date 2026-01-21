@@ -809,6 +809,25 @@ body {
   font-weight: 800;
 }
 
+
+.site-footer .footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+}
+.site-footer .footer-columns {
+  display: flex;
+  width: 100%;
+  gap: 36px;
+  align-items: center;
+  justify-content: space-between;
+}
+.site-footer .footer-columns .col { flex: 0 0 auto; }
+.site-footer .footer-col-contact { flex: 1 1 auto; display:flex; align-items:center; justify-content:center; text-align:center }
+.site-footer .footer-col-logo { flex: 0 0 auto }
+.site-footer .footer-col-logout { flex: 0 0 auto }
+
 @media (max-width:720px) {
   .profile-container {
     flex-direction: column;

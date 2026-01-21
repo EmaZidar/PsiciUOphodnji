@@ -34,14 +34,14 @@ export default function SetnjeSetacu() {
           <p><strong>Datum:</strong> {s.datum}</p>
           <p><strong>Vrijeme:</strong> {s.vrijeme}</p>
           <p><strong>Polazište:</strong> {s.polaziste}</p>
-          <p><strong>Tip šetnje:</strong> {s.tipsetnje}</p>
+          <p><strong>Tip šetnje:</strong> {s.tipsetnja}</p>
           <p><strong>Trajanje:</strong> {s.trajanje} min</p>
           <p><strong>Cijena:</strong> {s.cijena} €</p>
 
           <p>
             <strong>Vlasnik:</strong>{' '}
-            <Link to={`/vlasnik/${s.vlasnikid}`}>
-              {s.imekorisnik} {s.prezimekorisnik}
+            <Link to={`/vlasnik/${s.korisnikid}`}>
+              {s.imekorisnik} {s.prezkorisnik}
             </Link>
           </p>
 

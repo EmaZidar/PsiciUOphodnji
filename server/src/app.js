@@ -200,7 +200,7 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
 
         const userId = dbUser.idkorisnik ?? dbUser.idKorisnik ?? dbUser.id ?? dbUser.id_korisnik;
         const userWithRole = await db.getUserWithRole(userId);
-        console.log('/api/me - returning userWithRole:', userWithRole);
+        //console.log('/api/me - returning userWithRole:', userWithRole);
 
         res.json({ session: sessionUser, user: userWithRole });
     } catch (err) {
@@ -451,7 +451,7 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, chec
     }
 })
 
-app.use('/api/chats', chat);
+app.use('/api/chats', chat.router);
 
 
 const PORT = process.env.PORT || 8000;

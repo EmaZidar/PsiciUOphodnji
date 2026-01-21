@@ -5,7 +5,6 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function MojeSetnje(){
 
-
     const [loading, setLoading] = useState(true);
       const [user, setUser] = useState(null);
       const [error, setError] = useState(null);
@@ -16,7 +15,10 @@ export default function MojeSetnje(){
     const[prosleSetnje,setprosle]=useState([])
     const[buduceSetnje,setbuduce]=useState([])
 
+if (user){
+              const idKorisnik=user.idkorisnik||"0";
 
+}
         useEffect(() => {
             const API = `${BACKEND_URL}/api/me`;
             fetch(API, { credentials: 'include' })
@@ -32,20 +34,20 @@ export default function MojeSetnje(){
                 setError(err.message);
                 setLoading(false);
               });
-          }, []);
 
-const idKorisnik= "1"; //user.idKorisnik ||
+          }, [user]);
+
        useEffect(() => {
                const loadprosle = async () => {
                  try {
                    setLoading(true);
                    setError(null);
-                   const response = await fetch('/api/prosleSetnje/${idKorisnik}', { 
+                   const response = await fetch(`/api/prosleSetnje/${idKorisnik}`, { 
                      method: 'GET',
                      credentials: 'include' });
                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
                    const data = await response.json();
-                   setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ?? []));
+                   setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ??data?.proslesetnje ?? []));
                  } catch (err) {
                      setError(err.message || 'Greška pri dohvaćanju podataka');
                      setprosle([]);
@@ -61,12 +63,12 @@ const idKorisnik= "1"; //user.idKorisnik ||
                  try {
                    setLoading(true);
                    setError(null);
-                   const response = await fetch('/api/buduceSetnje/${idKorisnik}', { 
+                   const response = await fetch(`/api/buduceSetnje/${idKorisnik}`, { 
                      method: 'GET',
                      credentials: 'include' });
                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
                    const data = await response.json();
-                   setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? []));
+                   setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? data?.buducesetnje ?? []));
                  } catch (err) {
                      setError(err.message || 'Greška pri dohvaćanju podataka');
                      setbuduce([]);
@@ -262,7 +264,7 @@ const idKorisnik= "1"; //user.idKorisnik ||
         <div className='jednaSetnja'>
             <h3>Šetnja</h3>
             <p>Zakazana: {setnja.datum} </p>
-            <button onClick={izbrisi(setnja.idRezervacija)}>Otkaži </button>
+            <button onClick={()=>izbrisi(setnja.idRezervacija)}>Otkaži </button>
 
         </div>
 

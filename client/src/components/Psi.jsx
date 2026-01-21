@@ -97,9 +97,19 @@ export default function Psi() {
             });
             const data = await response.json();
             console.log("Created dog with ID:", data.idPas);
-            // Add new dog to the list
+            // Add new dog to the list - normalize field names from PostgreSQL
             if (data.pas) {
-                const newPas = { ...data.pas, idPas: data.idPas };
+                const p = data.pas;
+                const newPas = {
+                    idPas:  p.idpas,
+                    imePas:  p.imepas,
+                    pasmina: p.pasmina,
+                    starost: p.starost,
+                    socijalizacija: p.socijalizacija,
+                    zdravNapomene:  p.zdravnapomene,
+                    razinaEnergije: p.razinaenergije,
+                    idKorisnik: p.idkorisnik
+                };
                 setpsi(prevPsi => [...prevPsi, newPas]);
             }
             setPrikaziFormu(false);
@@ -175,18 +185,30 @@ export default function Psi() {
                     <button onClick={() => setPrikaziFormu(true)}>+</button>
          </div>
          {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
-            <label >Ime psa:</label>
-            <input type="text" id="imePas" name="imePas"  required value={pas.imePas} maxLength={50} onChange={spremi} ></input><br></br>
-            <label >Pasmina:      </label>
-            <input type="text" id="pasmina" name="pasmina" required value={pas.pasmina} maxLength={50} onChange={spremi}></input><br></br>
-            <label>Godine:</label>
-            <input type="number" id="starost" required name="starost" value={pas.starost} max={20} onChange={spremi}></input><br></br>
-            <label >Razina energije:    </label>
-            <input type="number" id="razinaEnergije" name="razinaEnergije"  max={5} required value={pas.razinaEnergije}  onChange={spremi}></input><br></br>
-            <label>Socijalizacija:    </label>
-            <input type="number" id="socijalizacija" required name="socijalizacija"  max={5} value={pas.socijalizacija}  onChange={spremi}></input><br></br>
-            <label >Zdravstvene napomene: </label>
-            <input type="text" id="zdravNapomene"  name="zdravNapomene" maxLength={500}  value={pas.zdravNapomene}  onChange={spremi}></input><br></br>
+            <div className="formField">
+                <label>Ime psa:</label>
+                <input type="text" id="imePas" name="imePas" required value={pas.imePas} maxLength={50} onChange={spremi} />
+            </div>
+            <div className="formField">
+                <label>Pasmina:</label>
+                <input type="text" id="pasmina" name="pasmina" required value={pas.pasmina} maxLength={50} onChange={spremi} />
+            </div>
+            <div className="formField">
+                <label>Godine:</label>
+                <input type="number" id="starost" required name="starost" value={pas.starost} min={0} max={20} onChange={spremi} />
+            </div>
+            <div className="formField">
+                <label>Razina energije:</label>
+                <input type="number" id="razinaEnergije" name="razinaEnergije" min={1} max={5} required value={pas.razinaEnergije} onChange={spremi} />
+            </div>
+            <div className="formField">
+                <label>Socijalizacija:</label>
+                <input type="number" id="socijalizacija" required name="socijalizacija" min={1} max={5} value={pas.socijalizacija} onChange={spremi} />
+            </div>
+            <div className="formField">
+                <label>Zdravstvene napomene:</label>
+                <input type="text" id="zdravNapomene" name="zdravNapomene" maxLength={500} value={pas.zdravNapomene} onChange={spremi} />
+            </div>
 
                     <button type="submit">Dodaj psa</button>
                     <button onClick={resetiraj}>Resetiraj</button>

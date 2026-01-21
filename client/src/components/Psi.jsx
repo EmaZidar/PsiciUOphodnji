@@ -136,13 +136,13 @@ function izbrisi(idPas){
                     <button onClick={() => setPrikaziFormu(true)}>+</button>
          </div>
          {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
-            <label for="ime">Ime psa:</label>
+            <label >Ime psa:</label>
             <input type="text" id="imePas" name="imePas"   value={pas.imePas}  onChange={spremi}></input><br></br>
-            <label for="pasmina">Pasmina:      </label>
+            <label >Pasmina:      </label>
             <input type="text" id="pasmina" name="pasmina" value={pas.pasmina}  onChange={spremi}></input><br></br>
             <label>Godine:</label>
             <input type="number" id="starost" name="starost" value={pas.starost}  onChange={spremi}></input><br></br>
-            <label for="energija">Razina energije:    </label>
+            <label >Razina energije:    </label>
             <input type="text" id="razinaEnergije" name="razinaEnergije"   value={pas.razinaEnergije}  onChange={spremi}></input><br></br>
             <label>Socijalizacija:    </label>
             <input type="text" id="socijalizacija" name="socijalizacija"   value={pas.socijalizacija}  onChange={spremi}></input><br></br>

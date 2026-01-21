@@ -4,10 +4,13 @@ import express from "express";
 import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
+import * as imgDb from "./imgDb.js";
+import multer from "multer"; 
 import cors from "cors";
 import * as calendar from "./calendar.js";
 
-db.testConnection();    
+db.testConnection();
+imgContainer = await imgDb.initializeBlobStorage();
 
 const app = express();
 app.use(express.json());
@@ -218,6 +221,19 @@ app.get('/api/setaci', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.get('/api/upload-profile-image', async (req, res) => {
+    try {
+        const sessionUser = req.session.user;
+        const userEmail = sessionUser.email;
+        await imgDb.uploadImage(userEmail+"profile_picture", imgContainer, Buffer.from(req.body.imageData, 'base64'));
+        res.status(200).json({ message: 'Image uploaded successfully' });
+    } catch (err) {
+        console.error('Error in /api/upload-profile-image:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 app.get('/api/vlasnici', async (req, res) => {
     try {

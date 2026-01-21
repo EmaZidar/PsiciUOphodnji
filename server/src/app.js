@@ -232,22 +232,6 @@ app.post('/api/logout', (req, res) => {
     }
 });
 
-// Compatibility route: plain /logout (matches your snippet)
-app.post('/logout', (req, res) => {
-    try {
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('Error destroying session on /logout:', err);
-                return res.status(500).send('Greška pri odjavi');
-            }
-            res.clearCookie('connect.sid');
-            return res.status(200).send('Odjavljeni ste.');
-        });
-    } catch (err) {
-        console.error('Error in /logout:', err);
-        return res.status(500).send('Internal server error');
-    }
-});
 
 app.get('/api/setaci', async (req, res) => {
     try {

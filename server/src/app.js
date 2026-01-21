@@ -250,21 +250,12 @@ app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
 //ugl 
 app.post('/api/psi', async (req, res) => {
     try {
-        if (!req.session.user || !req.session.user.email) {
-            return res.status(401).json({ error: 'Not authenticated' });
-        }
-        
-        const dbUser = await db.getUserWithEmail(req.session.user.email);
-        if (!dbUser) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        
-        const idkorisnik = dbUser.idkorisnik;
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email).catch(() => {
+            throw new Error('User not found')
+            });
+
         const { imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene } = req.body;
-        
-        console.log('Creating pas with data:', { imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idkorisnik });
-        
-        const pas = await db.createPas( 
+        const pas = await db.createPas(
             imePas,
             pasmina,
             parseInt(socijalizacija, 10),
@@ -273,9 +264,7 @@ app.post('/api/psi', async (req, res) => {
             zdravNapomene,
             idkorisnik
         );
-        
-        console.log('Created pas:', pas);
-        const idPas = pas?.idPas ?? pas?.idpas;
+        const idPas = pas?.idPas ?? pas?.idpas; // ne znam jel vraca idPas ili idpas
         res.status(201).json({ idPas, pas });
     } catch (err) {
         console.error('Error creating pas:', err);

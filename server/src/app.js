@@ -10,7 +10,21 @@ import cors from "cors";
 import * as calendar from "./calendar.js";
 
 db.testConnection();
-imgContainer = await imgDb.initializeBlobStorage();
+const imgContainer = await imgDb.initializeBlobStorage();
+
+// Configure multer for file uploads (memory storage)
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPEG, PNG, and WebP allowed'));
+        }
+    }
+});
 
 const app = express();
 app.use(express.json());
@@ -222,38 +236,54 @@ app.get('/api/setaci', async (req, res) => {
     }
 });
 
-app.post('/api/upload-profile-image', checkIsAuthenticated, async (req, res) => {
+app.post('/api/me/profile-image', checkIsAuthenticated, upload.single('profilfoto'), async (req, res) => {
     try {
-        const { imageData, fileType } = req.body;
-        
-        // provjeri input
-        if (!imageData) {
-            return res.status(400).json({ error: 'Missing image data' });
+        // Access the uploaded file via req.file
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
         }
         
-        // provjeri tip filea
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (fileType && !allowedTypes.includes(fileType)) {
-            return res.status(400).json({ error: 'Invalid file type. Allowed: JPEG, PNG, WebP' });
-        }
-        
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (imageData.length > maxSize) {
-            return res.status(400).json({ error: 'File too large (max 5MB)' });
-        }
+        console.log('File received:', {
+            fieldname: req.file.fieldname,
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size
+        });
         
         const sessionUser = req.session.user;
-        const userEmail = sessionUser.email;
-        const blobName = `${userEmail}-profile-${Date.now()}`;
+        const dbUser = await db.getUserWithEmail(sessionUser.email);
+        if (!dbUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
         
-        await imgDb.uploadImage(blobName, imgContainer, Buffer.from(imageData, 'base64'));
+        const userEmail = sessionUser.email.replace(/@/g, '_'); // Sanitize email for blob name
+        const fileExtension = req.file.mimetype.split('/')[1]; // jpeg, png, webp
+        const blobName = `${userEmail}-profile-${Date.now()}.${fileExtension}`;
+        
+        // Upload file buffer to Azure Blob Storage
+        const uploadResult = await imgDb.uploadImage(blobName, imgContainer, req.file.buffer);
+        
+        console.log('Image uploaded successfully:', uploadResult.url);
+        
+        // TODO: Update database with photo URL
+        const updateResult = await db.updateUserProfileImage(dbUser.idkorisnik, uploadResult.url);
+        if (!updateResult) {
+            return res.status(500).json({ error: 'Failed to update user profile image in database' });
+        } else {
+            console.log('Database updated with new profile image URL');
+        }
+        // Refresh user data
+        const userId = dbUser.idkorisnik;
+        const userWithRole = await db.getUserWithRole(userId);
         
         res.status(200).json({ 
             message: 'Image uploaded successfully',
-            blobName: blobName
+            blobName: uploadResult.blobName,
+            url: uploadResult.url,
+            user: userWithRole
         });
     } catch (err) {
-        console.error('Error in /api/upload-profile-image:', err);
+        console.error('Error in /api/me/profile-image:', err);
         res.status(500).json({ error: err.message || 'Internal server error' });
     }
 });

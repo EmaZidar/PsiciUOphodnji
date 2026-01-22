@@ -229,17 +229,24 @@ export default function MojeSetnje() {
                 <div className="sveSetnje">
                     <h2>Moje prošle šetnje:</h2>
 
-                    {njegoveProsleSetnje.map((setnja) => (
-                        <div className="jednaSetnja">
-                            <h3>Šetnja</h3>
-                            <p>Datum: {setnja.datum}</p>
-                            <p>Recenzija: {setnja.recenzija}</p>
-                            <button onClick={() => setPrikaziFormu(true)}>
-                                {" "}
-                                Ostavi recenziju
-                            </button>
+                    {loading ? (
+                        <p>Učitavanje...</p>
+                    ) : prosleSetnje.length === 0 ? (
+                        <div className="emptyState">Još niste imali šetnju — rezervirajte jednu.</div>
+                    ) : (
+                        <div className="ms-grid">
+                        {prosleSetnje.map((setnja) => (
+                            <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
+                                <h3 className="ms-naslov">Šetnja</h3>
+                                <div className="ms-meta">
+                                  <p>Datum: {setnja.datum}</p>
+                                  <p>Recenzija: {setnja.recenzija}</p>
+                                </div>
+                                <button onClick={() => setPrikaziFormu(true)}>Ostavi recenziju</button>
+                            </div>
+                        ))}
                         </div>
-                    ))}
+                    )}
 
                     {prikaziFormu && (
                         <form
@@ -312,17 +319,17 @@ export default function MojeSetnje() {
                 <div className="sveSetnje">
                     <h2>Moje buduće šetnje:</h2>
 
-                    {njegoveBuduceSetnje.map((setnja) => (
-                        <div className="jednaSetnja">
-                            <h3>Šetnja</h3>
-                            <p>Zakazana: {setnja.datum} </p>
-                            <button
-                                onClick={() => izbrisi(setnja.idrezervacija)}
-                            >
-                                Otkaži{" "}
-                            </button>
+                        <div className="ms-grid">
+                            {njegoveBuduceSetnje.map((setnja) => (
+                                <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
+                                    <h3 className="ms-naslov">Šetnja</h3>
+                                    <div className="ms-meta">
+                                        <p>Zakazana: {setnja.datum}</p>
+                                    </div>
+                                    <button className="ms-otkazi" onClick={() => izbrisi(setnja.idRezervacija)}>Otkaži</button>
+                                </div>
+                            ))}
                         </div>
-                    ))}
                 </div>
             </div>
         </>

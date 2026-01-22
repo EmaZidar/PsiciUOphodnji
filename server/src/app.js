@@ -505,7 +505,7 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
         console.error('Error in /api/rezervacije/*/placanje', err);
         res.status(500).json({ error: 'Internal server error' });
     }
-})
+});
 
 
 // API – setnje-setaca
@@ -523,7 +523,20 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
 //    - spajati s tablicom REZERVACIJA da dobijemo polaziste, datum, vrijeme, nacinPlacanja i dodNapomene
 // sortirati po datumu i vremenu (uzlazno)
 
+app.get('/api/setnje-setaca', async (req, res) => {
+    try {
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
 
+        if (!await db.checkIsSetac(idkorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
+        const setnje = await db.getSetnjeSetaca(idkorisnik);
+
+        return res.status(200).json(setnje);
+    } catch (err) {
+        console.error('Error in /api/setnje-setaca:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // TODO /vlasnik/:id endpoint za dohvat vlasnika i njegovih pasa
 // /api/vlasnik/:id

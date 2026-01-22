@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+
 import { Pool } from "pg";
 
 dotenv.config();
@@ -10,6 +11,7 @@ const pool = new Pool({
         rejectUnauthorized: false,
     },
 });
+
 
 export async function getUserWithEmail(email) {
     const res = await pool.query("SELECT * FROM korisnik WHERE email = $1", [

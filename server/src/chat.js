@@ -61,10 +61,8 @@ async function getChatChannel(req, res, next) {
         if (!otherKorisnikId)
             return res.status(404).json({ error: 'Ne postoji takva rezervacija' });
 
-        await chatClient.setGuestUser({ id: myKorisnikId })
-
-        const channel = chatClient.channel('messaging', {
-            members: [myKorisnikId, otherKorisnikId]
+        const channel = chatClient.channel('messaging', idRezervacija.toString(), {
+            created_by_id: 'backend'
         });
 
         await channel.create();
@@ -92,12 +90,12 @@ router.get('/:idRezervacija/messages', getChatChannel, async (req, res) => {
     const defaultMessageCountToLoad = 50;
     
     const result = await req.chatChannel.query({
-        messages: defaultMessageCountToLoad
+        messages: { limit: defaultMessageCountToLoad }
     });
 
     const formattedMessages = result.messages.map(m => ({
         vrijemeslanja: m.created_at,
-        posiljatelj: m.user,
+        posiljatelj: m.user.id,
         tekst: m.text,
     }));
 
@@ -112,13 +110,11 @@ router.get('/:idRezervacija/messages', getChatChannel, async (req, res) => {
 //  Provjeriti da je korisnik sudionik rezervacije
 //  Spremiti poruku u bazu (vrijemeSlanja = NOW())
 //  Vratiti kreiranu poruku kao JSON
-router.post('/:idRezervacije/messages', getChatChannel, async (req, res) => {
+router.post('/:idRezervacija/messages', getChatChannel, async (req, res) => {
     await req.chatChannel.sendMessage({
         text: req.body.tekst,
-        user_id: req.session.user.id,
+        user_id: req.session.user.id.toString(),
     });
-
-    chatClient.setGuestUser()
 
     return res.sendStatus(204); // no body
 });

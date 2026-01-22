@@ -97,7 +97,7 @@ export default function ChatWindow({ chat, me }) {
 
       <div className="chat-messages" ref={containerRef}>
         {messages.map((m) => {
-          const isMe = userId === m.posiljatelj;
+          const isMe = userId == m.posiljatelj;
           return (
             <div key={m.idporuka} className={`message-row ${isMe ? "me" : ""}`}>
               <div className={`message-bubble ${isMe ? "me" : "them"}`}>

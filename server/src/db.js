@@ -104,6 +104,17 @@ export async function getUserWithId(idKorisnik) {
     return res.rows[0];
 }
 
+export async function updateUserProfileImage(idKorisnik, imagePath) {
+    const res = await pool.query(
+        `UPDATE setac 
+         SET profilFoto = $1
+            WHERE idKorisnik = $2
+            RETURNING *`,
+        [imagePath, idKorisnik]
+    );
+    return res.rows[0];
+}
+
 export async function getSetacWithId(idKorisnik) {
     const res = await pool.query(
         `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.email, k.telefon, s.lokDjelovanja, s.tipClanarina, s.profilFoto

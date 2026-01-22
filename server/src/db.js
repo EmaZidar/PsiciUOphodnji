@@ -115,6 +115,14 @@ export async function updateUserProfileImage(idKorisnik, imagePath) {
     return res.rows[0];
 }
 
+export async function deleteUserWithId(idKorisnik) {
+    const res = await pool.query(
+        "DELETE FROM korisnik WHERE idKorisnik = $1 RETURNING *",
+        [idKorisnik]
+    );
+    return res.rows[0];
+}
+
 export async function getSetacWithId(idKorisnik) {
     const res = await pool.query(
         `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.email, k.telefon, s.lokDjelovanja, s.tipClanarina, s.profilFoto

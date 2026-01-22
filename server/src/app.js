@@ -210,6 +210,17 @@ function checkIsAuthenticated(req, res, next) {
     return res.status(401).json({ error: 'Not authenticated' });
 }
 
+app.delete('/api/delete/:idKorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idKorisnik, 10);
+        await db.deleteUserWithId(idKorisnik);
+        res.json({ message: 'Korisnik deleted' });
+    } catch (err) {
+        console.error('Error deleting korisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.get('/api/me', checkIsAuthenticated, async (req, res) => {
     try {
         const sessionUser = req.session.user;

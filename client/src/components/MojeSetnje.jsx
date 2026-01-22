@@ -144,7 +144,7 @@ export default function MojeSetnje() {
     }
 
     function izbrisi(idRezervacija) {
-        fetch(`${BACKEND_URL}/setnje/${idRezervacija}`, {
+        fetch(`${BACKEND_URL}/delete/setnja/${idRezervacija}`, {
             // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
             method: "DELETE",
         });
@@ -298,17 +298,17 @@ export default function MojeSetnje() {
                 <div className="sveSetnje">
                     <h2>Moje buduće šetnje:</h2>
 
-                                        <div className="ms-grid">
-                                        {njegoveBuduceSetnje.map((setnja) => (
-                                                <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
-                                                        <h3 className="ms-naslov">Šetnja</h3>
-                                                        <div className="ms-meta">
-                                                            <p>Zakazana: {setnja.datum}</p>
-                                                        </div>
-                                                        <button className="ms-otkazi" onClick={() => izbrisi(setnja.idRezervacija)}>Otkaži</button>
-                                                </div>
-                                        ))}
-                                        </div>
+                        <div className="ms-grid">
+                            {njegoveBuduceSetnje.map((setnja) => (
+                                <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
+                                    <h3 className="ms-naslov">Šetnja</h3>
+                                    <div className="ms-meta">
+                                        <p>Zakazana: {setnja.datum}</p>
+                                    </div>
+                                    <button className="ms-otkazi" onClick={() => izbrisi(setnja.idRezervacija)}>Otkaži</button>
+                                </div>
+                            ))}
+                        </div>
                 </div>
             </div>
         </>

@@ -24,7 +24,6 @@ export default function MojeSetnje() {
     const [prosleSetnje, setprosle] = useState([]);
     const [buduceSetnje, setbuduce] = useState([]);
 
-    
     useEffect(() => {
         const API = `${BACKEND_URL}/api/me`;
         fetch(API, { credentials: "include" })
@@ -42,51 +41,67 @@ export default function MojeSetnje() {
             });
     }, []);
 
-       useEffect(() => {
-                if (!user || !user.idkorisnik) return;
-               const loadprosle = async () => {
-                 try {
-                   setLoading(true);
-                   setError(null);
-                   const response = await fetch(`${BACKEND_URL}/api/prosleSetnje/${user.idkorisnik}`, { 
-                     method: 'GET',
-                     credentials: 'include' });
-                   if (!response.ok) throw new Error(`Server returned ${response.status}`);
-                   const data = await response.json();
-                   setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ??data?.proslesetnje ?? []));
-                 } catch (err) {
-                     setError(err.message || 'Greška pri dohvaćanju podataka');
-                     setprosle([]);
-                 } finally {
-                     setLoading(false);
-                 }
-               };
-           loadprosle();
-         }, [user]);    
-         
-     useEffect(() => {
+    useEffect(() => {
         if (!user || !user.idkorisnik) return;
-               const loadbuduce = async () => {
-                 try {
-                   setLoading(true);
-                   setError(null);
-                   const response = await fetch(`${BACKEND_URL}/api/buduceSetnje/${user.idkorisnik}`, { 
-                     method: 'GET',
-                     credentials: 'include' });
-                   if (!response.ok) throw new Error(`Server returned ${response.status}`);
-                   const data = await response.json();
-                   setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? data?.buducesetnje ?? []));
-                 } catch (err) {
-                     setError(err.message || 'Greška pri dohvaćanju podataka');
-                     setbuduce([]);
-                 } finally {
-                     setLoading(false);
-                 }
-               };
-           loadbuduce();
-         }, [user]);    
+        const loadprosle = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await fetch(
+                    `${BACKEND_URL}/api/prosleSetnje/${user.idkorisnik}`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    },
+                );
+                if (!response.ok)
+                    throw new Error(`Server returned ${response.status}`);
+                const data = await response.json();
+                setprosle(
+                    Array.isArray(data)
+                        ? data
+                        : (data?.prosleSetnje ?? data?.proslesetnje ?? []),
+                );
+            } catch (err) {
+                setError(err.message || "Greška pri dohvaćanju podataka");
+                setprosle([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadprosle();
+    }, [user]);
 
-    
+    useEffect(() => {
+        if (!user || !user.idkorisnik) return;
+        const loadbuduce = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await fetch(
+                    `${BACKEND_URL}/api/buduceSetnje/${user.idkorisnik}`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    },
+                );
+                if (!response.ok)
+                    throw new Error(`Server returned ${response.status}`);
+                const data = await response.json();
+                setbuduce(
+                    Array.isArray(data)
+                        ? data
+                        : (data?.buduceSetnje ?? data?.buducesetnje ?? []),
+                );
+            } catch (err) {
+                setError(err.message || "Greška pri dohvaćanju podataka");
+                setbuduce([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadbuduce();
+    }, [user]);
 
     const njegoveProsleSetnje = prosleSetnje || [
         { datum: "nema" },
@@ -183,10 +198,9 @@ export default function MojeSetnje() {
             if (data?.user) {
                 setUser(data.user);
             } else {
-                const userResponse = await fetch(
-                    `${BACKEND_URL}/api/me`,
-                    { credentials: "include" },
-                );
+                const userResponse = await fetch(`${BACKEND_URL}/api/me`, {
+                    credentials: "include",
+                });
                 const userData = await userResponse.json();
                 setUser(userData.user ?? userData.session ?? null);
             }
@@ -250,7 +264,11 @@ export default function MojeSetnje() {
                             className="formazarecenziju"
                         >
                             <label>Opis: </label>
-                            <input type="text" id="tekst" name="tekst" maxLength={500}
+                            <input
+                                type="text"
+                                id="tekst"
+                                name="tekst"
+                                maxLength={500}
                                 value={recenzija.tekst}
                                 onChange={spremi}
                             ></input>
@@ -258,9 +276,12 @@ export default function MojeSetnje() {
 
                             <label>Ocjena: </label>
                             <input
-                                type="number"  required
-                                id="ocjena"  name="ocjena"
-                                value={recenzija.ocjena} max={5}
+                                type="number"
+                                required
+                                id="ocjena"
+                                name="ocjena"
+                                value={recenzija.ocjena}
+                                max={5}
                                 onChange={spremi}
                             ></input>
                             <br></br>
@@ -269,8 +290,8 @@ export default function MojeSetnje() {
                                 <label>Dodajte sliku: </label>
                                 <input
                                     type="file"
-                                    accept="image/png, image/jpeg" 
-                                    onChange={handleImageSelect} 
+                                    accept="image/png, image/jpeg"
+                                    onChange={handleImageSelect}
                                     value={recenzija.fotografija}
                                 />{" "}
                             </div>

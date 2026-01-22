@@ -138,6 +138,16 @@ export default function Psi() {
         });
     }
 
+
+    useEffect(() => {
+        if (!prikaziFormu) return;
+        const onKey = (e) => {
+            if (e.key === "Escape") odustani();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [prikaziFormu]);
+
     function resetiraj(e) {
         e.preventDefault();
         setPas({
@@ -184,7 +194,10 @@ export default function Psi() {
          <div className="dodajP">
                     <button onClick={() => setPrikaziFormu(true)}>+</button>
          </div>
-         {prikaziFormu&&(<form onSubmit={handleSubmit} className="dodajPsa">
+         {prikaziFormu && (
+            <div className="modalOverlay" onClick={odustani}>
+                <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+                    <form onSubmit={handleSubmit} className="dodajPsa">
             <div className="formField">
                 <label>Ime psa:</label>
                 <input type="text" id="imePas" name="imePas" required value={pas.imePas} maxLength={50} onChange={spremi} />
@@ -211,10 +224,12 @@ export default function Psi() {
             </div>
 
                     <button type="submit">Dodaj psa</button>
-                    <button onClick={resetiraj}>Resetiraj</button>
-                    <button onClick={odustani}>Odustani</button>
-                </form>
-            )}
+                    <button type="button" onClick={resetiraj}>Resetiraj</button>
+                    <button type="button" onClick={odustani}>Odustani</button>
+                    </form>
+                </div>
+            </div>
+        )}
         </div>
     );
 }

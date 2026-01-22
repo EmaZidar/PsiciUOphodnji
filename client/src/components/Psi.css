@@ -17,6 +17,17 @@
   margin: 0 auto;
 }
 
+
+.psiContainer{
+  max-width: 1120px;
+  margin: 24px auto;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(250,252,255,1));
+  border: 1px solid rgba(2,6,23,0.04);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.04);
+}
+
 .jedanPas{
   background: #ffffff;
   border: 1px solid var(--card-border);
@@ -97,7 +108,7 @@
   font-size: 22px;
   cursor: pointer;
   font-weight: 800;
-  box-shadow: none; /* no card shadow */
+  box-shadow: none; 
 }
 
 .dodajP button:hover{ filter:brightness(0.95); transform: translateY(1px); }

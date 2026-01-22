@@ -175,7 +175,8 @@ export default function Psi() {
     }
 
     return (
-        <div className="sviPsi">
+        <div className="psiContainer">
+          <div className="sviPsi">
             {njegoviPsi.map((pas) => (
                 <div key={pas.idPas} className="jedanPas">
                     <h3 className="imePsa">{pas.imePas || "-"}</h3>
@@ -189,10 +190,11 @@ export default function Psi() {
 
                     <button onClick={() => izbrisi(pas.idPas)}>Izbriši psa</button>
 
-                </div>))}
-         <div className="dodajP">
+                  </div>))}
+              <div className="dodajP">
                     <button onClick={() => setPrikaziFormu(true)}>+</button>
          </div>
+              </div>
          {prikaziFormu && (
             <div className="modalOverlay" onClick={odustani}>
                 <div className="modalContent" onClick={(e) => e.stopPropagation()}>

@@ -144,7 +144,7 @@ export default function MojeSetnje() {
     }
 
     function izbrisi(idRezervacija) {
-        fetch(`${BACKEND_URL}/setnje/${idRezervacija}`, {
+        fetch(`${BACKEND_URL}/delete/setnja/${idRezervacija}`, {
             // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
             method: "DELETE",
         });
@@ -295,7 +295,7 @@ export default function MojeSetnje() {
                         <div className="jednaSetnja">
                             <h3>Šetnja</h3>
                             <p>Zakazana: {setnja.datum} </p>
-                            <button onClick={izbrisi(setnja.idRezervacija)}>
+                            <button onClick={() => izbrisi(setnja.idrezervacija)}>
                                 Otkaži{" "}
                             </button>
                         </div>

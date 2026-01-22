@@ -179,11 +179,10 @@ export default function Psi() {
             {njegoviPsi.map((pas) => (
                 <div key={pas.idPas} className="jedanPas">
                     <h3 className="imePsa">{pas.imePas || "-"}</h3>
-                    <p>Pasmina:{pas.pasmina || "-"}</p>
+                    <p>Pasmina: {pas.pasmina || "-"}</p>
                     <p>Godine: {pas.starost || "-"}</p>
                     <p>
-                        Socijalizacija s drugim psima:
-                        {pas.socijalizacija || "-"}
+                        Socijalizacija sa psima: {pas.socijalizacija || "-"}
                     </p>
                     <p>Zdravstvene napomene: {pas.zdravNapomene || "-"}</p>
                     <p>Razina energije: {pas.razinaEnergije || "-"}</p>

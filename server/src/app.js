@@ -224,7 +224,7 @@ app.post('/api/logout', (req, res) => {
                 return res.status(500).json({ error: 'Failed to logout' });
             }
             res.clearCookie('connect.sid');
-            return res.json({ message: 'Logged out' });
+            return res.status(200).json({ message: 'Logged out' });
         });
     } catch (err) {
         console.error('Error in /api/logout:', err);

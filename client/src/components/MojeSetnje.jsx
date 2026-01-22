@@ -260,10 +260,7 @@ export default function MojeSetnje() {
                             className="formazarecenziju"
                         >
                             <label>Opis: </label>
-                            <input
-                                type="text"
-                                id="tekst"
-                                name="tekst"
+                            <input type="text" id="tekst" name="tekst" maxLength={500}
                                 value={recenzija.tekst}
                                 onChange={spremi}
                             ></input>
@@ -271,10 +268,9 @@ export default function MojeSetnje() {
 
                             <label>Ocjena: </label>
                             <input
-                                type="number"
-                                id="ocjena"
-                                name="ocjena"
-                                value={recenzija.ocjena}
+                                type="number"  required
+                                id="ocjena"  name="ocjena"
+                                value={recenzija.ocjena} max={5}
                                 onChange={spremi}
                             ></input>
                             <br></br>
@@ -283,8 +279,8 @@ export default function MojeSetnje() {
                                 <label>Dodajte sliku: </label>
                                 <input
                                     type="file"
-                                    accept="image/png, image/jpeg"
-                                    onChange={handleImageSelect}
+                                    accept="image/png, image/jpeg" 
+                                    onChange={handleImageSelect} 
                                     value={recenzija.fotografija}
                                 />{" "}
                             </div>

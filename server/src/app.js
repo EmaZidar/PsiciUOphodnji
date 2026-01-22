@@ -68,12 +68,10 @@ app.get("/login/auth", async (_req, res) => {
         `state=${state}&` +
         `scope=${encodedScopes}`;
 
-    console.log("Redirecting to:", GOOGLE_OAUTH_CONSENT_SCREEN_URL);
     res.redirect(GOOGLE_OAUTH_CONSENT_SCREEN_URL);
 });
 
 app.get("/google/callback", async (req, res) => {
-    console.log("Callback received:", req.query);
     const { code } = req.query;
 
     const data = {
@@ -83,8 +81,6 @@ app.get("/google/callback", async (req, res) => {
         redirect_uri: GOOGLE_CALLBACK_URL,
         grant_type: "authorization_code",
     };
-
-    console.log("Exchanging code for token:", data);
 
     try {
         const response = await fetch(GOOGLE_ACCESS_TOKEN_URL, {
@@ -96,7 +92,6 @@ app.get("/google/callback", async (req, res) => {
         });
 
         const access_token_data = await response.json();
-        console.log("Token response:", access_token_data);
 
         const { id_token } = access_token_data;
 
@@ -136,41 +131,40 @@ app.get("/google/callback", async (req, res) => {
 
 
 //TODO ADMIN TIP CLANARINE to mi treba nez jel to na kraju imamo tu ili ne
-app.post('/api/register', (req, res) => {
-  console.log("registering....")
-  if (req.headers["content-type"] !== "application/json") {
-    res.status(400).send('Expected form data')
-    return
-  }
-  let requestForm = req.body
+app.post('/api/register', async (req, res) => {
+    console.log("registering....")
+    if (req.headers["content-type"] !== "application/json") {
+        res.status(400).send('Expected form data')
+        return
+    }
+    let requestForm = req.body
 
-  const isSetac = requestForm.uloga === "setac"
-  if (!isSetac && requestForm.uloga !== "vlasnik") {
-    res.sendStatus(400).send('Nevalidna uloga')
-    console.log('nevaldna uloga')
-    return
-  }
+    const isSetac = requestForm.uloga === "setac"
+    if (!isSetac && requestForm.uloga !== "vlasnik") {
+        res.sendStatus(400).send('Nevalidna uloga')
+        console.log('nevaldna uloga')
+        return
+    }
 
-  // TODO treba provjeriti jos ostale parametre valjaju li
+    // TODO treba provjeriti jos ostale parametre valjaju li
 
-  db.createUser(
-    requestForm.ime,
-    requestForm.prezime,
-    requestForm.email,
-    requestForm.telefon,
-  ).then(user => {
+    const user = await db.createUser(
+        requestForm.ime,
+        requestForm.prezime,
+        requestForm.email,
+        requestForm.telefon,
+    );
     console.log('Created user:', user)
     const idKorisnik = user.rows[0].idkorisnik // TODO treba vidjet jel postoji lol
     console.log('id korisnik:', idKorisnik)
     req.session.user.id = idKorisnik;
     req.session.user.role = isSetac ? 'setac' : 'vlasnik';
     if (isSetac)
-      db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
+        db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
     else
-      db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
-  })
+        db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
 
-  res.sendStatus(200)
+    res.sendStatus(200)
 })
 
 app.get('/api/users', async (_req, res) => {

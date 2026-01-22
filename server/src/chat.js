@@ -28,6 +28,7 @@ function checkIsAuthenticated(req, res, next) {
 //  Vratiti listu chatova kao JSON
 
 router.get('/', checkIsAuthenticated, async (req, res) => {
+    console.log('Fetching chats')
     try {
         let chatParticipants
         if (req.session.user.role === 'vlasnik')
@@ -37,7 +38,7 @@ router.get('/', checkIsAuthenticated, async (req, res) => {
         else
             return res.status(401).json({ error: 'Invalid user role' });
 
-        return chatParticipants;
+        return res.status(200).json(chatParticipants);
     } catch (err) {
         console.error('Error in /api/chats', err);
         res.status(500).json({ error: 'Internal server error' });
@@ -59,6 +60,8 @@ async function getChatChannel(req, res, next) {
         
         if (!otherKorisnikId)
             return res.status(404).json({ error: 'Ne postoji takva rezervacija' });
+
+        await chatClient.setGuestUser({ id: myKorisnikId })
 
         const channel = chatClient.channel('messaging', {
             members: [myKorisnikId, otherKorisnikId]
@@ -114,6 +117,8 @@ router.post('/:idRezervacije/messages', getChatChannel, async (req, res) => {
         text: req.body.tekst,
         user_id: req.session.user.id,
     });
+
+    chatClient.setGuestUser()
 
     return res.sendStatus(204); // no body
 });

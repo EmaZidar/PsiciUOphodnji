@@ -1,5 +1,4 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
-const { v1: uuidv1 } = require("uuid");
 require("dotenv").config();
 
 export async function initializeBlobStorage() {
@@ -39,19 +38,32 @@ export async function initializeBlobStorage() {
 }
 
 export async function uploadImage(blobName, containerClient, imageBuffer) {
-    // Create a unique name for the blob
-    const blobName = "quickstart" + uuidv1() + ".txt";
+    try {
+        if (!blobName || !containerClient || !imageBuffer) {
+            throw new Error('Missing required parameters: blobName, containerClient, or imageBuffer');
+        }
 
-    // Get a block blob client
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        // Get a block blob client
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-    // Display blob name and url
-    console.log(
-        `\nUploading to Azure storage as blob\n\tname: ${blobName}:\n\tURL: ${blockBlobClient.url}`,
-    );
-    // Upload data to the blob
-    const uploadBlobResponse = await blockBlobClient.upload(imageBuffer, imageBuffer.length);
-    console.log(
-        `Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`,
-    );
+        // Display blob name and url
+        console.log(
+            `\nUploading to Azure storage as blob\n\tname: ${blobName}\n\tURL: ${blockBlobClient.url}`,
+        );
+        
+        // Upload data to the blob
+        const uploadBlobResponse = await blockBlobClient.upload(imageBuffer, imageBuffer.length);
+        console.log(
+            `Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`,
+        );
+        
+        return {
+            blobName: blobName,
+            url: blockBlobClient.url,
+            requestId: uploadBlobResponse.requestId
+        };
+    } catch (err) {
+        console.error(`Error uploading image: ${err.message}`);
+        throw err;
+    }
 }

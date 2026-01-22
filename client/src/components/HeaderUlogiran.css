@@ -6,9 +6,23 @@
 
 #neureden{
   all: unset;
-  background:none;
-  border:none;
+  background: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.18s ease, background 0.12s ease;
+}
 
+#neureden:hover {
+  background: rgba(0,0,0,0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+#neureden:active {
+  transform: none;
 }
 
 #x{
@@ -45,6 +59,32 @@
   align-items: center;
   padding: 6px;
   cursor: pointer;
+  border-radius: 8px;
+  transition: box-shadow 0.18s ease, background 0.12s ease;
+}
+
+/* unify header item hover/active styles */
+.header-nav a,
+.notif-button,
+#neureden {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: box-shadow 0.18s ease, background 0.12s ease;
+}
+
+.header-nav a:hover,
+.notif-button:hover,
+#neureden:hover {
+  background: rgba(0,0,0,0.06);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.header-nav a:active,
+.notif-button:active,
+#neureden:active {
+  transform: none;
 }
 
 .notif-badge{

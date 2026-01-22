@@ -32,7 +32,7 @@
   font-weight: 800;
 }
 
-/* Add subtle section separator when multiple sections present */
+
 .sveSetnje + .sveSetnje{
   border-top: 1px dashed rgba(2,6,23,0.04);
   padding-top: 18px;
@@ -87,7 +87,7 @@
   color:#fff;
   border:none;
   font-weight:800;
-  font-size:0.5rem;
+  font-size:0.95rem;
   box-shadow: none;
   transition: transform .12s ease, filter .12s ease;
 }

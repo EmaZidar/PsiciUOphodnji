@@ -29,6 +29,12 @@ function formatVrijeme(vrijeme) {
   return vrijeme.slice(0, 5);
 }
 
+function formatDatumVrijeme(datumVrijeme) {
+  if (!datumVrijeme) return '';
+
+  return datumVrijeme.slice(11, 16);
+}
+
 export default function ChatWindow({ chat, me }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -102,7 +108,7 @@ export default function ChatWindow({ chat, me }) {
             <div key={m.idporuka} className={`message-row ${isMe ? "me" : ""}`}>
               <div className={`message-bubble ${isMe ? "me" : "them"}`}>
                 <div className="message-text">{m.tekst}</div>
-                <div className="message-meta">{formatVrijeme(m.vrijemeslanja)}</div>
+                <div className="message-meta">{formatDatumVrijeme(m.vrijemeslanja)}</div>
               </div>
             </div>
           );

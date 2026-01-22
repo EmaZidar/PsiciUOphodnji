@@ -796,11 +796,12 @@ body {
 }
 
 .profile-info-box {
-  background: #fff;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(8,48,66,0.04);
-  box-shadow: 0 6px 18px rgba(2,10,20,0.03);
+  background: linear-gradient(180deg, #ffffff 0%, #fcfeff 100%);
+  padding: 28px;
+  border-radius: 14px;
+  border: 1px solid rgba(8,48,66,0.06);
+  box-shadow: 0 8px 22px rgba(20,40,80,0.06);
+  transition: box-shadow 0.18s ease, transform 0.12s ease;
 }
 
 .profile-name {

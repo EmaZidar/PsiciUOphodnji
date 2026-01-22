@@ -14,6 +14,34 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.formField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.formField label {
+  flex: 0 0 180px;
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.formField input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.formField input:focus {
+  outline: none;
+  border-color: rgb(195, 223, 248);
+  box-shadow: 0 0 0 2px rgba(195, 223, 248, 0.2);
+}
+
  button{
    padding: 10px;
    margin: 5px;

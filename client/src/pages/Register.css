@@ -86,6 +86,11 @@
   border-color: #61dafb;
 }
 
+#email:focus {
+  border-color: #ced4da;
+  outline: none;
+}
+
 .input-field input.error,
 .input-field select.error {
   border-color: #dc3545;

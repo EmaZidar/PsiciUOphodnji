@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Register.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     // za sve korisnike
     ime: '',
@@ -123,7 +125,7 @@ export default function Register() {
       console.log('Fetch result:', fetchResult)
 
       alert('Registracija uspješna!');
-      
+      navigate('/main');
       
     } catch (error) {
       console.error('Greška pri registraciji:', error);
@@ -181,7 +183,7 @@ export default function Register() {
                     id="email"
                     name="email"
                     value={formData.email}
-                    onChange={handleInputChange}
+                    readOnly
                     className={errors.email ? 'error' : ''}
                     placeholder="primjer@email.com"
                   />

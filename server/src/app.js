@@ -4,11 +4,14 @@ import express from "express";
 import session from "express-session";
 import fetch from "node-fetch";
 import * as db from "./db.js";
+import * as imgDb from "./imgDb.js";
+import multer from "multer"; 
 import cors from "cors";
 import * as calendar from "./calendar.js";
 import * as chat from "./chat.js";
 
-db.testConnection();    
+db.testConnection();
+imgContainer = await imgDb.initializeBlobStorage();
 
 const app = express();
 app.use(express.json());
@@ -241,7 +244,44 @@ app.get('/api/setaci', async (_req, res) => {
     }
 });
 
-app.get('/api/vlasnici', async (_req, res) => {
+app.post('/api/upload-profile-image', checkIsAuthenticated, async (req, res) => {
+    try {
+        const { imageData, fileType } = req.body;
+        
+        // provjeri input
+        if (!imageData) {
+            return res.status(400).json({ error: 'Missing image data' });
+        }
+        
+        // provjeri tip filea
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (fileType && !allowedTypes.includes(fileType)) {
+            return res.status(400).json({ error: 'Invalid file type. Allowed: JPEG, PNG, WebP' });
+        }
+        
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (imageData.length > maxSize) {
+            return res.status(400).json({ error: 'File too large (max 5MB)' });
+        }
+        
+        const sessionUser = req.session.user;
+        const userEmail = sessionUser.email;
+        const blobName = `${userEmail}-profile-${Date.now()}`;
+        
+        await imgDb.uploadImage(blobName, imgContainer, Buffer.from(imageData, 'base64'));
+        
+        res.status(200).json({ 
+            message: 'Image uploaded successfully',
+            blobName: blobName
+        });
+    } catch (err) {
+        console.error('Error in /api/upload-profile-image:', err);
+        res.status(500).json({ error: err.message || 'Internal server error' });
+    }
+});
+
+
+app.get('/api/vlasnici', async (req, res) => {
     try {
         const vlasnici = await db.getAllVlasnici();
         res.status(200).json(vlasnici)

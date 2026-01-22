@@ -11,7 +11,21 @@ import * as calendar from "./calendar.js";
 import * as chat from "./chat.js";
 
 db.testConnection();
-imgContainer = await imgDb.initializeBlobStorage();
+const imgContainer = await imgDb.initializeBlobStorage();
+
+// Configure multer for file uploads (memory storage)
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPEG, PNG, and WebP allowed'));
+        }
+    }
+});
 
 const app = express();
 app.use(express.json());
@@ -196,6 +210,17 @@ function checkIsAuthenticated(req, res, next) {
     return res.status(401).json({ error: 'Not authenticated' });
 }
 
+app.delete('/api/delete/:idKorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idKorisnik, 10);
+        await db.deleteUserWithId(idKorisnik);
+        res.json({ message: `Korisnik ${idKorisnik} deleted` });
+    } catch (err) {
+        console.error('Error deleting korisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.get('/api/me', checkIsAuthenticated, async (req, res) => {
     try {
         const sessionUser = req.session.user;
@@ -244,38 +269,54 @@ app.get('/api/setaci', async (_req, res) => {
     }
 });
 
-app.post('/api/upload-profile-image', checkIsAuthenticated, async (req, res) => {
+app.post('/api/me/profile-image', checkIsAuthenticated, upload.single('profilfoto'), async (req, res) => {
     try {
-        const { imageData, fileType } = req.body;
-        
-        // provjeri input
-        if (!imageData) {
-            return res.status(400).json({ error: 'Missing image data' });
+        // Access the uploaded file via req.file
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
         }
         
-        // provjeri tip filea
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (fileType && !allowedTypes.includes(fileType)) {
-            return res.status(400).json({ error: 'Invalid file type. Allowed: JPEG, PNG, WebP' });
-        }
-        
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (imageData.length > maxSize) {
-            return res.status(400).json({ error: 'File too large (max 5MB)' });
-        }
+        console.log('File received:', {
+            fieldname: req.file.fieldname,
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size
+        });
         
         const sessionUser = req.session.user;
-        const userEmail = sessionUser.email;
-        const blobName = `${userEmail}-profile-${Date.now()}`;
+        const dbUser = await db.getUserWithEmail(sessionUser.email);
+        if (!dbUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
         
-        await imgDb.uploadImage(blobName, imgContainer, Buffer.from(imageData, 'base64'));
+        const userEmail = sessionUser.email.replace(/@/g, '_'); // Sanitize email for blob name
+        const fileExtension = req.file.mimetype.split('/')[1]; // jpeg, png, webp
+        const blobName = `${userEmail}-profile-${Date.now()}.${fileExtension}`;
+        
+        // Upload file buffer to Azure Blob Storage
+        const uploadResult = await imgDb.uploadImage(blobName, imgContainer, req.file.buffer);
+        
+        console.log('Image uploaded successfully:', uploadResult.url);
+        
+        // TODO: Update database with photo URL
+        const updateResult = await db.updateUserProfileImage(dbUser.idkorisnik, uploadResult.url);
+        if (!updateResult) {
+            return res.status(500).json({ error: 'Failed to update user profile image in database' });
+        } else {
+            console.log('Database updated with new profile image URL');
+        }
+        // Refresh user data
+        const userId = dbUser.idkorisnik;
+        const userWithRole = await db.getUserWithRole(userId);
         
         res.status(200).json({ 
             message: 'Image uploaded successfully',
-            blobName: blobName
+            blobName: uploadResult.blobName,
+            url: uploadResult.url,
+            user: userWithRole
         });
     } catch (err) {
-        console.error('Error in /api/upload-profile-image:', err);
+        console.error('Error in /api/me/profile-image:', err);
         res.status(500).json({ error: err.message || 'Internal server error' });
     }
 });
@@ -303,10 +344,7 @@ app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-//TODO PSI  ja imam fetch("http://localhost:8000/psi", i tamo saljem psa  tj zapravo 
-// saljem objekt koji se zove "kojiPas" jer je u njemu svi atribut od psa ali  i idKorisnik jer bi rekla da bi trebali vi
-//kad se stvori novi pas njemu napravit idPas pa sam poslala i idKorisnik ak bi doslo do problema ak se dva psa zovu isto
-//ugl 
+
 app.post('/api/psi', async (req, res) => {
     try {
         if (!req.session.user || !req.session.user.email) {
@@ -389,15 +427,33 @@ app.get('/api/setnje/:idkorisnik', async (req, res) => {
     }
 });
 
-
-
 //TODO MOJE SETNJE   moja ideja je da vi filtirate koje setnje su prosle a koje bududce s nekim ono current_date u bazi i 
 //da tako svaki put kad se ispisu setnje vi filtrirate koje se meni salju na  
 //  fetch('/api/prosleSetnje/${idKorisnik}', {  a koje da mi se salju na /buduceSetnje/${idKorisnik} jer ja tako napravim 2 liste pa prek tog radim 
 //al ak mislite da je lakse meni na frontu filtrirat mogu al nekak mi se cinilo lakse da sam napravite neki query bazi 
 // setnja.datum-current_date>0 pa bi mi to bilo idealno i idkorisnik saljem id vlasnika log
 
+app.get('/api/prosleSetnje/:idkorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idkorisnik, 10);
+        const prosleSetnje = await db.getProsleSetnjeVlasnika(idKorisnik);
+        res.status(200).json(prosleSetnje);
+    } catch (err) {
+        console.error('Error in /api/prosleSetnje/:idkorisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
+app.get('/api/buduceSetnje/:idkorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idkorisnik, 10);
+        const buduceSetnje = await db.getBuduceSetnjeVlasnika(idKorisnik);
+        res.status(200).json(buduceSetnje);
+    } catch (err) {
+        console.error('Error in /api/buduceSetnje/:idkorisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Kreiraj novu šetnju
 app.post('/api/setnja', async (req, res) => {

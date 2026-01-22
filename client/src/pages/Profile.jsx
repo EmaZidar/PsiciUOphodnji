@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import { useNavigate } from 'react-router-dom';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';

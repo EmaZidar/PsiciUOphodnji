@@ -1,5 +1,6 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
-require("dotenv").config();
+import { BlobServiceClient } from "@azure/storage-blob";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export async function initializeBlobStorage() {
     try {
@@ -17,24 +18,36 @@ export async function initializeBlobStorage() {
             AZURE_STORAGE_CONNECTION_STRING,
         );
 
-        // Create a unique name for the container
-        const containerName = "profilneSlike";
+        // Container name MUST be lowercase and can only contain letters, numbers, and hyphens
+        const containerName = "profil-slike";
 
-        console.log("\nCreating container...");
+        console.log("\nInitializing Azure Blob Storage container...");
         console.log("\t", containerName);
 
         // Get a reference to a container
         const containerClient =
             blobServiceClient.getContainerClient(containerName);
-        // Create the container
-        const createContainerResponse = await containerClient.create();
-        console.log(
-            `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`,
-        );
-    } catch (err) {
-        console.err(`Error: ${err.message}`);
+        
+        // Try to create the container, but it's ok if it already exists
+        try {
+            const createContainerResponse = await containerClient.create();
+            console.log(
+                `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`,
+            );
+        } catch (error) {
+            // If container already exists, that's fine
+            if (error.code === 'ContainerAlreadyExists') {
+                console.log(`Container already exists: ${containerClient.url}`);
+            } else {
+                throw error;
+            }
+        }
+        
+        return containerClient;
+    } catch (error) {
+        console.error(`Error initializing blob storage: ${error.message}`);
+        throw error;
     }
-    return containerClient;
 }
 
 export async function uploadImage(blobName, containerClient, imageBuffer) {

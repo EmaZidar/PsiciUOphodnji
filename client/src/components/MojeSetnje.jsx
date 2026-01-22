@@ -3,6 +3,16 @@ import "./MojeSetnje.css";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
+function formatDatumHR(datum) {
+    if (!datum) return "";
+    const d = new Date(datum);
+    if (isNaN(d)) return datum;
+    const dan = String(d.getDate()).padStart(2, '0');
+    const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+    const godina = d.getFullYear();
+    return `${dan}.${mjesec}.${godina}.`;
+}
+
 export default function MojeSetnje() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
@@ -224,10 +234,10 @@ export default function MojeSetnje() {
                         {prosleSetnje.map((setnja) => (
                             <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
                                 <h3 className="ms-naslov">Šetnja</h3>
-                                <div className="ms-meta">
-                                  <p>Datum: {setnja.datum}</p>
-                                  <p>Recenzija: {setnja.recenzija}</p>
-                                </div>
+                                                                <div className="ms-meta">
+                                                                    <p>Datum: {formatDatumHR(setnja.datum)}</p>
+                                                                    <p>Recenzija: {setnja.recenzija}</p>
+                                                                </div>
                                 <button onClick={() => setPrikaziFormu(true)}>Ostavi recenziju</button>
                             </div>
                         ))}
@@ -303,7 +313,7 @@ export default function MojeSetnje() {
                                 <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
                                     <h3 className="ms-naslov">Šetnja</h3>
                                     <div className="ms-meta">
-                                        <p>Zakazana: {setnja.datum}</p>
+                                        <p>Zakazana: {formatDatumHR(setnja.datum)}</p>
                                     </div>
                                     <button className="ms-otkazi" onClick={() => izbrisi(setnja.idRezervacija)}>Otkaži</button>
                                 </div>

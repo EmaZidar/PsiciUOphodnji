@@ -40,7 +40,7 @@ export default function SetnjeSetacu() {
 
           <p>
             <strong>Vlasnik:</strong>{' '}
-            <Link to={`/vlasnik/${s.korisnikid}`}>
+            <Link to={`/vlasnik/${s.idkorisnik}`}>
               {s.imekorisnik} {s.prezkorisnik}
             </Link>
           </p>

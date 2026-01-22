@@ -14,6 +14,7 @@ export default function MojeSetnje() {
     const [prosleSetnje, setprosle] = useState([]);
     const [buduceSetnje, setbuduce] = useState([]);
 
+    
     useEffect(() => {
         const API = `${BACKEND_URL}/api/me`;
         fetch(API, { credentials: "include" })
@@ -32,11 +33,12 @@ export default function MojeSetnje() {
     }, []);
 
        useEffect(() => {
+                if (!user || !user.idkorisnik) return;
                const loadprosle = async () => {
                  try {
                    setLoading(true);
                    setError(null);
-                   const response = await fetch(`/api/prosleSetnje/${idKorisnik}`, { 
+                   const response = await fetch(`${BACKEND_URL}/api/prosleSetnje/${user.idkorisnik}`, { 
                      method: 'GET',
                      credentials: 'include' });
                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
@@ -50,14 +52,15 @@ export default function MojeSetnje() {
                  }
                };
            loadprosle();
-         }, []);    
+         }, [user]);    
          
      useEffect(() => {
+        if (!user || !user.idkorisnik) return;
                const loadbuduce = async () => {
                  try {
                    setLoading(true);
                    setError(null);
-                   const response = await fetch(`/api/buduceSetnje/${idKorisnik}`, { 
+                   const response = await fetch(`${BACKEND_URL}/api/buduceSetnje/${user.idkorisnik}`, { 
                      method: 'GET',
                      credentials: 'include' });
                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
@@ -71,39 +74,9 @@ export default function MojeSetnje() {
                  }
                };
            loadbuduce();
-         }, []);    
-        
-    //const njegoveProsleSetnje=prosleSetnje || [{datum: "nema"}, { datum: "1.1.2000.",  recenzija: "-" },]
-    //const njegoveBuduceSetnje=buduceSetnje || [{datum: "nema"}, 
-    //  { datum: "1.1.2026.",  otakazan: "0"}]   ne znam je ovo const se dva puta definira pa sam zakomentirao
+         }, [user]);    
 
-    useEffect(() => {
-        const loadbuduce = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const response = await fetch(
-                    "/api/buduceSetnje/${idKorisnik}",
-                    {
-                        method: "GET",
-                        credentials: "include",
-                    },
-                );
-                if (!response.ok)
-                    throw new Error(`Server returned ${response.status}`);
-                const data = await response.json();
-                setbuduce(
-                    Array.isArray(data) ? data : (data?.buduceSetnje ?? []),
-                );
-            } catch (err) {
-                setError(err.message || "Greška pri dohvaćanju podataka");
-                setbuduce([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadbuduce();
-    }, []);
+    
 
     const njegoveProsleSetnje = prosleSetnje || [
         { datum: "nema" },

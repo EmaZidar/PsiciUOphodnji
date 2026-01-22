@@ -5,20 +5,20 @@ import "../components/Chat.css";
 
 const SAMPLE_CHATS = [
   {
-    idRezervacija: 'test-1',
-    idSetnja: 's-test-1',
-    otherId: 999,
-    otherName: 'Test User',
-    tipSetnja: 'Test šetnja',
+    idrezervacija: 'test-1',
+    idsetnja: 's-test-1',
+    otherid: 999,
+    othername: 'Test User',
+    tipsetnja: 'Test šetnja',
     datum: '2026-01-20',
     vrijeme: '10:00'
   },
   {
-    idRezervacija: 'test-2',
-    idSetnja: 's-test-2',
-    otherId: 998,
-    otherName: 'Demo Vlasnik',
-    tipSetnja: 'Brza šetnja',
+    idrezervacija: 'test-2',
+    idsetnja: 's-test-2',
+    otherid: 998,
+    othername: 'Demo Vlasnik',
+    tipsetnja: 'Brza šetnja',
     datum: '2026-01-21',
     vrijeme: '15:30'
   }

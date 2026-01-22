@@ -89,7 +89,7 @@
   font-size: 14px;
   font-weight: 650;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  transition: box-shadow 0.18s ease, opacity 0.18s ease;
   box-shadow: var(--shadow-sm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -124,12 +124,7 @@
   box-shadow: var(--shadow-md);
 }
 
-.profile-upload-button:active,
-.save-button:active,
-.upload-btn:active,
-.delete-btn:active {
-  transform: translateY(1px);
-}
+/* Removed active transform to prevent buttons shifting on click */
 
 .save-button:disabled {
   opacity: 0.6;

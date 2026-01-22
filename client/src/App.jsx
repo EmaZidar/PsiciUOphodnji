@@ -16,6 +16,7 @@ import Korisnici from "./pages/Korisnici.jsx";
 import Clanarina from "./pages/Clanarina.jsx";
 import MjesecnaClanarina from "./pages/MjesecnaClanarina.jsx";
 import GodisnjaClanarina from "./pages/GodisnjaClanarina.jsx";
+import Chat from "./pages/Chat.jsx";
 function App() {
   return (
     <>
@@ -35,6 +36,7 @@ function App() {
           <Route path="/clanarina" element={<Clanarina />} />
           <Route path="/clanarina/mjesecna" element={<MjesecnaClanarina />} />
           <Route path="/clanarina/godisnja" element={<GodisnjaClanarina />} />
+          <Route path="/chat" element={<Chat />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -308,6 +308,53 @@ export async function platiRezervaciju(idKorisnik, idRezervacija) {
     return res.rows.length !== 0;
 }
 
+export async function getChatParticipantsForVlasnik(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, s.idSetnja, st.idKorisnik as otherId, (imeKorisnik || ' ' || prezKorisnik) as otherName, tipSetnja, datum, vrijeme
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+                JOIN setac st ON st.idKorisnik = s.idKorisnik
+                JOIN korisnik k ON st.idKorisnik = k.idKorisnik
+            WHERE r.idKorisnik = $1`,
+        [idKorisnik]
+    )
+    return res.rows;
+}
+
+export async function getChatParticipantsForSetac(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, s.idSetnja, k.idKorisnik as otherId, (imeKorisnik || ' ' || prezKorisnik) as otherName, tipSetnja, datum, vrijeme
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
+            WHERE s.idKorisnik = $1`,
+        [idKorisnik]
+    )
+    return res.rows;
+}
+
+export async function getOtherChatParticipantIdForSetac(idRezervacija, idKorisnik) {
+    const res = await pool.query(
+        `SELECT r.idKorisnik
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE r.idRezervacija = $1 AND s.idKorisnik = $2`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
+}
+
+export async function getOtherChatParticipantIdForVlasnik(idRezervacija, idKorisnik) {
+    const res = await pool.query(
+        `SELECT s.idKorisnik
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE r.idRezervacija = $1 AND r.idKorisnik = $2`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
+}
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");

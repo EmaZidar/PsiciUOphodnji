@@ -6,6 +6,7 @@ import fetch from "node-fetch";
 import * as db from "./db.js";
 import cors from "cors";
 import * as calendar from "./calendar.js";
+import * as chat from "./chat.js";
 
 db.testConnection();    
 
@@ -77,12 +78,10 @@ app.get("/login/auth", async (_req, res) => {
         `state=${state}&` +
         `scope=${encodedScopes}`;
 
-    console.log("Redirecting to:", GOOGLE_OAUTH_CONSENT_SCREEN_URL);
     res.redirect(GOOGLE_OAUTH_CONSENT_SCREEN_URL);
 });
 
 app.get("/google/callback", async (req, res) => {
-    console.log("Callback received:", req.query);
     const { code } = req.query;
 
     const data = {
@@ -92,8 +91,6 @@ app.get("/google/callback", async (req, res) => {
         redirect_uri: GOOGLE_CALLBACK_URL,
         grant_type: "authorization_code",
     };
-
-    console.log("Exchanging code for token:", data);
 
     try {
         const response = await fetch(GOOGLE_ACCESS_TOKEN_URL, {
@@ -105,7 +102,6 @@ app.get("/google/callback", async (req, res) => {
         });
 
         const access_token_data = await response.json();
-        console.log("Token response:", access_token_data);
 
         const { id_token } = access_token_data;
 
@@ -133,7 +129,8 @@ app.get("/google/callback", async (req, res) => {
             const userId = existingUser.idkorisnik ?? existingUser.idKorisnik ?? existingUser.id ?? existingUser.id_korisnik;
             const userWithRole = await db.getUserWithRole(userId);
             const role = userWithRole?.role ?? "unassigned";
-            req.session.user = userWithRole;
+            req.session.user.id = userId;
+            req.session.user.role = role;
             res.redirect(`${clientUrl}/main?role=${encodeURIComponent(role)}`);
         }
     } catch (error) {
@@ -144,42 +141,43 @@ app.get("/google/callback", async (req, res) => {
 
 
 //TODO ADMIN TIP CLANARINE to mi treba nez jel to na kraju imamo tu ili ne
-app.post('/api/register', (req, res) => {
-  console.log("registering....")
-  if (req.headers["content-type"] !== "application/json") {
-    res.status(400).send('Expected form data')
-    return
-  }
-  let requestForm = req.body
+app.post('/api/register', async (req, res) => {
+    console.log("registering....")
+    if (req.headers["content-type"] !== "application/json") {
+        res.status(400).send('Expected form data')
+        return
+    }
+    let requestForm = req.body
 
-  const isSetac = requestForm.uloga === "setac"
-  if (!isSetac && requestForm.uloga !== "vlasnik") {
-    res.sendStatus(400).send('Nevalidna uloga')
-    console.log('nevaldna uloga')
-    return
-  }
+    const isSetac = requestForm.uloga === "setac"
+    if (!isSetac && requestForm.uloga !== "vlasnik") {
+        res.sendStatus(400).send('Nevalidna uloga')
+        console.log('nevaldna uloga')
+        return
+    }
 
-  // TODO treba provjeriti jos ostale parametre valjaju li
+    // TODO treba provjeriti jos ostale parametre valjaju li
 
-  db.createUser(
-    requestForm.ime,
-    requestForm.prezime,
-    requestForm.email,
-    requestForm.telefon,
-  ).then(user => {
+    const user = await db.createUser(
+        requestForm.ime,
+        requestForm.prezime,
+        requestForm.email,
+        requestForm.telefon,
+    );
     console.log('Created user:', user)
     const idKorisnik = user.rows[0].idkorisnik // TODO treba vidjet jel postoji lol
     console.log('id korisnik:', idKorisnik)
+    req.session.user.id = idKorisnik;
+    req.session.user.role = isSetac ? 'setac' : 'vlasnik';
     if (isSetac)
-      db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
+        db.createSetac(requestForm.tipClanarina, requestForm.profilFoto, idKorisnik, requestForm.lokDjelovanja)
     else
-      db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
-  })
+        db.createVlasnik(requestForm.primanjeObavijesti, idKorisnik)
 
-  res.sendStatus(200)
+    res.sendStatus(200)
 })
 
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', async (_req, res) => {
     try {
         const users = await db.getAllUsers();
         res.status(200).json(users);
@@ -206,7 +204,7 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
 
         const userId = dbUser.idkorisnik ?? dbUser.idKorisnik;
         const userWithRole = await db.getUserWithRole(userId);
-        console.log('/api/me - returning userWithRole:', userWithRole);
+        //console.log('/api/me - returning userWithRole:', userWithRole);
 
         res.json({ session: sessionUser, user: userWithRole });
     } catch (err) {
@@ -233,13 +231,9 @@ app.post('/api/logout', (req, res) => {
 });
 
 
-app.get('/api/setaci', async (req, res) => {
+app.get('/api/setaci', async (_req, res) => {
     try {
         const setaci = await db.getAllSetaci();
-        if (setaci.length > 0)
-            console.log(setaci[0])
-        else console.log('Empty setaci :(')
-
         res.status(200).json(setaci)
     } catch (err) {
         console.error('Error in /api/setaci:', err);
@@ -247,12 +241,9 @@ app.get('/api/setaci', async (req, res) => {
     }
 });
 
-app.get('/api/vlasnici', async (req, res) => {
+app.get('/api/vlasnici', async (_req, res) => {
     try {
         const vlasnici = await db.getAllVlasnici();
-        if (vlasnici.length > 0)
-            console.log(vlasnici)
-        else console.log('Nema vlasnika')
         res.status(200).json(vlasnici)
     } catch (err) {
         console.error('Error in /api/vlasnici:', err);
@@ -262,7 +253,7 @@ app.get('/api/vlasnici', async (req, res) => {
 
 app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     try {
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const idkorisnik = req.session.user.id;
         const { idSetnja, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja } = req.body;
         const rezervacija = await db.createRezervacija(idSetnja, idkorisnik, polaziste, vrijeme, datum, dodNapomene, status, nacinPlacanja);
         res.status(201).json(rezervacija.rows[0]);
@@ -405,45 +396,13 @@ app.delete('/api/setnje/:id', async (req, res) => {
     }
 });
 
-/*
-    TODO: Ocjene i recenzije (pojednostavljeno)
-
-    Trenutna dev implementacija koristi memorijski niz i privremene rute:
-        - GET  /api/reviews?user=<id>  -> vraća recenzije za korisnika
-        - POST /api/reviews            -> dodaje recenziju
-
-    Što napraviti za produkciju (sažeto):
-        1) Dodati tablicu `reviews` ili Mongoose model (polja: user, author, authorName, rating, text, createdAt).
-        2) Implementirati rute i kontrolere (GET list, POST create, opc. DELETE/get).
-        3) Validirati/sanitizirati input (rating 1..5, limit teksta, XSS sanitizacija).
-        4) Zahtijevati autentikaciju za POST/DELETE i postaviti `author` sa servera.
-        5) Dodati agregat/endpoint za `avg` i `count` (ili računati u queryu).
-
-*/
-
-
 
 app.use('/api/calendar', calendar.router)
 
-// TODO: Implementirati endpoint za upload profilne slike
-// POST /api/upload-profile-image
-// - Primiti file iz req.file (multer je već konfiguriran)
-// - Spremi putanju /uploads/... u DB (koristiti db.updateUserProfileImage())
-// - Vrati updated user kao JSON
-// - Klijent će tada prikazati novu sliku
-//
-// Frontend je spreman i čeka ovaj endpoint
-// Multer je već konfiguriran na serveru
 
 app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     try {
-        const sessionUser = req.session.user;
-        const dbUser = await db.getUserWithEmail(sessionUser.email);
-        if (!dbUser) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        
-        const userId = dbUser.idkorisnik;
+        const userId = req.session.user.id;
         console.log('Deleting user with ID:', userId);
         
         // OBRIŠI KORISNIKA
@@ -463,29 +422,21 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-// APIJI ZA NOTIFIKACIJE I PLAĆANJE
-// odite na pageove di se zovu ovi apiji da vidite kontekst i da dodate ono VITE_BACKEND_URL ili sta vec treba jer nisam bila zihi kako
-// ideja: odlucila sam implementirati na nacin da setac ili vlasnik vidi notifikacije tek kad klikne na ikonicu notifikacija u headeru jer mi se polling cini overkill za sad
-// dakle kad korisnik klikne na ikonicu, frontend salje request na backend da dohvati notifikacije
-// onda kad setac prihvati ili odbije rezervaciju, frontend salje request na backend da updatea status rezervacije
-// znaci basically notifikacije su samo filtriranje po statusu rezervacije i vracanje tih rezervacija u frontend ovisno je li u pitanju vlasnik ili setac
+function checkIsSetac(req, res, next) {
+    if (req.session.user?.role === 'setac')
+        return next();
+    return res.status(403).json({ error: 'Pristup dozvoljen samo setacima' });
+}
 
-//GET /api/setac/notifikacije (zove se u HeaderUlogiran.jsx)
-// prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
-// provjera: korisnik mora biti ulogiran i mora biti setac
-// backend mora vratiti array notifikacija za setaca - svaki objekt notifikacije treba imati:
-// idRezervacija, tipSetnja, cijena, trajanje, imeKorisnik, prezKorisnik, datum, vrijeme, polaziste, dodNapomene
-// to se dobije mergeanjem tablica KORISNIK, VLASNIK (jer mi trebaju ime i prezime vlasnika koji je napravio rezervaciju), REZERVACIJA, SETNJA
-// bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "na cekanju" jer su to notifikacije za setaca
-app.get('/api/setac/notifikacije', checkIsAuthenticated, async (req, res) => {
+function checkIsVlasnik(req, res, next) {
+    if (req.session.user?.role === 'vlasnik')
+        return next();
+    return res.status(403).json({ error: 'Pristup dozvoljen samo vlasnicima' });
+}
+
+app.get('/api/setac/notifikacije', checkIsAuthenticated, checkIsSetac, async (req, res) => {
     try {
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsSetac(idkorisnik))
-        if (!await db.checkIsSetac(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
-
-        const notifications = await db.getSetacNotifikacije(idkorisnik);
+        const notifications = await db.getSetacNotifikacije(req.session.user.id);
 
         return res.status(200).json(notifications);
     } catch (err) {
@@ -498,9 +449,7 @@ function changeRezervacijaStatus(newStatus) {
     return async (req, res) => {
         try {
             const idRezervacija = req.params.idRezervacija;
-            const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-        if (!await db.checkIsSetac(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
+            const idkorisnik = req.session.user.id;
 
             const success = await db.changeRezervacijaStatus(idkorisnik, idRezervacija, newStatus);
             if (success)
@@ -517,13 +466,13 @@ function changeRezervacijaStatus(newStatus) {
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
 // provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
 // ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
-app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, changeRezervacijaStatus('potvrdeno'));
+app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('potvrdeno'));
 
 //PATCH /api/rezervacija/:idRezervacija/odbij (zove se u HeaderUlogiran.jsx)
 // provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
 // provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
 // ako sve prode, updateat rezervaciju da bude u statusu "odbijeno"!!!!
-app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeRezervacijaStatus('odbijeno'));
+app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('odbijeno'));
 
 //GET /api/vlasnik/notifikacije (zove se u HeaderUlogiran.jsx)
 // prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
@@ -532,14 +481,9 @@ app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, changeR
 // idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
 // to se dobije mergeanjem tablica REZERVACIJA i SETNJA
 // bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
-app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
+app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsVlasnik(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
-
-        const notifications = await db.getVlasnikNotifikacije(idkorisnik);
+        const notifications = await db.getVlasnikNotifikacije(req.session.user.id);
 
         return res.status(200).json(notifications);
     } catch (err) {
@@ -553,13 +497,10 @@ app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
 // to se sve dobije iz tablice REZERVACIJA
-app.get('/api/rezervacije/:idRezervacija', async (req, res) => {
+app.get('/api/rezervacije/:idRezervacija', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsVlasnik(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+        const idkorisnik = req.session.user.id;
 
         const rezervacija = await db.getRezervacija(idkorisnik, idRezervacija);
 
@@ -577,13 +518,10 @@ app.get('/api/rezervacije/:idRezervacija', async (req, res) => {
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
 // ako sve prode, updateat rezervaciju da bude u statusu "placeno"
-app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
+app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
-        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
-
-        if (!await db.checkIsVlasnik(idkorisnik))
-            return res.status(403).json({ error: "Pristup dozvoljen samo vlasnicima" });
+        const idkorisnik = req.session.user.id;
 
         const success = await db.platiRezervaciju(idkorisnik, idRezervacija);
         if (success)
@@ -595,6 +533,9 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', async (req, res) => {
     }
 })
 
+app.use('/api/chats', chat.router);
+
+
 const PORT = process.env.PORT || 8000;
 const start = async (port) => {
     app.listen(port, () => {
@@ -605,3 +546,64 @@ const start = async (port) => {
 start(PORT);
 
 export default app;
+
+
+//APIJI ZA UREDIVANJE OSOBNIH PODATAKA VLASNIKA I SETACA
+// + UPLOAD PROFILNE SLIKE + PRIKAZ SREDNJE OCJENE I BROJA RECENZIJA ZA SETACA
+
+// provjerite jel sam dobro stavila ovaj BACKEND_URL u fetchove
+
+// GET /api/setaci/:idkorisnik/rating-summary (zove se u Profile.jsx i Reviews.jsx (kasnije))
+// svrha: dohvatiti srednju ocjenu i broj recenzija za setaca
+// provjera: korisnik mora biti ulogiran i mora biti setac
+// backend treba vratiti objekt: {ukocjena: float, brojrecenzija: int}
+// edge case: ako setac nema recenzija, ukocjena treba biti null, brojrecenzija treba biti 0
+// tu se mora neki veliki merge tablica napravit: SETAC, SETNJA, REZERVACIJA, RECENZIJA tak da se moze doc do ocjena
+// znaci treba se izracunat prosjek ocjena iz recenzija za sve setnje tog setaca i prebrojat koliko taj setac ima recenzija i poslat nam u response
+
+// POST /api/me/profile-image (zove se u Profile.jsx)
+// svrha: setac uploada novu profilnu sliku -> front salje multipart/form-data s fieldom "profilfoto" (File - vrsta Bloba)
+// provjera: korisnik mora biti ulogiran i mora bit setac, idkorisnik se dobije iz sessiona
+// dozvoljeni mime: image/jpeg, image/png, image/jpg
+// backend treba spremiti sliku u object storage i dobiti URL/key koji se sprema u bazu
+// napomena za URL: ak se vraca puni url front moze direkt prikazat a ak se vraca relativna putanja front mora znat prefiks
+// backend treba updateat putanju profilne slike u tablici SETAC za tog korisnika
+// frontend ocekuje da se odmah osvjezi user
+// sad cu tu copy pasteat TODO koji mi je chatgpt dao jer ne znam kak se to treba raditi tocno pa ak vam treba helper
+//TODO koraci:
+//Pročitati datoteku iz requesta (multer memory storage ili stream).
+//Generirati jedinstveni key npr: profile-images/{idKorisnik}/{timestamp}-{random}.{ext}
+//Upload u object storage bucket (S3/MinIO/Azure Blob… ovisi što koristite):
+    //postaviti Content-Type na mime filea
+    //opcionalno Cache-Control (npr. public, max-age=31536000 ako su verzionirani keyevi)
+//Spremiti rezultat:
+    //ili public URL (npr. https://.../bucket/...)
+    //ili key + vi ga kasnije mapirate na URL
+//Ako imate staru sliku: opcionalno obrisati stari objekt u storage-u (da se ne gomila).
+//DB update
+    //Upisati novu putanju u tablicu šetača (ili gdje već držite profilnu):
+    //Paziti da ovo radi samo za šetače (ako vlasnici nemaju profilnu ili drugačije).
+
+
+// PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)
+// svrha: azuriranje osobnih podataka za oba korisnika
+// vlasnik: ime, prezime, email, telefon, setac: ime, prezime, email, telefon, lokDjelovanja
+// znaci ak je vlasnik u pitanju updatea se samo tablica KORISNIK, ak je setac onda se updatea KORISNIK i SETAC
+// ako nije setac nego vlasnik lokdjelovanja se ignorira
+// provjera: korisnik mora biti ulogiran
+// korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
+// slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
+// edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"
+
+
+
+// API ZA RECENZIJE
+// provjerite jel sam dobro stavila ovaj BACKEND_URL u fetch
+
+// GET /api/setaci/:idkorisnik/recenzije (zove se u Reviews.jsx)
+// svrha: dohvatiti sve recenzije za setaca s idkorisnik
+// nema neke provjere
+// backend treba vratiti array recenzija pod imenom "recenzije" - svaki objekt recenzije treba imati:
+// idrecenzija, ocjena, tekst (ako ga ima), fotografija (ako je ima), imekorisnik, prezkorisnik (ime i prezime vlasnika koji je ostavio recenziju)
+// to se dobije mergeanjem tablica SETAC, SETNJA, REZERVACIJA, RECENZIJA, VLASNIK, KORISNIK
+// edge case: ako setac nema recenzija, treba vratiti prazan array

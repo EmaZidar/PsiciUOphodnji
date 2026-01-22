@@ -115,12 +115,26 @@ export async function updateUserProfileImage(idKorisnik, imagePath) {
     return res.rows[0];
 }
 
-export async function deleteUserWithId(idKorisnik) {
+export async function getProsleSetnjeVlasnika(idKorisnik) {
     const res = await pool.query(
-        "DELETE FROM korisnik WHERE idKorisnik = $1 RETURNING *",
+        `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
+            FROM rezervacija r
+                JOIN setnja s ON r.idSetnja = s.idSetnja
+            WHERE r.idKorisnik = $1 AND r.datum < CURRENT_DATE`,
         [idKorisnik]
     );
-    return res.rows[0];
+    return res.rows;
+}
+
+export async function getBuduceSetnjeVlasnika(idKorisnik) {
+    const res = await pool.query(
+        `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
+            FROM rezervacija r
+                JOIN setnja s ON r.idSetnja = s.idSetnja
+            WHERE r.idKorisnik = $1 AND r.datum >= CURRENT_DATE`,
+        [idKorisnik]
+    );
+    return res.rows;
 }
 
 export async function getSetacWithId(idKorisnik) {
@@ -379,7 +393,7 @@ export async function getOtherChatParticipantIdForVlasnik(idRezervacija, idKoris
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");
-        console.log("Database connected:", rows.rows);
+        console.log("Database connected:", rows.rows.length, "rows in korisnik table");
     } catch (err) {
         console.error("Database connection error:", err);
     }

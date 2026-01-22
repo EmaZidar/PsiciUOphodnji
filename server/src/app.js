@@ -214,7 +214,7 @@ app.delete('/api/delete/:idKorisnik', async (req, res) => {
     try {
         const idKorisnik = parseInt(req.params.idKorisnik, 10);
         await db.deleteUserWithId(idKorisnik);
-        res.json({ message: 'Korisnik deleted' });
+        res.json({ message: `Korisnik ${idKorisnik} deleted` });
     } catch (err) {
         console.error('Error deleting korisnik:', err);
         res.status(500).json({ error: 'Internal server error' });
@@ -344,10 +344,7 @@ app.post('/api/rezervacije', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-//TODO PSI  ja imam fetch("http://localhost:8000/psi", i tamo saljem psa  tj zapravo 
-// saljem objekt koji se zove "kojiPas" jer je u njemu svi atribut od psa ali  i idKorisnik jer bi rekla da bi trebali vi
-//kad se stvori novi pas njemu napravit idPas pa sam poslala i idKorisnik ak bi doslo do problema ak se dva psa zovu isto
-//ugl 
+
 app.post('/api/psi', async (req, res) => {
     try {
         if (!req.session.user || !req.session.user.email) {
@@ -430,15 +427,33 @@ app.get('/api/setnje/:idkorisnik', async (req, res) => {
     }
 });
 
-
-
 //TODO MOJE SETNJE   moja ideja je da vi filtirate koje setnje su prosle a koje bududce s nekim ono current_date u bazi i 
 //da tako svaki put kad se ispisu setnje vi filtrirate koje se meni salju na  
 //  fetch('/api/prosleSetnje/${idKorisnik}', {  a koje da mi se salju na /buduceSetnje/${idKorisnik} jer ja tako napravim 2 liste pa prek tog radim 
 //al ak mislite da je lakse meni na frontu filtrirat mogu al nekak mi se cinilo lakse da sam napravite neki query bazi 
 // setnja.datum-current_date>0 pa bi mi to bilo idealno i idkorisnik saljem id vlasnika log
 
+app.get('/api/prosleSetnje/:idkorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idkorisnik, 10);
+        const prosleSetnje = await db.getProsleSetnjeVlasnika(idKorisnik);
+        res.status(200).json(prosleSetnje);
+    } catch (err) {
+        console.error('Error in /api/prosleSetnje/:idkorisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
+app.get('/api/buduceSetnje/:idkorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idkorisnik, 10);
+        const buduceSetnje = await db.getBuduceSetnjeVlasnika(idKorisnik);
+        res.status(200).json(buduceSetnje);
+    } catch (err) {
+        console.error('Error in /api/buduceSetnje/:idkorisnik:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Kreiraj novu šetnju
 app.post('/api/setnja', async (req, res) => {

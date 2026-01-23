@@ -67,10 +67,7 @@ export async function getUserWithRole(userId) {
     const user = userResult.rows[0];
 
     // Dohvati ulogu i dodatne podatke
-    const [adminResult, setacResult, vlasnikResult] = await Promise.all([
-        pool.query("SELECT * FROM ADMINISTRATOR WHERE idKorisnik = $1", [
-            userId,
-        ]),
+    const [setacResult, vlasnikResult] = await Promise.all([
         pool.query("SELECT * FROM SETAC WHERE idKorisnik = $1", [userId]),
         pool.query("SELECT * FROM VLASNIK WHERE idKorisnik = $1", [userId]),
     ]);
@@ -78,10 +75,7 @@ export async function getUserWithRole(userId) {
     let role = "unassigned";
     let roleData = {};
 
-    if (adminResult.rows.length > 0) {
-        role = "admin";
-        roleData = adminResult.rows[0];
-    } else if (setacResult.rows.length > 0) {
+    if (setacResult.rows.length > 0) {
         role = "setac";
         roleData = setacResult.rows[0];
     } else if (vlasnikResult.rows.length > 0) {
@@ -104,12 +98,11 @@ export async function getUserWithId(idKorisnik) {
     return res.rows[0];
 }
 
-export async function patchUser(idKorisnik, ime, prezime, email, telefon, lokDjelovanja) {
+export async function patchUser(idKorisnik, ime, prezime, telefon, lokDjelovanja) {
     const fieldsToUpdate = [];
     const korisnikArgs = [idKorisnik];
     if (ime)     { fieldsToUpdate.push('imeKorisnik = $' + (korisnikArgs.length + 1));  korisnikArgs.push(ime); }
     if (prezime) { fieldsToUpdate.push('prezKorisnik = $' + (korisnikArgs.length + 1)); korisnikArgs.push(prezime); }
-    if (email)   { fieldsToUpdate.push('email = $' + (korisnikArgs.length + 1));        korisnikArgs.push(email); }
     if (telefon) { fieldsToUpdate.push('telefon = $' + (korisnikArgs.length + 1));      korisnikArgs.push(telefon); }
     
     let korisnikQuery = '';
@@ -367,9 +360,9 @@ export async function getVlasnikNotifikacije(idKorisnik) {
 
 export async function getRezervacija(idKorisnik, idRezervacija) {
     const res = await pool.query(
-        `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
-            FROM rezervacija
-            WHERE idRezervacija = $1 AND idKorisnik = $2`,
+        `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status, setnja.tipSetnja, setnja.cijena, setnja.trajanje, dodNapomene
+            FROM rezervacija join setnja on rezervacija.idSetnja = setnja.idSetnja
+            WHERE idRezervacija = $1 AND rezervacija.idKorisnik = $2`,
         [idRezervacija, idKorisnik]
     );
     return res.rows.length >= 1 ? res.rows[0] : undefined;

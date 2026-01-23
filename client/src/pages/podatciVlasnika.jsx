@@ -13,7 +13,6 @@ export default function Profile() {
   const [form, setForm] = useState({
     imekorisnik: "",
     prezkorisnik: "",
-    email: "",
     telefon: "",
   });
 
@@ -55,7 +54,6 @@ export default function Profile() {
     setForm({
       imekorisnik: user.imekorisnik ?? "",
       prezkorisnik: user.prezkorisnik ?? "",
-      email: user.email ?? "",
       telefon: user.telefon ?? "",
     });
   }, [user]);
@@ -75,7 +73,6 @@ export default function Profile() {
     setForm({
       imekorisnik: user?.imekorisnik ?? "",
       prezkorisnik: user?.prezkorisnik ?? "",
-      email: user?.email ?? "",
       telefon: user?.telefon ?? "",
     });
     setIsEditing(false);
@@ -92,7 +89,6 @@ export default function Profile() {
         body: JSON.stringify({
           imekorisnik: form.imekorisnik,
           prezkorisnik: form.prezkorisnik,
-          email: form.email,
           telefon: form.telefon,
         }),
       });
@@ -164,12 +160,7 @@ export default function Profile() {
                     )}
                   </div>
                   <div className="v-profile-row">
-                    <strong>Email:</strong>{" "}
-                    {isEditing ? (
-                      <input type="email" name="email" value={form.email} onChange={handleChange} className="profile-input"/>
-                    ) : (
-                      user.email || '—'
-                    )}
+                    <strong>Email:</strong> {user.email || '—'}
                   </div>
                   <div className="v-profile-row">
                     <strong>Telefon:</strong>{" "}

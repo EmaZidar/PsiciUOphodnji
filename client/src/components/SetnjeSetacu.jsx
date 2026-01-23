@@ -5,6 +5,7 @@ import './SetnjeSetacu.css';
 export default function SetnjeSetacu() {
   const [setnje, setSetnje] = useState([]);
   const [loading, setLoading] = useState(true);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
  function formatDatumHR(datum) {
   if (!datum) return '';
 
@@ -25,7 +26,7 @@ function formatVrijeme(vrijeme) {
 
 
   useEffect(() => {
-    fetch('/api/setnje-setaca', { credentials: 'include' })
+    fetch(`${BACKEND_URL}/api/setnje-setaca`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setSetnje(data);

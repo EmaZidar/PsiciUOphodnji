@@ -13,6 +13,12 @@ function formatDatumHR(datum) {
     return `${dan}.${mjesec}.${godina}.`;
 }
 
+function formatVrijeme(vrijeme) {
+  if (!vrijeme) return '';
+
+  return vrijeme.slice(0, 5);
+}
+
 export default function MojeSetnje() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
@@ -263,6 +269,8 @@ export default function MojeSetnje() {
                                     <div className="ms-meta">
                                         <p>
                                             Datum: {formatDatumHR(setnja.datum)}
+                                            <br />
+                                            Vrijeme: {formatVrijeme(setnja.vrijeme)}
                                         </p>
                                         <p>Recenzija: {setnja.recenzija}</p>
                                     </div>
@@ -356,7 +364,7 @@ export default function MojeSetnje() {
                                 <h3 className="ms-naslov">Šetnja</h3>
                                 <div className="ms-meta">
                                     <p>
-                                        Zakazana: {formatDatumHR(setnja.datum)}
+                                        Zakazana: {formatDatumHR(setnja.datum)} {formatVrijeme(setnja.vrijeme)}
                                     </p>
                                 </div>
                                 <button

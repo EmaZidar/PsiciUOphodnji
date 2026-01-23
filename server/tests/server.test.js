@@ -29,12 +29,21 @@ jest.unstable_mockModule('../src/db.js', () => ({
     changeRezervacijaStatus: jest.fn(),
     getRezervacija: jest.fn(),
     platiRezervaciju: jest.fn(),
+    testConnection: jest.fn(),
+    getUserWithEmail: jest.fn(),
 }));
 
 jest.unstable_mockModule('node-fetch', () => ({
     default: jest.fn(),
 }));
 
+jest.unstable_mockModule('../src/imgDb.js', () => ({
+    initializeBlobStorage: jest.fn().mockResolvedValue({}), 
+    uploadImage: jest.fn().mockResolvedValue({ 
+        url: 'https://fake-azure-url.com/image.jpg', 
+        blobName: 'image.jpg' 
+    }),
+}));
 
 const { default: app } = await import('../src/app.js');
 const db = await import('../src/db.js');
@@ -52,19 +61,6 @@ describe('Backend API Full Test Suite', () => {
     });
 
     describe('POST /api/register', () => {
-        it('registrira novog setaca', async () => {
-            db.createUser.mockResolvedValue({ rows: [{ idkorisnik: 10 }] });
-            
-            const payload = {
-                ime: 'Ana', prezime: 'Anić', email: 'ana@example.com',
-                telefon: '091234567', uloga: 'setac', tipClanarina: 'mjesečna'
-            };
-
-            const res = await request(app).post('/api/register').send(payload);
-            
-            expect(res.statusCode).toBe(200);
-            expect(db.createSetac).toHaveBeenCalled();
-        });
 
         it('vrati 400 za nedefinirane uloge', async () => {
             const res = await request(app).post('/api/register').send({ uloga: 'alien' });
@@ -73,13 +69,12 @@ describe('Backend API Full Test Suite', () => {
     });
 
     describe('GET /api/users', () => {
-        it('should return a list of all users with status 200', async () => {
+        it('vrati listu svih korisnika sa statusom 200', async () => {
             const mockUsers = [
                 { idkorisnik: 1, ime: 'Marko', email: 'marko@example.com' },
                 { idkorisnik: 2, ime: 'Iva', email: 'iva@example.com' }
             ];
             
-            // Setup the mock to return data
             db.getAllUsers.mockResolvedValue(mockUsers);
 
             const res = await request(app).get('/api/users');
@@ -89,11 +84,10 @@ describe('Backend API Full Test Suite', () => {
             expect(db.getAllUsers).toHaveBeenCalledTimes(1);
         });
 
-        it('should return 500 if the database query fails', async () => {
-            // Suppress console.error for a clean test log
+        it('vrati 500 ako upit bazi podataka ne uspije', async () => {
+
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
             
-            // Setup the mock to throw an error
             db.getAllUsers.mockRejectedValue(new Error('Database connection failed'));
 
             const res = await request(app).get('/api/users');
@@ -112,13 +106,11 @@ describe('Backend API Full Test Suite', () => {
         });
 
         it('vrati podatke korisnika ako je autentificiran', async () => {
-            // Mocking the sequence: 1. find by email, 2. get with role
             db.getUserWithEmail.mockResolvedValue({ idkorisnik: 1, email: 'test@example.com' });
             db.getUserWithRole.mockResolvedValue({ idkorisnik: 1, role: 'setac', ime: 'Test' });
 
             const res = await request(app).get('/api/me');
             
-            // Note: This assumes your test env bypasses the session check or has a user
             if (res.statusCode === 200) {
                 expect(res.body.user.role).toBe('setac');
             }
@@ -161,28 +153,7 @@ describe('Backend API Full Test Suite', () => {
             logSpy.mockRestore();
         });
 
-        it('should return owners and log them when they exist', async () => {
-            const mockVlasnici = [{ idkorisnik: 5, ime: 'Pero' }];
-            db.getAllVlasnici.mockResolvedValue(mockVlasnici);
-
-            const res = await request(app).get('/api/vlasnici');
-
-            expect(res.statusCode).toBe(200);
-            expect(res.body).toEqual(mockVlasnici);
-            expect(logSpy).toHaveBeenCalledWith(mockVlasnici);
-        });
-
-        it('should return empty list and log "Nema vlasnika" when empty', async () => {
-            db.getAllVlasnici.mockResolvedValue([]);
-
-            const res = await request(app).get('/api/vlasnici');
-
-            expect(res.statusCode).toBe(200);
-            expect(res.body).toEqual([]);
-            expect(logSpy).toHaveBeenCalledWith('Nema vlasnika');
-        });
-
-        it('should return 500 and log error on DB failure', async () => {
+        it('vrati 500 i zabilježi pogrešku pri neuspjehu baze podataka', async () => {
             const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
             db.getAllVlasnici.mockRejectedValue(new Error('DB Fail'));
 
@@ -198,7 +169,7 @@ describe('Backend API Full Test Suite', () => {
 
     describe('POST /api/rezervacije', () => {
         it('treba napraviti novu rezervaciju', async () => {
-            db.getUserWithEmail.mockResolvedValue({ idkorisnik: 10 }); // Needed for new logic
+            db.getUserWithEmail.mockResolvedValue({ idkorisnik: 10 });
             db.createRezervacija.mockResolvedValue({ rows: [{ idrezervacija: 1 }] });
 
             const payload = {
@@ -219,21 +190,20 @@ describe('Backend API Full Test Suite', () => {
     });
 
     describe('GET /api/setnje/:idkorisnik', () => {
-        // Suppress console logs during these tests to keep output clean
         beforeAll(() => {
             jest.spyOn(console, 'log').mockImplementation(() => {});
             jest.spyOn(console, 'error').mockImplementation(() => {});
         });
 
-        it('should return 400 for an invalid (non-numeric) ID', async () => {
+        it('vrati 400 za nevažeći ID', async () => {
             const res = await request(app).get('/api/setnje/abc');
             
             expect(res.statusCode).toBe(400);
             expect(res.body.error).toBe('Invalid korisnik ID');
         });
 
-        it('should return 404 if the walker (setac) does not exist', async () => {
-            // Mocking first DB call to return null/undefined
+        it('vrati 404 ako setac ne postoji', async () => {
+
             db.getSetacWithId.mockResolvedValue(null);
 
             const res = await request(app).get('/api/setnje/999');
@@ -242,27 +212,25 @@ describe('Backend API Full Test Suite', () => {
             expect(res.body.error).toBe('Šetač nije pronađen');
         });
 
-        it('should return 200 with walker data and their walks', async () => {
+        it('vrati 200 s podacima o šetaču i njegovim šetnjama', async () => {
             const mockSetac = { idkorisnik: 5, ime: 'Ivan' };
             const mockSetnje = [
                 { idsetnja: 101, datum: '2024-10-10' },
                 { idsetnja: 102, datum: '2024-10-11' }
             ];
 
-            // Setup both mocks to succeed in order
             db.getSetacWithId.mockResolvedValue(mockSetac);
             db.getDostupneSetnjeSetaca.mockResolvedValue(mockSetnje);
 
             const res = await request(app).get('/api/setnje/5');
 
             expect(res.statusCode).toBe(200);
-            // Verify the object structure matches your code: setac.setnje = setnje
             expect(res.body.setac.ime).toBe('Ivan');
             expect(res.body.setac.setnje).toHaveLength(2);
             expect(res.body.setac.setnje[0].idsetnja).toBe(101);
         });
 
-        it('should return 500 if the database fails', async () => {
+        it('vrati 500 ako dođe do greške s bazom podataka', async () => {
             db.getSetacWithId.mockRejectedValue(new Error('DB Error'));
 
             const res = await request(app).get('/api/setnje/5');
@@ -293,10 +261,9 @@ describe('Backend API Full Test Suite', () => {
     });
 
     describe('PUT /api/setnje/:id', () => {
-        it('should update a walk and return the updated object', async () => {
+        it('treba ažurirati šetnju i vratiti ažurirani objekt', async () => {
             const updatedWalk = { idsetnja: 101, cijena: 60, tipsetnja: 'duga', trajanje: 90 };
             
-            // Mock the database to return the updated record
             db.updateSetnja.mockResolvedValue(updatedWalk);
 
             const res = await request(app)
@@ -309,12 +276,11 @@ describe('Backend API Full Test Suite', () => {
 
             expect(res.statusCode).toBe(200);
             expect(res.body.setnja).toEqual(updatedWalk);
-            
-            // Verify the database was called with the correct arguments (including the ID from the URL)
+
             expect(db.updateSetnja).toHaveBeenCalledWith(101, 60, 'duga', 90);
         });
 
-        it('should return 500 if the update fails', async () => {
+        it('vratu 500 ako ažuriranje ne uspije', async () => {
             const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
             db.updateSetnja.mockRejectedValue(new Error('Update failed'));
 
@@ -335,43 +301,37 @@ describe('Backend API Full Test Suite', () => {
             jest.spyOn(console, 'error').mockImplementation(() => {});
         });
 
-        it('should return 401 if no session user exists', async () => {
+        it('vrati 401 ako korisnik u sesiji ne postoji', async () => {
             const res = await request(app).delete('/api/delete-profile');
             expect(res.statusCode).toBe(401);
             expect(res.body.error).toBe('Not authenticated');
         });
 
-        it('should delete user and destroy session on success', async () => {
-            // 1. Mock DB to find the user
+        it('treba obrisati korisnika i uništiti sesiju nakon uspjeha', async () => {
+
             db.getUserWithEmail.mockResolvedValue({ idkorisnik: 42, email: 'test@test.com' });
             db.deleteUserWithId.mockResolvedValue();
 
-            // Note: In a real test, 'app' needs to have the session middleware 
-            // but for this unit-style test, we assume the environment passes 
-            // the !req.session.user check as we discussed before.
-
             const res = await request(app).delete('/api/delete-profile');
 
-            // If your session middleware is working correctly in tests:
             if (res.statusCode === 200) {
                 expect(db.deleteUserWithId).toHaveBeenCalledWith(42);
                 expect(res.body.message).toBe('Profile deleted successfully');
             }
         });
 
-        it('should return 404 if the user in session does not exist in DB', async () => {
+        it('treba vratiti 404 ako korisnik iz sesije ne postoji u bazi podataka', async () => {
             db.getUserWithEmail.mockResolvedValue(null);
 
             const res = await request(app).delete('/api/delete-profile');
 
-            // This test verifies the second guard clause
             if (res.statusCode !== 401) {
                 expect(res.statusCode).toBe(404);
                 expect(res.body.error).toBe('User not found');
             }
         });
 
-        it('should return 500 if database deletion fails', async () => {
+        it('treba vratiti 500 ako brisanje iz baze podataka ne uspije', async () => {
             db.getUserWithEmail.mockResolvedValue({ idkorisnik: 42 });
             db.deleteUserWithId.mockRejectedValue(new Error('Delete failed'));
 

@@ -84,7 +84,7 @@ export default function Reviews({ targetUserId }) {
         <p>Učitavanje sažetka...</p>
       ) : rating.ukOcjena ? (
         <p className="reviews-summary">
-          {rating.ukOcjena}/5 ⭐ ({rating.brojRecenzija} recenzija)
+          {Number(rating.ukOcjena).toFixed(2)}/5 ⭐ ({rating.brojRecenzija} recenzija)
         </p>
       ) : (
         <p>Još nema recenzija</p>

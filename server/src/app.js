@@ -678,6 +678,21 @@ app.get('/api/setnje-setaca', async (req, res) => {
 // Iz tablice PAS trebam dohvatiti sve pse tog vlasnika, znaci sve ono sto on opisuje za psa svog
 // idpas, imepas, pasmina, starost, socijalizacija, razinaenergije, zdravnapomene
 // sorturati pse po imenu psa ili idu redom kako su uneseni
+app.get('/api/vlasnik/:idkorisnik', async (req, res) => {
+    try {
+        const idKorisnik = parseInt(req.params.idkorisnik, 10);
+        const vlasnik = await db.getVlasnikWithId(idKorisnik);
+        if (!vlasnik) {
+            return res.status(404).json({ error: 'Vlasnik nije pronađen' });
+        }
+        const psi = await db.getPsiByKorisnikId(idKorisnik);
+        vlasnik.psi = psi;
+        res.status(200).json({ vlasnik });
+    } catch (err) {
+        console.error('Error in /api/vlasnik/:id:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 app.use('/api/chats', chat.router);
 

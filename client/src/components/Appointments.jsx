@@ -38,9 +38,9 @@ export default function Appointments({ userId, userName, showHeader = true }) {
   const addDefault = () => {
     const newItem = {
       id: 'draft',
-      cijena: 50,
+      cijena: 10,
       tipsetnja: 'individualna',
-      trajanje: 60
+      trajanje: 40
     }
     setDraft(newItem)
     setEditingId(newItem.id)

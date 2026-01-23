@@ -250,7 +250,7 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
         const userWithRole = await db.getUserWithRole(userId);
         //console.log('/api/me - returning userWithRole:', userWithRole);
         const isAdmin = userWithRole.email === process.env.ADMIN_EMAIL;
-        userWithRole.role = isAdmin ? 'admin' : userWithRole.role;
+        userWithRole.isAdmin = isAdmin;
         res.json({ session: sessionUser, user: userWithRole });
     } catch (err) {
         console.error('Error in /api/me:', err);

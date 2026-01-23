@@ -1,0 +1,70 @@
+
+:root{
+  --home-accent: #0097D7;
+  --card-border: #e6edf6;
+  --card-radius: 14px;
+  --card-shadow: 0 8px 22px rgba(20,40,80,0.06);
+  --text-strong: #334155;
+}
+
+.setacu-sve-setnje{
+  display:block;
+  padding: 6px 4px;
+}
+
+.setacu-sve-setnje h2{
+  margin: 0 0 12px 0;
+  font-size: 1.3rem;
+  color: var(--home-accent);
+  font-weight: 800;
+}
+
+
+.setacu-sve-setnje + .setacu-sve-setnje{
+  border-top: 1px dashed rgba(2,6,23,0.04);
+  padding-top: 18px;
+}
+
+.setacu-jedna-setnja{
+  background:linear-gradient(180deg, #ffffff, #fbfdff);
+  border: 2px solid rgba(44,123,229);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 14px 40px rgba(2,6,23,0.08);
+  margin-bottom: 14px;
+  max-width: none;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.setacu-jedna-setnja h3{ margin:0; color:var(--home-accent); font-weight:900; font-size:1.1rem; letter-spacing:0.2px; }
+.setacu-jedna-setnja p{ margin:6px 0; color:var(--text-strong); font-weight:600; font-size:1rem; }
+
+
+.setacu-jedna-setnja:hover{ box-shadow: 0 22px 50px rgba(2,6,23,0.12); }
+
+
+.ms-kartica{ display:flex; flex-direction:column; justify-content:space-between; gap:8px; }
+.ms-naslov{ margin:0; font-size:0.98rem; font-weight:800; color:var(--home-accent); }
+.ms-meta{ display:flex; gap:8px; flex-wrap:wrap; }
+.ms-kartica p{ margin:3px 0; color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+
+
+
+
+
+
+.emptyState{
+  background: rgba(0,151,215,0.12); 
+  border: 1px solid rgba(0,151,215,0.18);
+  padding: 12px;
+  border-radius: 10px;
+  color: #334155; 
+  font-weight: 700;
+  margin-bottom: 12px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  font-size: 0.98rem;
+}
+

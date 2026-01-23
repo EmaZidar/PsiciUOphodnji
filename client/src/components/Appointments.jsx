@@ -13,7 +13,6 @@ export default function Appointments({ userId, userName, showHeader = true }) {
   const [draft, setDraft] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Dohvati šetnje iz baze
   useEffect(() => {
     const loadSetnje = async () => {
       try {
@@ -36,19 +35,17 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     if (userId) loadSetnje()
   }, [userId])
 
-  // Dodaj novu šetnju
   const addDefault = () => {
     const newItem = {
       id: 'draft',
-      cijena: 50,
+      cijena: 10,
       tipsetnja: 'individualna',
-      trajanje: 60
+      trajanje: 40
     }
     setDraft(newItem)
     setEditingId(newItem.id)
   }
 
-  // Spremi šetnju u bazu
   const saveEdit = async (id, patch) => {
     try {
       if (draft && draft.id === id) {
@@ -91,7 +88,6 @@ export default function Appointments({ userId, userName, showHeader = true }) {
     }
   }
 
-  // Obriši šetnju iz baze
   const remove = async (id) => {
     if (!window.confirm('Obrisati termin?')) return
     

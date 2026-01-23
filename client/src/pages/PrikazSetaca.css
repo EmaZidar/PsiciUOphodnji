@@ -59,6 +59,33 @@ body {
   box-shadow: 0 0 0 3px rgba(0, 151, 215, 0.15);
 }
 
+.setaci-lokacija-input {
+  border: 1px solid #d7dee9;
+  background: #ffffff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  outline: none;
+  min-width: 260px;
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.setaci-lokacija-input::placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.setaci-lokacija-input:focus {
+  border-color: #0097D7;
+  box-shadow: 0 0 0 3px rgba(0, 151, 215, 0.15);
+}
+
+.setaci-lokacija-input:hover {
+  border-color: #cbd5e1;
+}
+
 .setaci-list {
   display: flex;
   flex-direction: column;

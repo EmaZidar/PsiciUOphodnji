@@ -1,0 +1,184 @@
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --bg-top: #fbfdff;
+  --bg-mid: #f0f6ff;
+  --bg-bot: #e6f0ff;
+  --light-bg: #ecf0f1;
+  --border-color: #e6eaf0;
+  --text-light: #7f8c8d;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Page */
+.v-profile-main {
+  /*min-height: 100vh;*/
+  width: 100%;
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 40%, var(--bg-bot) 100%);
+  padding: 40px 28px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.v-profile-main h1 {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 2.3rem;
+  font-weight: 650;
+  margin-bottom: 36px;
+  letter-spacing: -0.3px;
+}
+
+/* Layout - full width */
+.v-profile-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .v-profile-main {
+    padding: 32px 16px;
+  }
+
+  .v-profile-container {
+    max-width: 100%;
+  }
+}
+
+/* Card */
+.v-profile-details {
+  background: linear-gradient(180deg, #ffffff 0%, #fcfeff 100%);
+  padding: 32px;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(20, 40, 80, 0.06);
+  border: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.v-profile-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.v-profile-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--light-bg);
+  color: var(--text-light);
+  font-size: 15px;
+  word-break: break-word;
+}
+
+.v-profile-row:last-child {
+  border-bottom: none;
+}
+
+.v-profile-row strong {
+  color: var(--primary-color);
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-size: 13px;
+}
+
+/* Delete section */
+.v-profile-actions {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Buttons */
+.v-delete-btn,
+.delete-btn {
+  display: inline-block;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  box-shadow: var(--shadow-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, #2980b9 100%);
+  color: #fff;
+  margin: 0;
+}
+
+.v-delete-btn:hover,
+.delete-btn:hover {
+  box-shadow: var(--shadow-md);
+  opacity: 0.95;
+}
+
+.v-delete-btn:active,
+.delete-btn:active {
+  transform: translateY(1px);
+}
+
+/* Edit inputs */
+.profile-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Messages */
+.v-profile-main p {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 16px;
+  margin-top: 24px;
+}
+
+.v-error-message {
+  color: var(--secondary-color) !important;
+  font-weight: 650;
+  background: rgba(52, 152, 219, 0.1);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border-left: 4px solid var(--secondary-color);
+}
+
+@media (max-width: 600px) {
+  .v-profile-main {
+    padding: 24px 16px;
+  }
+
+  .v-profile-main h1 {
+    font-size: 1.8rem;
+    margin-bottom: 28px;
+  }
+
+  .v-profile-details {
+    padding: 24px;
+  }
+
+  .v-profile-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

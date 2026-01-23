@@ -23,23 +23,20 @@ export default function Login() {
           <div className="features-list">
             <h2>Jednostavna prijava u 2 klika</h2>
             <div className="feature-item">
-              <span className="feature-icon">🔐</span>
               <div>
-                <h3>Sigurno i brzo</h3>
+                <h3>Sigurno</h3>
                 <p>Koristite postojeći Google račun</p>
               </div>
             </div>
             
             <div className="feature-item">
-              <span className="feature-icon">🐕</span>
               <div>
-                <h3>Jedan račun za sve</h3>
+                <h3>Birate ulogu</h3>
                 <p>Pristupite kao vlasnik psa ili šetač</p>
               </div>
             </div>
             
             <div className="feature-item">
-              <span className="feature-icon">⚡</span>
               <div>
                 <h3>Bez lozinki</h3>
                 <p>Nema potrebe za pamćenjem još jedne lozinke</p>

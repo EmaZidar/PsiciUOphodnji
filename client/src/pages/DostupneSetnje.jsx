@@ -44,11 +44,6 @@ export default function DostupneSetnje() {
       loadSetac();
    }, [idkorisnik]);
 
-   const avatarSrcRaw = setac?.profilfoto || "/images/profile.png";
-   const avatarSrc = avatarSrcRaw.startsWith('/uploads/')
-      ? `${BACKEND_URL}${avatarSrcRaw}`
-      : avatarSrcRaw;
-
    return(
    <>
       <HeaderUlogiran />
@@ -63,7 +58,7 @@ export default function DostupneSetnje() {
             <>
                <section className="ds-container">
                   <div className="ds-avatar-wrapper">
-                     <img src={avatarSrc} alt="Profilna fotografija" className="ds-avatar" />
+                     <img src={setac?.profilfoto} alt="Profilna fotografija" className="ds-avatar" />
                   </div>
 
                   <div className="ds-details">
@@ -106,7 +101,7 @@ export default function DostupneSetnje() {
                                  <strong>Cijena:</strong> {setnja.cijena} €
                               </div>
                               <div className="setnja-action">
-                                 <Link key={setnja.idsetnja} to={`/${setac.idkorisnik}/setnje/${setnja.idsetnja}/rezervacija`}>
+                                 <Link key={setnja.idsetnja} to={`/setnje/${setnja.idsetnja}/rezervacija`}>
                                     <button className="btn-termini">Rezerviraj</button>
                                  </Link>
                               </div>
@@ -118,7 +113,7 @@ export default function DostupneSetnje() {
             </>
          )}
       </main>
-      <Reviews userId={idkorisnik} />
+      <Reviews targetUserId={idkorisnik} />
       <Footer />
    </>);
 }

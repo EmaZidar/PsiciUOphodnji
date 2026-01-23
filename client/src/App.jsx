@@ -6,6 +6,8 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import DostupneSetnje from "./pages/DostupneSetnje.jsx";
 import Rezervacija from "./pages/Rezervacija.jsx";
+import Placanje from "./pages/Placanje.jsx";
+import VlasnikInfo from "./pages/VlasnikInfo.jsx";
 import { Routes } from "react-router-dom";
 import "./style.css";
 import { BrowserRouter, Route } from "react-router-dom";
@@ -15,6 +17,7 @@ import Korisnici from "./pages/Korisnici.jsx";
 import Clanarina from "./pages/Clanarina.jsx";
 import MjesecnaClanarina from "./pages/MjesecnaClanarina.jsx";
 import GodisnjaClanarina from "./pages/GodisnjaClanarina.jsx";
+import Chat from "./pages/Chat.jsx";
 function App() {
   return (
     <>
@@ -26,12 +29,16 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/:idkorisnik/setnje" element={<DostupneSetnje />} />
-          <Route path="/:idkorisnik/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
+          <Route path="/setnje/:idsetnja/rezervacija" element={<Rezervacija />} />
+          <Route path="/placanje" element={<Placanje />} />
+          <Route path="/placanje/:idrezervacija" element={<Placanje />} />
+          <Route path="/vlasnik/:idkorisnik" element={<VlasnikInfo />} />
           <Route path="/admin" element={<UlogiranAdmin />} />
           <Route path="/korisnici" element={<Korisnici />} />
           <Route path="/clanarina" element={<Clanarina />} />
           <Route path="/clanarina/mjesecna" element={<MjesecnaClanarina />} />
           <Route path="/clanarina/godisnja" element={<GodisnjaClanarina />} />
+          <Route path="/chat" element={<Chat />} />
         </Routes>
       </BrowserRouter>
     </>

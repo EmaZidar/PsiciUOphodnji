@@ -31,7 +31,6 @@ export default function ProfilRouter() {
   if (loading) return <div>Učitavanje profila…</div>;
 
   const role = user?.role ?? '';
-  // if role explicitly says 'vlasnik' show owner profile, otherwise show generic profile
   if (String(role).toLowerCase().includes('vlasnik')) {
     return <ProfilVlasnik />;
   }

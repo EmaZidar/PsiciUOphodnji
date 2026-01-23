@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import './ProfilVlasnik.css';
-import Profile from './Profile';
+import PodatciVlasnika from './podatciVlasnika';
 import Psi from '../components/Psi';
 import MojeSetnje from '../components/MojeSetnje';
 
@@ -11,7 +11,7 @@ export default function ProfilVlasnik(){
 //dio za pse tu su izlistani
 return(
 <>
-<Profile></Profile>
+<PodatciVlasnika></PodatciVlasnika>
 
 <h2>Moji psi: </h2>
 

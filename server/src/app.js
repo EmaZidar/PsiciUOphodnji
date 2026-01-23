@@ -222,6 +222,27 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
     }
 });
 
+// PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)
+// svrha: azuriranje osobnih podataka za oba korisnika
+// vlasnik: ime, prezime, email, telefon, setac: ime, prezime, email, telefon, lokDjelovanja
+// znaci ak je vlasnik u pitanju updatea se samo tablica KORISNIK, ak je setac onda se updatea KORISNIK i SETAC
+// ako nije setac nego vlasnik lokdjelovanja se ignorira
+// provjera: korisnik mora biti ulogiran
+// korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
+// slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
+// edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"
+app.patch('/api/me', checkIsAuthenticated, async (req, res) => {
+    try {
+        const idKorisnik = req.session.user.id;
+        const { imekorisnik, prezkorisnik, email, telefon, lokdjelovanja } = req.body;
+        db.patchUser(idKorisnik, imekorisnik, prezkorisnik, email, telefon, lokdjelovanja);
+        return res.sendStatus(200);
+    } catch (err) {
+        console.error('Error in /api/me:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.get('/api/setaci', async (req, res) => {
     try {
         const setaci = await db.getAllSetaci();
@@ -615,14 +636,3 @@ export default app;
 //DB update
     //Upisati novu putanju u tablicu šetača (ili gdje već držite profilnu):
     //Paziti da ovo radi samo za šetače (ako vlasnici nemaju profilnu ili drugačije).
-
-
-// PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)
-// svrha: azuriranje osobnih podataka za oba korisnika
-// vlasnik: ime, prezime, email, telefon, setac: ime, prezime, email, telefon, lokDjelovanja
-// znaci ak je vlasnik u pitanju updatea se samo tablica KORISNIK, ak je setac onda se updatea KORISNIK i SETAC
-// ako nije setac nego vlasnik lokdjelovanja se ignorira
-// provjera: korisnik mora biti ulogiran
-// korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
-// slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
-// edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"

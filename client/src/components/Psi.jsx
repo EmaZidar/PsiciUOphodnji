@@ -39,7 +39,6 @@ export default function Psi() {
                     throw new Error(`Server returned ${response.status}`);
                 const data = await response.json();
                 const psiList = Array.isArray(data) ? data : (data?.psi ?? []);
-                // Normalize field names from PostgreSQL (returns lowercase)
                 const normalizedPsi = psiList.map(p => ({
                     idPas: p.idpas,
                     imePas: p.imepas,
@@ -97,7 +96,6 @@ export default function Psi() {
             });
             const data = await response.json();
             console.log("Created dog with ID:", data.idPas);
-            // Add new dog to the list - normalize field names from PostgreSQL
             if (data.pas) {
                 const p = data.pas;
                 const newPas = {
@@ -167,7 +165,6 @@ export default function Psi() {
                 method: "DELETE",
                 credentials: "include",
             });
-            // Remove dog from the list
             setpsi(prevPsi => prevPsi.filter(p => p.idPas !== idPas));
         } catch (error) {
             console.error("Error deleting dog:", error);

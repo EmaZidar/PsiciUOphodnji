@@ -1,65 +1,67 @@
-.vlasnik-info {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: var(--light-bg);
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-  font-family: 'Arial', sans-serif;
-  color: var(--text-color);
+:root{
+  --home-accent: #0097D7;
+  --card-border: #e6edf6;
+  --card-radius: 16px;
+  --card-shadow: 0 8px 20px rgba(15,23,42,0.06);
+  --text-strong: #334155;
 }
 
-.vlasnik-info h2 {
-  color: var(--primary-color);
-  margin-bottom: 20px;
-  border-bottom: 2px solid var(--secondary-color);
-  padding-bottom: 10px;
+.vlasnik-info{
+  max-width: 1120px;
+  margin: 24px auto;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(250,252,255,1));
+  border: 1px solid rgba(2,6,23,0.04);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.04);
+  color: var(--text-strong);
 }
 
-.vlasnik-info p {
-  font-size: 16px;
-  margin: 6px 0;
+.vlasnik-info h2{ margin:0 0 12px 0; font-size:1.4rem; color:var(--home-accent); }
+
+.vlasnik-info p{ margin:6px 0; font-weight:600; }
+
+.vlasnik-info strong{ font-weight:800; }
+
+.psi-lista{
+  list-style:none;
+  padding:18px 0 0 0;
+  margin:0;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:16px;
 }
 
-.vlasnik-info strong {
-  color: var(--secondary-color);
-}
-
-.psi-lista {
-  list-style: none;
-  padding: 0;
-  margin: 20px 0 0 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-.pas-kartica {
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.pas-kartica:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-5px);
-}
-
-.pas-kartica p {
-  margin: 6px 0;
+.pas-kartica{
+  background:#ffffff;
+  border:1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding:16px;
+  box-shadow: var(--card-shadow);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
   font-size: 15px;
-  color: var(--text-color);
 }
 
-.pas-kartica strong {
-  color: var(--accent-color);
-}
+.pas-kartica:hover{ transform: translateY(-4px); box-shadow: 0 14px 34px rgba(2,6,23,0.06); }
 
-@media (max-width: 600px) {
-  .psi-lista {
-    grid-template-columns: 1fr;
-  }
-}
+.pas-kartica .imePsa{ margin:0; font-size:1.2rem; font-weight:800; color:var(--home-accent); }
+
+.pas-kartica p{ font-size:15px; }
+
+.pas-kartica p{ margin:6px 0; color:var(--text-strong); font-weight:600; }
+
+@media (max-width:720px){ .psi-lista{ grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); } .pas-kartica .imePsa{ font-size:1.05rem; } }
+
+.vlasnik-page{ display:flex; flex-direction:column; min-height: calc(100vh - 120px); }
+
+.owner-card{ max-width:920px; width: min(920px, 96%); margin: 18px auto; padding: 22px; background:#fff; border-radius:12px; border:1px solid var(--card-border); box-shadow: var(--card-shadow); text-align:left; }
+
+.owner-card p{ font-size:16px; line-height:1.4; }
+
+.psi-section{ margin-top:28px; padding-top:18px; border-top:1px dashed rgba(2,6,23,0.06); }
+
+.psi-section h3{ margin:0 0 12px 0; }
+

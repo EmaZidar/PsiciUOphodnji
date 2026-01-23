@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './VlasnikInfo.css';
+import HeaderUlogiran from '../components/HeaderUlogiran';
+import Footer from '../components/Footer';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
@@ -35,27 +37,37 @@ export default function VlasnikInfo() {
   if (!vlasnik) return <p>Vlasnik nije pronađen.</p>;
 
   return (
-    <div className="vlasnik-info">
-      <h2>Profil vlasnika</h2>
+    <>
+      <HeaderUlogiran />
+      <main className="vlasnik-page">
+        <div className="vlasnik-info">
+          <h2>Profil vlasnika</h2>
 
-      <p><strong>Ime:</strong> {vlasnik.imekorisnik}</p>
-      <p><strong>Prezime:</strong> {vlasnik.prezkorisnik}</p>
-      <p><strong>Email:</strong> {vlasnik.email}</p>
-      <p><strong>Telefon:</strong> {vlasnik.telefon}</p>
+          <div className="owner-card">
+            <p><strong>Ime:</strong> {vlasnik.imekorisnik}</p>
+            <p><strong>Prezime:</strong> {vlasnik.prezkorisnik}</p>
+            <p><strong>Email:</strong> {vlasnik.email}</p>
+            <p><strong>Telefon:</strong> {vlasnik.telefon}</p>
+          </div>
 
-      <h3>Psi vlasnika</h3>
-      <ul className="psi-lista">
-        {vlasnik.psi?.map(p => (
-          <li key={p.idpas} className="pas-kartica">
-            <p><strong>Ime psa:</strong> {p.imepas}</p>
-            <p><strong>Pasmina:</strong> {p.pasmina}</p>
-            <p><strong>Godine:</strong> {p.starost}</p>
-            <p><strong>Razina energije:</strong> {p.razinaenergije}/5</p>
-            <p><strong>Socijalizacija:</strong> {p.socijalizacija}/5</p>
-            <p><strong>Zdravstvene napomene:</strong> {p.zdravnapomene || 'Nema napomena'}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+          <section className="psi-section">
+            <h3>PSI VLASNIKA</h3>
+            <ul className="psi-lista">
+              {vlasnik.psi?.map(p => (
+                <li key={p.idpas} className="pas-kartica">
+                  <p className="imePsa"><strong>Ime psa:</strong> {p.imepas}</p>
+                  <p><strong>Pasmina:</strong> {p.pasmina}</p>
+                  <p><strong>Godine:</strong> {p.starost}</p>
+                  <p><strong>Razina energije:</strong> {p.razinaenergije}/5</p>
+                  <p><strong>Socijalizacija:</strong> {p.socijalizacija}/5</p>
+                  <p><strong>Zdravstvene napomene:</strong> {p.zdravnapomene || 'Nema napomena'}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }

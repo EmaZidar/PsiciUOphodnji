@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './VlasnikInfo.css';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+
 export default function VlasnikInfo() {
   const { idkorisnik } = useParams();
   const [vlasnik, setVlasnik] = useState(null);
@@ -10,10 +12,15 @@ export default function VlasnikInfo() {
   useEffect(() => {
     async function fetchVlasnik() {
       try {
-        const res = await fetch(`/api/vlasnik/${idkorisnik}`, { credentials: 'include' });
+        console.log('VlasnikInfo: fetching', `${BACKEND_URL}/api/vlasnik/${idkorisnik}`);
+        const res = await fetch(`${BACKEND_URL}/api/vlasnik/${idkorisnik}`, { credentials: 'include' });
+        console.log('VlasnikInfo: fetch status', res.status);
+        const text = await res.text();
+        console.log('VlasnikInfo: response text', text);
+        let data = null;
+        try { data = JSON.parse(text || 'null'); } catch (e) { console.warn('VlasnikInfo: response not JSON'); }
+        setVlasnik(data?.vlasnik ?? data);
         if (!res.ok) throw new Error('Greška pri dohvaćanju vlasnika');
-        const data = await res.json();
-        setVlasnik(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -21,8 +28,8 @@ export default function VlasnikInfo() {
       }
     }
 
-    fetchVlasnik();
-  }, [id]);
+    if (idkorisnik) fetchVlasnik();
+  }, [idkorisnik]);
 
   if (loading) return <p>Učitavanje vlasnika...</p>;
   if (!vlasnik) return <p>Vlasnik nije pronađen.</p>;
@@ -38,7 +45,7 @@ export default function VlasnikInfo() {
 
       <h3>Psi vlasnika</h3>
       <ul className="psi-lista">
-        {vlasnik.psi.map(p => (
+        {vlasnik.psi?.map(p => (
           <li key={p.idpas} className="pas-kartica">
             <p><strong>Ime psa:</strong> {p.imepas}</p>
             <p><strong>Pasmina:</strong> {p.pasmina}</p>

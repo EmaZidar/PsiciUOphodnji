@@ -232,14 +232,14 @@ export default function Profile() {
         throw new Error(body?.error || "Greška pri brisanju profila");
       }
 
-      window.location.href = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
+      window.location.href = import.meta.env.VITE_CLIENT_URL || 'http://localhost:5173';
     } catch (e) {
       setError(e?.message || "Greška pri brisanju profila");
     }
   }
 
   const defaultImage = new URL('/images/profile.png', import.meta.url).href;
-  const avatarSrc = imagePreviewUrl || user.profilfoto;
+  const avatarSrc = imagePreviewUrl || (user?.roleData.profilfoto ?? user?.roleData.profilFoto ?? defaultImage);
 
   return (
     <>
@@ -305,7 +305,7 @@ export default function Profile() {
                     )}
                   </div>
                   <div className="profile-row">
-                    <strong>Email:</strong> {user.email || '—'}
+                    <strong>Email:</strong>{user.email || '—'}
                   </div>
                   <div className="profile-row">
                     <strong>Telefon:</strong>{" "}

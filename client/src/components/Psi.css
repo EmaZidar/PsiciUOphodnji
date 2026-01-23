@@ -1,68 +1,173 @@
 
 
-
-.dodajPsa{
-  background: white;
-  padding: 30px;
-  
-  margin:30px;
-  margin-left: 28vw;
-  border-radius: 16px;
-  box-shadow: var(--shadow-3d);
-  text-align: center;
-  position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
- button{
-   padding: 10px;
-   margin: 5px;
-  border-radius: 10px;
-  color: rgb(0, 0, 0);
-  background-color: rgb(195, 223, 248);
+:root{
+  --home-accent: #0097D7;
+  --card-border: #e6edf6;
+  --card-radius: 16px;
+  --card-shadow: 0 8px 20px rgba(15,23,42,0.06);
+  --text-strong: #334155;
 }
 
 .sviPsi{
-    display:flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 18px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+.psiContainer{
+  max-width: 1120px;
+  margin: 24px auto;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(250,252,255,1));
+  border: 1px solid rgba(2,6,23,0.04);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.04);
 }
 
 .jedanPas{
-    
-  background: white;
-  padding: 30px;
-  margin:30px;
-  border-radius: 16px;
-  box-shadow: var(--shadow-3d);
-  text-align: center;
-  position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.jedanPas:hover {
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+.imePsa{
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--home-accent);
 }
+
+.jedanPas p{
+  margin: 6px 0;
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.jedanPas .meta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  background: rgba(0,151,215,0.08);
+  color: var(--home-accent);
+  padding:6px 8px;
+  border-radius:8px;
+  font-weight:600;
+  font-size:0.85rem;
+}
+
+.jedanPas button{
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  background: var(--home-accent);
+  font-weight: 800;
+}
+
+.jedanPas button:hover{ filter:brightness(0.95); transform: translateY(1px); }
 
 .dodajP{
-    
-  background: white;
-  padding: 30px;
-  margin:30px;
-  border-radius: 16px;
-  box-shadow: var(--shadow-3d);
-  text-align: center;
-  align-content: center;
-  position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  padding: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: none;
+  justify-self: center;
+  margin: 0;
 }
 
 .dodajP button{
-  padding: 10px;
-  border-radius: 20px;
-  color: rgb(0, 0, 90);
-    font-size: 40px;
-  background-color: white;
+  all: unset;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  border-radius: 50%;
+  background: var(--home-accent);
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  font-weight: 800;
+  box-shadow: none; 
+}
+
+.dodajP button:hover{ filter:brightness(0.95); transform: translateY(1px); }
+
+.dodajPsa{
+  background: #ffffff;
+  padding: 18px;
+  margin: 12px;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  width: min(760px, calc(100% - 48px));
+}
+
+.formField{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.formField label{ color:var(--text-strong); font-weight:700; }
+
+.formField input{ padding:10px 12px; border-radius:8px; border:1px solid #d7dee9; }
+
+.formField input:focus{ outline:none; box-shadow:0 0 0 4px rgba(0,151,215,0.12); border-color: var(--home-accent); }
+
+.dodajPsa button{ margin-right:8px; padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+
+.dodajPsa button[type="submit"]{ background: var(--home-accent); color: #fff; font-weight:800; }
+
+.dodajPsa button:nth-of-type(2){ background:#f0f4f8; }
+
+.dodajPsa button:nth-of-type(3){ background:#fff0f0; color:#b33; }
+
+@media (max-width:720px){
+  .sviPsi{ grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .dodajPsa{ margin-left: 6px; margin-right:6px; }
+}
 
 
+.modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(10,20,30,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 1200;
+  padding: 24px;
+}
+
+.modalContent{
+  width: min(720px, 96%);
+  max-height: 90vh;
+  overflow:auto;
+}
+
+.modalContent .dodajPsa{
+  margin: 0;
+  box-shadow: 0 18px 40px rgba(2,6,23,0.45);
 }

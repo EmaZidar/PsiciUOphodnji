@@ -1,57 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import './UlogiranSetac.css';
 import Appointments from '../components/Appointments';
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+import SetnjeSetacu from '../components/SetnjeSetacu';
 
 export default function UlogiranSetac({ user }) {
-  const [remoteUser, setRemoteUser] = useState(user || null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (user) return; 
-    let mounted = true;
-    setLoading(true);
-    fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' })
-      .then(r => (r.ok ? r.json() : Promise.reject()))
-      .then(data => {
-        if (!mounted) return;
-        setRemoteUser(data.user ?? data.session ?? null);
-      })
-      .catch(() => {
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [user]);
-
-  const effectiveUser = remoteUser || user || null;
-  const firstName = (effectiveUser && (effectiveUser.imeKorisnik || effectiveUser.name || effectiveUser.ime)) || '';
-  const userId = effectiveUser && (effectiveUser._id || effectiveUser.id || effectiveUser.idKorisnik || effectiveUser.idkorisnik);
+  const userId =
+    user &&
+    (user._id ||
+      user.id ||
+      user.idKorisnik ||
+      user.idkorisnik);
 
   return (
     <>
       <HeaderUlogiran />
+
       <main className="ulogiran-setac-main">
         <div className="setac-container">
           <div className="welcome-card">
             <h1>Dobrodošli!</h1>
             <p className="muted">Ovime upravljate svojim terminima šetnje.</p>
+
             <div className="dashboard-main">
               <Appointments userId={userId} showHeader={false} />
+
+              {userId && (
+                <section className="moje-setnje">
+                  <h2>Moje buduće šetnje</h2>
+                  <SetnjeSetacu userId={userId} />
+                </section>
+              )}
             </div>
           </div>
 
-          <aside className="dashboard-side">
-            {}
-          </aside>
+          <aside className="dashboard-side" />
         </div>
       </main>
+
       <Footer />
     </>
   );

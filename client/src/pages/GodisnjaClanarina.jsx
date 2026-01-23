@@ -60,7 +60,7 @@ export default function GodisnjaClanarina() {
 		  try {
 			setLoading(true);
 			setError(null);
-			const response = await fetch('/api/godisnja', { credentials: 'include' });
+			const response = await fetch(`${BACKEND_URL}/api/godisnja`, { credentials: 'include' });
 			if (!response.ok) throw new Error(`Server returned ${response.status}`);
 			const data = await response.json();
 			setgodclanarina(data ?? 0);

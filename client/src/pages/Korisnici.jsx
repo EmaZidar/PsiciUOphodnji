@@ -21,7 +21,7 @@ export default function Korisnici() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch("/api/setaci", {
+                const response = await fetch(`${BACKEND_URL}/api/setaci`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -45,7 +45,7 @@ export default function Korisnici() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch("/api/vlasnici", {
+                const response = await fetch(`${BACKEND_URL}/api/vlasnici`, {
                     method: "GET",
                     credentials: "include",
                 });

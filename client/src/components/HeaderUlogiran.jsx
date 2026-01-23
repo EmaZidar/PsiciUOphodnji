@@ -33,8 +33,8 @@ export default function Header() {
     setError("");
 
     const endpoint = user.role === 'setac'
-      ? '/api/setac/notifikacije'
-      : '/api/vlasnik/notifikacije';
+      ? `${BACKEND_URL}/api/setac/notifikacije`
+      : `${BACKEND_URL}/api/vlasnik/notifikacije`;
 
     try {
       const res = await fetch(endpoint, { credentials: 'include' });
@@ -56,7 +56,7 @@ export default function Header() {
   const handleAccept = async (idrezervacija) => {
     setError("");
     
-    const res = await fetch(`/api/rezervacija/${idrezervacija}/prihvati`, {
+    const res = await fetch(`${BACKEND_URL}/api/rezervacija/${idrezervacija}/prihvati`, {
       method: 'PATCH',
       credentials: 'include',
     });
@@ -73,7 +73,7 @@ export default function Header() {
   const handleReject = async (idrezervacija) => {
     setError("");
     
-    const res = await fetch(`/api/rezervacija/${idrezervacija}/odbij`, {
+    const res = await fetch(`${BACKEND_URL}/api/rezervacija/${idrezervacija}/odbij`, {
       method: 'PATCH',
       credentials: 'include',
     });
@@ -88,12 +88,12 @@ export default function Header() {
   };
 
   const handlePay = (idrezervacija) => {
-    navigate(`/placanje/${idrezervacija}`);
+    navigate(`${BACKEND_URL}/placanje/${idrezervacija}`);
   };
   
   useEffect(() => {
     (async () => {
-      const res = await fetch('/api/me', { credentials: 'include' })
+      const res = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' })
       if (!res.ok) return;
       const data = await res.json();
       setUser(data.user);

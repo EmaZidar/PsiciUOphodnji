@@ -115,7 +115,8 @@ export default function Placanje() {
                                 </p>
                             )}
                             <p>
-                                <strong>Cijena:</strong> {rezervacija.cijena} EUR
+                                <strong>Cijena:</strong> {rezervacija.cijena}{" "}
+                                EUR
                             </p>
                             <div id="paypal-button-container"></div>
                         </>
@@ -147,15 +148,39 @@ export default function Placanje() {
                                         color: "gold",
                                         label: "paypal",
                                     }}
+                                    createOrder={(data, actions) => {
+                                        return actions.order.create({
+                                            purchase_units: [
+                                                {
+                                                    amount: {
+                                                        value: rezervacija.cijena.toString(),
+                                                        currency_code: "EUR",
+                                                    },
+                                                    description: `Šetnja ${rezervacija.tipsetnja}`,
+                                                },
+                                            ],
+                                        });
+                                    }}
                                     onApprove={async (data, actions) => {
-                                        try {
-
-                                        } catch (error) {
-                                            console.error(error);
-                                            setMessage(
-                                                `Sorry, your transaction could not be processed...${error}`,
-                                            );
-                                        }
+                                        const details =
+                                            await actions.order.capture();
+                                            const response = await fetch(
+                                                `/api/rezervacije/${idrezervacija}/placanje`
+                                            , {
+                                                method: "PATCH",
+                                                credentials: "include",
+                                            });
+                                            if (!response.ok) {
+                                                setError(
+                                                    "Greška pri ažuriranju statusa plaćanja."
+                                                );
+                                                return;
+                                            } 
+                                        setPaid(true);
+                                        // You can also POST to your backend to mark reservation as paid
+                                    }}
+                                    onError={(err) => {
+                                        setError("Greška pri PayPal plaćanju.");
                                     }}
                                 />
                             </PayPalScriptProvider>

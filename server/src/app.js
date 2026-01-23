@@ -666,25 +666,10 @@ function changeRezervacijaStatus(newStatus) {
     }
 }
 
-//PATCH /api/rezervacija/:idRezervacija/prihvati (zove se u HeaderUlogiran.jsx)
-// provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
-// provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
-// ako sve prode, updateat rezervaciju da bude u statusu "potvrdeno"!!!!
 app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('potvrdeno'));
 
-//PATCH /api/rezervacija/:idRezervacija/odbij (zove se u HeaderUlogiran.jsx)
-// provjera: korisnik mora biti ulogiran i mora biti setac, rezervacija mora postojati i mora biti u statusu "na cekanju"
-// provjera: setac mora biti vlasnik te setnje na koju se odnosi rezervacija (rezervacija ima idSetnja, treba dohvatiti setnju i provjeriti idKorisnik setnje)
-// ako sve prode, updateat rezervaciju da bude u statusu "odbijeno"!!!!
 app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('odbijeno'));
 
-//GET /api/vlasnik/notifikacije (zove se u HeaderUlogiran.jsx)
-// prvo sam zatrazila onaj api/me koji vrati usera sa ulogom (nadam se)
-// provjera: korisnik mora biti ulogiran i mora biti vlasnik
-// backend mora vratiti array notifikacija za vlasnika - svaki objekt notifikacije treba imati:
-// idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
-// to se dobije mergeanjem tablica REZERVACIJA i SETNJA
-// bitna stvar!!! treba filtrirati samo one rezervacije koje su u statusu "potvrdeno" I "odbijeno" jer su to notifikacije za vlasnika
 app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const notifications = await db.getVlasnikNotifikacije(req.session.user.id);
@@ -696,11 +681,6 @@ app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, checkIsVlasnik, async
     }
 });
 
-//GET /api/rezervacije/:idRezervacija (zove se u Placanje.jsx)
-// sluzi da se dohvati detalje rezervacije za prikaz na stranici placanja
-// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
-// backend vraca detalje rezervacije (array): idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
-// to se sve dobije iz tablice REZERVACIJA
 app.get('/api/rezervacije/:idRezervacija', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
@@ -717,11 +697,6 @@ app.get('/api/rezervacije/:idRezervacija', checkIsAuthenticated, checkIsVlasnik,
     }
 });
 
-//PATCH /api/rezervacije/:idRezervacija/placanje (zove se u Placanje.jsx)
-// sluzi da se updatea rezervacija kao placena
-// provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
-// provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
-// ako sve prode, updateat rezervaciju da bude u statusu "placeno"
 app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const idRezervacija = req.params.idRezervacija;
@@ -768,12 +743,6 @@ app.get('/api/setnje-setaca', async (req, res) => {
     }
 });
 
-// TODO /vlasnik/:id endpoint za dohvat vlasnika i njegovih pasa
-// /api/vlasnik/:id
-// Iz tablica KORISNIK i VLASNIK trebam dohvatiti podatke o vlasniku ime, prezime, email, telefon
-// Iz tablice PAS trebam dohvatiti sve pse tog vlasnika, znaci sve ono sto on opisuje za psa svog
-// idpas, imepas, pasmina, starost, socijalizacija, razinaenergije, zdravnapomene
-// sorturati pse po imenu psa ili idu redom kako su uneseni
 app.get('/api/vlasnik/:idkorisnik', async (req, res) => {
     try {
         const idKorisnik = parseInt(req.params.idkorisnik, 10);
@@ -791,6 +760,52 @@ app.get('/api/vlasnik/:idkorisnik', async (req, res) => {
 });
 
 app.use('/api/chats', chat.router);
+
+app.get('/api/mjesecna', async (req, res) => {
+    try {
+        const iznos = await db.getMjesecnaClanarina();
+        return res.status(200).json(iznos);
+    } catch (err) {
+        console.error('Error in /api/mjesecna:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/api/mjesecna', async (req, res) => {
+    try {
+        const iznos = +req.body;
+        if (!(iznos > 0))
+            return res.status(400).json({ error: 'Nevalidni iznos' });
+        await db.setMjesecnaClanarina(iznos);
+        return res.sendStatus(204);
+    } catch (err) {
+        console.error('Error in /api/mjesecna:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/godisnja', async (req, res) => {
+    try {
+        const iznos = await db.getGodisnjaClanarina();
+        return res.status(200).json(iznos);
+    } catch (err) {
+        console.error('Error in /api/mjesecna:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/api/godisnja', async (req, res) => {
+    try {
+        const iznos = +req.body;
+        if (!(iznos > 0))
+            return res.status(400).json({ error: 'Nevalidni iznos' });
+        await db.setMjesecnaClanarina(iznos);
+        return res.sendStatus(204);
+    } catch (err) {
+        console.error('Error in /api/mjesecna:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 
 const PORT = process.env.PORT || 8000;

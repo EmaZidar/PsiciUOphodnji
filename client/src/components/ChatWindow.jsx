@@ -37,6 +37,8 @@ function formatDatumVrijeme(datumVrijeme) {
   return datumVrijeme.slice(11, 16);
 }
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
 export default function ChatWindow({ chat, me }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");

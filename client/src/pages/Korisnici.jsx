@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 export default function Korisnici() {
     const [setaci, setSetaci] = useState([]);
     const [vlasnici, setvlasnici] = useState([]);
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

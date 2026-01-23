@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import NotificationDropdown from './NotificationDropdown'
 import './HeaderUlogiran.css'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 export default function Header() {
   const navigate = useNavigate()
@@ -37,7 +37,7 @@ export default function Header() {
       : `${BACKEND_URL}/api/vlasnik/notifikacije`;
 
     try {
-      const res = await fetch(endpoint, { credentials: 'include' });
+      const res = await fetch(`${BACKEND_URL}${endpoint}`, { credentials: 'include' });
       const data = await res.json();
       setNotifications(data);
     } catch {

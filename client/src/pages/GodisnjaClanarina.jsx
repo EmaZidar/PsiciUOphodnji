@@ -9,7 +9,7 @@ export default function GodisnjaClanarina() {
     const [error, setError] = useState(null);
     const [prikaziFormu, setPrikaziFormu] = useState(false);
     const [godclanarina, setgodclanarina] = useState(0);
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
     useEffect(() => {
         const loadSetaci = async () => {
@@ -86,7 +86,7 @@ export default function GodisnjaClanarina() {
 
     function spremi1(e) {
         setgodclanarina(e.target.value);
-        fetch(`${BACKEND_URL}/godisnja`, {
+        fetch(`${BACKEND_URL}/api/godisnja`, {
             //TODO
             method: "POST",
             headers: {

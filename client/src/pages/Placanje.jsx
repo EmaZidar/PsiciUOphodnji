@@ -5,6 +5,8 @@ import Footer from "../components/Footer";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import "./Placanje.css";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
 const initialOptions = {
     "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID || "test",
     "disable-funding": "card,credit",

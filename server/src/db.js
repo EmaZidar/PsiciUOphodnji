@@ -334,6 +334,20 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
     return res.rows.length >= 1 ? res.rows[0] : undefined;
 }
 
+export async function getSetnjeSetaca(idKorisnik) {
+    const res = await pool.query(
+        `SELECT s.idSetnja, r.datum, r.vrijeme, r.polaziste, s.tipSetnja, s.trajanje, s.cijena, r.dodNapomene,
+                r.idKorisnik, k.imeKorisnik, k.prezKorisnik
+            FROM setnja s
+                JOIN rezervacija r ON s.idSetnja = r.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
+            WHERE s.idKorisnik = $1 AND r.datum >= CURRENT_DATE AND (r.status = 'placeno' OR (r.status = 'potvrdeno' AND r.nacinPlacanja = 'gotovina'))
+            ORDER BY r.datum, r.vrijeme`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
 // ako sve prode, updateat rezervaciju da bude u statusu "placeno"

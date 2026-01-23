@@ -1,0 +1,65 @@
+.vlasnik-info {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: var(--light-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  font-family: 'Arial', sans-serif;
+  color: var(--text-color);
+}
+
+.vlasnik-info h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--secondary-color);
+  padding-bottom: 10px;
+}
+
+.vlasnik-info p {
+  font-size: 16px;
+  margin: 6px 0;
+}
+
+.vlasnik-info strong {
+  color: var(--secondary-color);
+}
+
+.psi-lista {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.pas-kartica {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.pas-kartica:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
+}
+
+.pas-kartica p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: var(--text-color);
+}
+
+.pas-kartica strong {
+  color: var(--accent-color);
+}
+
+@media (max-width: 600px) {
+  .psi-lista {
+    grid-template-columns: 1fr;
+  }
+}

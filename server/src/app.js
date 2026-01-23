@@ -638,7 +638,45 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, chec
         console.error('Error in /api/rezervacije/*/placanje', err);
         res.status(500).json({ error: 'Internal server error' });
     }
-})
+});
+
+
+// API – setnje-setaca
+// setac na svom home pageu (UlogiranSetac) treba vidjeti sve setnje koje ga cekaju u buducnosti
+// pogledajte SetnjeSetacu.jsx da vidite kako frontend salje request i sta ocekuje kao odgovor
+// mislim da sam sve navela tu al za svaki slucaj 
+// koraci na backendu:
+// provjeriti je li korisnik ulogiran i je li setac, ID SETACA (nisam ziher) 
+// dohvatiti sve setnje za tog setaca:
+//    - tablica SETNJA -> idKorisnik = ulogirani setac
+//    - filtrirati samo one gdje postoji rezervacija u tablici REZERVACIJA
+//      koja je u statusu ("placeno") ILI ("potvrdeno" + da je nacin placanja "gotovina")
+//    - datum rezervacije >= danas (buduce setnje)
+//    - spajati s tablicom KORISNIK (VLASNIK) da dobijemo imekorisnik i prezKorisnik vlasnika
+//    - spajati s tablicom REZERVACIJA da dobijemo polaziste, datum, vrijeme, nacinPlacanja i dodNapomene
+// sortirati po datumu i vremenu (uzlazno)
+
+app.get('/api/setnje-setaca', async (req, res) => {
+    try {
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+
+        if (!await db.checkIsSetac(idkorisnik))
+            return res.status(403).json({ error: "Pristup dozvoljen samo setacima" });
+        const setnje = await db.getSetnjeSetaca(idkorisnik);
+
+        return res.status(200).json(setnje);
+    } catch (err) {
+        console.error('Error in /api/setnje-setaca:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// TODO /vlasnik/:id endpoint za dohvat vlasnika i njegovih pasa
+// /api/vlasnik/:id
+// Iz tablica KORISNIK i VLASNIK trebam dohvatiti podatke o vlasniku ime, prezime, email, telefon
+// Iz tablice PAS trebam dohvatiti sve pse tog vlasnika, znaci sve ono sto on opisuje za psa svog
+// idpas, imepas, pasmina, starost, socijalizacija, razinaenergije, zdravnapomene
+// sorturati pse po imenu psa ili idu redom kako su uneseni
 
 app.use('/api/chats', chat.router);
 

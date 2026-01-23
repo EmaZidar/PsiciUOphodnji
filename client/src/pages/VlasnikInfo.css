@@ -1,0 +1,73 @@
+:root{
+  --home-accent: #0097D7;
+  --card-border: #e6edf6;
+  --card-radius: 16px;
+  --card-shadow: 0 8px 20px rgba(15,23,42,0.06);
+  --text-strong: #334155;
+}
+
+.vinfo-container{
+  max-width: 1120px;
+  margin: 24px auto;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,1), rgba(250,252,255,1));
+  border: 1px solid rgba(2,6,23,0.04);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.04);
+  color: var(--text-strong);
+}
+
+.vinfo-container h2{ margin:0 0 12px 0; font-size:1.4rem; color:var(--home-accent); }
+
+.vinfo-container p{ margin:6px 0; font-weight:600; }
+
+.vinfo-container strong{ font-weight:800; }
+
+.vinfo-psi-lista{
+  list-style:none;
+  padding:18px 0 0 0;
+  margin:0;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:16px;
+}
+
+.vinfo-pas-kartica{
+  background:#ffffff;
+  border:1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding:16px;
+  box-shadow: var(--card-shadow);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  font-size: 15px;
+}
+
+.vinfo-pas-kartica:hover{ transform: translateY(-4px); box-shadow: 0 14px 34px rgba(2,6,23,0.06); }
+
+.vinfo-psi-section .vinfo-pas-kartica:hover{
+  transform: none;
+  box-shadow: var(--card-shadow);
+  cursor: default;
+}
+
+.vinfo-pas-kartica .vinfo-imePsa{ margin:0; font-size:1.2rem; font-weight:800; color:var(--home-accent); }
+
+.vinfo-pas-kartica p{ font-size:15px; }
+
+.vinfo-pas-kartica p{ margin:6px 0; color:var(--text-strong); font-weight:600; }
+
+@media (max-width:720px){ .vinfo-psi-lista{ grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); } .vinfo-pas-kartica .vinfo-imePsa{ font-size:1.05rem; } }
+
+.vinfo-page{ display:flex; flex-direction:column; min-height: calc(100vh - 120px); }
+
+.vinfo-owner-card{ max-width:920px; width: min(920px, 96%); margin: 18px auto; padding: 22px; background:#fff; border-radius:12px; border:1px solid var(--card-border); box-shadow: var(--card-shadow); text-align:left; }
+
+.vinfo-owner-card p{ font-size:16px; line-height:1.4; }
+
+.vinfo-psi-section{ margin-top:28px; padding-top:18px; border-top:1px dashed rgba(2,6,23,0.06); }
+
+.vinfo-psi-section h3{ margin:0 0 12px 0; }
+

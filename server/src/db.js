@@ -151,6 +151,28 @@ export async function updateUserProfileImage(idKorisnik, imagePath) {
     return res.rows[0];
 }
 
+export async function getProsleSetnjeVlasnika(idKorisnik) {
+    const res = await pool.query(
+        `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
+            FROM rezervacija r
+                JOIN setnja s ON r.idSetnja = s.idSetnja
+            WHERE r.idKorisnik = $1 AND r.datum < CURRENT_DATE`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
+export async function getBuduceSetnjeVlasnika(idKorisnik) {
+    const res = await pool.query(
+        `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
+            FROM rezervacija r
+                JOIN setnja s ON r.idSetnja = s.idSetnja
+            WHERE r.idKorisnik = $1 AND r.datum >= CURRENT_DATE`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
 export async function getSetacWithId(idKorisnik) {
     const res = await pool.query(
         `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.email, k.telefon, s.lokDjelovanja, s.tipClanarina, s.profilFoto
@@ -214,7 +236,7 @@ export async function createRezervacija(idSetnja, idKorisnik, polaziste, vrijeme
 }
 export async function getAllVlasnici() {
     const res = await pool.query(
-        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik
+        `SELECT k.idKorisnik, k.imeKorisnik, k.prezKorisnik, k.telefon, v.primanjeObavijesti
          FROM korisnik k
             JOIN vlasnik v ON k.idKorisnik = v.idKorisnik`
     );
@@ -237,6 +259,33 @@ export async function deleteUserWithId(idKorisnik) {
     );
     return res.rows[0];
 }
+
+export async function createPas(imePas, pasmina, socijalizacija, razinaEnergije,starost, zdravNapomene, idKorisnik) {
+    const res = await pool.query(
+        `INSERT INTO pas (imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idKorisnik)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+        [imePas, pasmina, socijalizacija, razinaEnergije, starost, zdravNapomene, idKorisnik]
+    );
+    return res.rows[0];
+}
+
+export async function deletePas(idPas) {
+    const res = await pool.query(
+        `DELETE FROM pas WHERE idPas = $1`,
+        [idPas]
+    );
+    return res;
+}
+
+export async function getPsiByKorisnikId(idKorisnik) {
+    const res = await pool.query(
+        `SELECT * FROM pas WHERE idKorisnik = $1`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
 
 export async function createSetnja(cijena, tipSetnja, trajanje, idKorisnik) {
     const res = await pool.query(
@@ -263,6 +312,15 @@ export async function deleteSetnja(idSetnja) {
     const res = await pool.query(
         `DELETE FROM setnja WHERE idSetnja = $1`,
         [idSetnja]
+    );
+    return res;
+}
+
+export async function deleteRezervacija(idRezervacija) {
+    const res = await pool.query(
+        `DELETE FROM setnja WHERE idSetnja = 
+            (SELECT idSetnja FROM rezervacija WHERE idRezervacija = $1)`,
+        [idRezervacija]
     );
     return res;
 }
@@ -313,6 +371,20 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
     return res.rows.length >= 1 ? res.rows[0] : undefined;
 }
 
+export async function getSetnjeSetaca(idKorisnik) {
+    const res = await pool.query(
+        `SELECT s.idSetnja, r.datum, r.vrijeme, r.polaziste, s.tipSetnja, s.trajanje, s.cijena, r.dodNapomene,
+                r.idKorisnik, k.imeKorisnik, k.prezKorisnik
+            FROM setnja s
+                JOIN rezervacija r ON s.idSetnja = r.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
+            WHERE s.idKorisnik = $1 AND r.datum >= CURRENT_DATE AND (r.status = 'placeno' OR (r.status = 'potvrdeno' AND r.nacinPlacanja = 'gotovina'))
+            ORDER BY r.datum, r.vrijeme`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
 // provjera: rezervacija mora biti u statusu "potvrdeno", nacinPlacanja mora biti "kreditna kartica"
 // ako sve prode, updateat rezervaciju da bude u statusu "placeno"
@@ -330,10 +402,57 @@ export async function platiRezervaciju(idKorisnik, idRezervacija) {
     return res.rows.length !== 0;
 }
 
+export async function getChatParticipantsForVlasnik(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, s.idSetnja, st.idKorisnik as otherId, (imeKorisnik || ' ' || prezKorisnik) as otherName, tipSetnja, datum, vrijeme
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+                JOIN setac st ON st.idKorisnik = s.idKorisnik
+                JOIN korisnik k ON st.idKorisnik = k.idKorisnik
+            WHERE r.idKorisnik = $1`,
+        [idKorisnik]
+    )
+    return res.rows;
+}
+
+export async function getChatParticipantsForSetac(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idRezervacija, s.idSetnja, k.idKorisnik as otherId, (imeKorisnik || ' ' || prezKorisnik) as otherName, tipSetnja, datum, vrijeme
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
+            WHERE s.idKorisnik = $1`,
+        [idKorisnik]
+    )
+    return res.rows;
+}
+
+export async function getOtherChatParticipantIdForSetac(idRezervacija, idKorisnik) {
+    const res = await pool.query(
+        `SELECT r.idKorisnik
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE r.idRezervacija = $1 AND s.idKorisnik = $2`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
+}
+
+export async function getOtherChatParticipantIdForVlasnik(idRezervacija, idKorisnik) {
+    const res = await pool.query(
+        `SELECT s.idKorisnik
+            FROM rezervacija r
+                JOIN setnja s ON s.idSetnja = r.idSetnja
+            WHERE r.idRezervacija = $1 AND r.idKorisnik = $2`,
+        [idRezervacija, idKorisnik]
+    );
+    return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
+}
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");
-        console.log("Database connected:", rows.rows);
+        console.log("Database connected:", rows.rows.length, "rows in korisnik table");
     } catch (err) {
         console.error("Database connection error:", err);
     }

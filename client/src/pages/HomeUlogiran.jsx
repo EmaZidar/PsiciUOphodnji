@@ -63,7 +63,6 @@ export default function HomeUlogiran() {
 
   const role = user?.role || 'unassigned';
 
-  // Dynamically render the appropriate component based on user role
   if (role === 'vlasnik') {
     return <UlogiranVlasnik user={user} />;
   } else if (role === 'setac') {
@@ -75,7 +74,7 @@ export default function HomeUlogiran() {
       <>
         <HeaderUlogiran />
         <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p>Vaša uloga nije određena. Molimo kontaktirajte administratora.</p>
+          <p>Vaša uloga nije određena. </p>
         </main>
         <Footer />
       </>

@@ -6,7 +6,7 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import "./Placanje.css";
 
 const initialOptions = {
-    "client-id": "test",
+    "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID || "test",
     "disable-funding": "card,credit",
     "buyer-country": "US",
     currency: "EUR",
@@ -164,20 +164,20 @@ export default function Placanje() {
                                     onApprove={async (data, actions) => {
                                         const details =
                                             await actions.order.capture();
-                                            const response = await fetch(
-                                                `/api/rezervacije/${idrezervacija}/placanje`
-                                            , {
+                                        const response = await fetch(
+                                            `/api/rezervacije/${idrezervacija}/placanje`,
+                                            {
                                                 method: "PATCH",
                                                 credentials: "include",
-                                            });
-                                            if (!response.ok) {
-                                                setError(
-                                                    "Greška pri ažuriranju statusa plaćanja."
-                                                );
-                                                return;
-                                            } 
+                                            },
+                                        );
+                                        if (!response.ok) {
+                                            setError(
+                                                "Greška pri ažuriranju statusa plaćanja.",
+                                            );
+                                            return;
+                                        }
                                         setPaid(true);
-                                        // You can also POST to your backend to mark reservation as paid
                                     }}
                                     onError={(err) => {
                                         setError("Greška pri PayPal plaćanju.");

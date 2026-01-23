@@ -33,8 +33,8 @@ export default function Header() {
     setError("");
 
     const endpoint = user.role === 'setac'
-      ? `${BACKEND_URL}/api/setac/notifikacije`
-      : `${BACKEND_URL}/api/vlasnik/notifikacije`;
+      ? `/api/setac/notifikacije`
+      : `/api/vlasnik/notifikacije`;
 
     try {
       const res = await fetch(`${BACKEND_URL}${endpoint}`, { credentials: 'include' });

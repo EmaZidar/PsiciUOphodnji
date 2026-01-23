@@ -35,6 +35,8 @@ function formatDatumVrijeme(datumVrijeme) {
   return datumVrijeme.slice(11, 16);
 }
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
 export default function ChatWindow({ chat, me }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -44,7 +46,7 @@ export default function ChatWindow({ chat, me }) {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch(`/api/chats/${chat.idrezervacija}/messages`, { credentials: "include" });
+      const res = await fetch(`${BACKEND_URL}/api/chats/${chat.idrezervacija}/messages`, { credentials: "include" });
       let data = [];
       if (res.ok) {
         data = await res.json();
@@ -69,7 +71,7 @@ export default function ChatWindow({ chat, me }) {
   const sendMessage = async () => {
     if (!text.trim()) return;
     try {
-      await fetch(`/api/chats/${chat.idrezervacija}/messages`, {
+      await fetch(`${BACKEND_URL}/api/chats/${chat.idrezervacija}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

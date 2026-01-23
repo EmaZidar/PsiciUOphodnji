@@ -10,7 +10,7 @@ export default function MjesecnaClanarina() {
     const [prikaziFormu, setPrikaziFormu] = useState(false);
     const [mjclanarina, setmjclanarina] = useState(0);
 
-	const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
     useEffect(() => {
         const loadSetaci = async () => {
@@ -61,7 +61,7 @@ export default function MjesecnaClanarina() {
 		  try {
 			setLoading(true);
 			setError(null);
-			const response = await fetch('/api/mjesecna', { credentials: 'include' });
+            const response = await fetch(`${BACKEND_URL}/api/mjesecna`, { credentials: 'include' });
 			if (!response.ok) throw new Error(`Server returned ${response.status}`);
 			const data = await response.json();
 			setmjclanarina(data ?? 0);
@@ -87,7 +87,7 @@ export default function MjesecnaClanarina() {
 
     function spremi1(e) {
         setmjclanarina(e.target.value);
-        fetch(`${BACKEND_URL}/mjesecna`, {
+        fetch(`${BACKEND_URL}/api/mjesecna`, {
             //TODO
             method: "POST",
             headers: {

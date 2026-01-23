@@ -154,7 +154,7 @@ export default function Header() {
               <p>Svi vaši podatci su sigurni na našoj stranici.</p>
               <br></br>
               <h3>Preporučite nas!</h3>
-              <p>Ako Vam se svidjela naša stranica, preporučite ju prijateljima</p>
+              <p>Ako Vam se svidjela naša stranica, preporučite ju prijateljima!</p>
             </div>
             )}
       </>

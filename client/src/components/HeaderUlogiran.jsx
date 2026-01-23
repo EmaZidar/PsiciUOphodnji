@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import NotificationDropdown from './NotificationDropdown'
 import './HeaderUlogiran.css'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 export default function Header() {
   const navigate = useNavigate()
@@ -37,7 +37,7 @@ export default function Header() {
       : '/api/vlasnik/notifikacije';
 
     try {
-      const res = await fetch(endpoint, { credentials: 'include' });
+      const res = await fetch(`${BACKEND_URL}${endpoint}`, { credentials: 'include' });
       const data = await res.json();
       setNotifications(data);
     } catch {
@@ -56,7 +56,7 @@ export default function Header() {
   const handleAccept = async (idrezervacija) => {
     setError("");
     
-    const res = await fetch(`/api/rezervacija/${idrezervacija}/prihvati`, {
+    const res = await fetch(`${BACKEND_URL}/api/rezervacija/${idrezervacija}/prihvati`, {
       method: 'PATCH',
       credentials: 'include',
     });
@@ -73,7 +73,7 @@ export default function Header() {
   const handleReject = async (idrezervacija) => {
     setError("");
     
-    const res = await fetch(`/api/rezervacija/${idrezervacija}/odbij`, {
+    const res = await fetch(`${BACKEND_URL}/api/rezervacija/${idrezervacija}/odbij`, {
       method: 'PATCH',
       credentials: 'include',
     });
@@ -93,7 +93,7 @@ export default function Header() {
   
   useEffect(() => {
     (async () => {
-      const res = await fetch('/api/me', { credentials: 'include' })
+      const res = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' })
       if (!res.ok) return;
       const data = await res.json();
       setUser(data.user);

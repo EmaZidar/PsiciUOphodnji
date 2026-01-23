@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 export default function Korisnici() {
     const [setaci, setSetaci] = useState([]);
     const [vlasnici, setvlasnici] = useState([]);
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ export default function Korisnici() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch("/api/setaci", {
+                const response = await fetch(`${BACKEND_URL}/api/setaci`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -45,7 +45,7 @@ export default function Korisnici() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch("/api/vlasnici", {
+                const response = await fetch(`${BACKEND_URL}/api/vlasnici`, {
                     method: "GET",
                     credentials: "include",
                 });

@@ -110,7 +110,7 @@ export default function Reviews({ targetUserId }) {
               </div>
 
               {r.tekst && <p className="review-text">{r.tekst}</p>}
-
+                
               {r.fotografija && (
                 <div className="review-photo">
                   <img

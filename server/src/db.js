@@ -406,7 +406,7 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
             WHERE idRezervacija = $1 AND rezervacija.idKorisnik = $2`,
         [idKorisnik, idRezervacija]
     );
-    return res.rows.length >= 1 ? res.rows[0] : undefined;
+    return res.rows[0];
 }
 
 export async function getSetnjeSetaca(idKorisnik) {

@@ -149,22 +149,26 @@ export async function updateUserProfileImage(idKorisnik, imagePath) {
 }
 
 export async function getProsleSetnjeVlasnika(idKorisnik) {
+    // ovo da vrati samo odradene setnje za vlasnika
+    // status = 'odradeno'
     const res = await pool.query(
         `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
             FROM rezervacija r
                 JOIN setnja s ON r.idSetnja = s.idSetnja
-            WHERE r.idKorisnik = $1 AND r.datum < CURRENT_DATE`,
+            WHERE r.idKorisnik = $1 AND r.status = 'odradeno'`,
         [idKorisnik]
     );
     return res.rows;
 }
 
 export async function getBuduceSetnjeVlasnika(idKorisnik) {
+    // ovo da vrati samo aktivne setnje za vlasnika
+    // status = 'potvrdeno' ili 'placeno'
     const res = await pool.query(
         `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
             FROM rezervacija r
                 JOIN setnja s ON r.idSetnja = s.idSetnja
-            WHERE r.idKorisnik = $1 AND r.datum >= CURRENT_DATE`,
+            WHERE r.idKorisnik = $1 AND r.status IN ('potvrdeno', 'placeno')`,
         [idKorisnik]
     );
     return res.rows;
@@ -372,6 +376,21 @@ export async function changeRezervacijaStatus(idKorisnik, idRezervacija, newStat
     return res.rows.length !== 0;
 }
 
+// ovo je nova funkcija za vlasnika da moze oznacit rezervaciju kao odradenu
+// vidite jesam li dobro napisala
+export async function changeRezervacijaStatusVlasnik(idKorisnik, idRezervacija, newStatus) {
+    const res = await pool.query(
+        `UPDATE rezervacija r
+            SET status = $3
+            WHERE r.idRezervacija = $1
+                AND r.idKorisnik = $2
+                AND (r.status = 'potvrdeno' OR r.status = 'placeno')
+            RETURNING idRezervacija`,
+        [idRezervacija, idKorisnik, newStatus]
+    );
+    return res.rows.length !== 0;
+}
+
 export async function getVlasnikNotifikacije(idKorisnik) {
     const res = await pool.query(
         `SELECT idRezervacija, status, tipSetnja, cijena, trajanje, datum, vrijeme
@@ -388,23 +407,51 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
         `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status, setnja.tipSetnja, setnja.cijena, setnja.trajanje, dodNapomene
             FROM rezervacija join setnja on rezervacija.idSetnja = setnja.idSetnja
             WHERE idRezervacija = $1 AND rezervacija.idKorisnik = $2`,
-        [idRezervacija, idKorisnik]
+        [idKorisnik, idRezervacija]
     );
     return res.rows.length >= 1 ? res.rows[0] : undefined;
 }
 
 export async function getSetnjeSetaca(idKorisnik) {
+    // ovo da vrati samo aktivne setnje za setaca
+    // status = potvrdeno ili placeno
     const res = await pool.query(
         `SELECT s.idSetnja, r.datum, r.vrijeme, r.polaziste, s.tipSetnja, s.trajanje, s.cijena, r.dodNapomene,
-                r.idKorisnik, k.imeKorisnik, k.prezKorisnik
+                r.idKorisnik, k.imeKorisnik, k.prezKorisnik, r.status, r.idRezervacija
             FROM setnja s
                 JOIN rezervacija r ON s.idSetnja = r.idSetnja
                 JOIN korisnik k ON r.idKorisnik = k.idKorisnik
-            WHERE s.idKorisnik = $1 AND r.datum >= CURRENT_DATE AND (r.status = 'placeno' OR (r.status = 'potvrdeno' AND r.nacinPlacanja = 'gotovina'))
+            WHERE s.idKorisnik = $1 AND (r.status = 'placeno' OR r.status = 'potvrdeno')
             ORDER BY r.datum, r.vrijeme`,
         [idKorisnik]
     );
     return res.rows;
+}
+
+// ovo da vrati samo prosle (odradene) setnje za setaca
+// status = odradeno
+export async function getProsleSetnjeSetaca(idKorisnik) {
+    const res = await pool.query(
+        `SELECT s.idSetnja, r.datum, r.vrijeme, r.polaziste, s.tipSetnja, s.trajanje, s.cijena, r.dodNapomene,
+                r.idKorisnik, k.imeKorisnik, k.prezKorisnik, r.status, r.idRezervacija
+            FROM setnja s
+                JOIN rezervacija r ON s.idSetnja = r.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
+            WHERE s.idKorisnik = $1 AND r.status = 'odradeno'
+            ORDER BY r.datum DESC, r.vrijeme`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
+export async function createRecenzija(idRezervacija, ocjena, tekst, fotografija) {
+    const res = await pool.query(
+        `INSERT INTO recenzija (idRezervacija, ocjena, tekst, fotografija)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *`,
+        [idRezervacija, ocjena, tekst, fotografija]
+    );
+    return res.rows[0];
 }
 
 // provjera: korisnik mora biti ulogiran i mora biti vlasnik i mora biti vlasnik te rezervacije (postoji idKorisnik u REZERVACIJA)
@@ -469,6 +516,24 @@ export async function getOtherChatParticipantIdForVlasnik(idRezervacija, idKoris
         [idRezervacija, idKorisnik]
     );
     return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
+}
+
+export async function getMjesecnaClanarina() {
+    const res = await pool.query("SELECT iznos FROM clanarina WHERE clanarina = 'cijenaMjClanarina'");
+    return +res.rows[0].iznos;
+}
+
+export async function getGodisnjaClanarina() {
+    const res = await pool.query("SELECT iznos FROM clanarina WHERE clanarina = 'cijenaGodClanarina'");
+    return +res.rows[0].iznos;
+}
+
+export async function setMjesecnaClanarina(iznos) {
+    await pool.query("UPDATE clanarina SET iznos = $1 WHERE clanarina = 'cijenaMjClanarina'", [iznos]);
+}
+
+export async function setGodisnjaClanarina(iznos) {
+    await pool.query("UPDATE clanarina SET iznos = $1 WHERE clanarina = 'cijenaGodClanarina'", [iznos]);
 }
 
 export async function testConnection() {

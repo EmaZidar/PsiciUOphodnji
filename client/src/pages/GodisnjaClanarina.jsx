@@ -52,9 +52,28 @@ export default function GodisnjaClanarina() {
                 setLoading(false);
             }
         };
+	});
 
-        loadgodcl();
-    }, []);
+  useEffect(() => {
+		
+		const loadgodcl = async () => {
+		  try {
+			setLoading(true);
+			setError(null);
+			const response = await fetch('/api/godisnja', { credentials: 'include' });
+			if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			const data = await response.json();
+			setgodclanarina(data ?? 0);
+		  } catch (err) {
+			  setError(err.message || 'Greška pri dohvaćanju podataka');
+			  setgodclanarina(0);
+		  } finally {
+			  setLoading(false);
+		  }
+		};
+	
+	loadgodcl();
+  }, []);
 
     function uredi() {
         setPrikaziFormu(true);

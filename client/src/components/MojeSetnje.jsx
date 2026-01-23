@@ -1,6 +1,25 @@
 import React, { useEffect, useState } from "react";
 import "./MojeSetnje.css";
+import React, { useEffect, useState } from "react";
+import "./MojeSetnje.css";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
+function formatDatumHR(datum) {
+    if (!datum) return "";
+    const d = new Date(datum);
+    if (isNaN(d)) return datum;
+    const dan = String(d.getDate()).padStart(2, "0");
+    const mjesec = String(d.getMonth() + 1).padStart(2, "0");
+    const godina = d.getFullYear();
+    return `${dan}.${mjesec}.${godina}.`;
+}
+
+function formatVrijeme(vrijeme) {
+  if (!vrijeme) return '';
+
+  return vrijeme.slice(0, 5);
+}
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
 function formatDatumHR(datum) {
@@ -20,6 +39,7 @@ function formatVrijeme(vrijeme) {
 }
 
 export default function MojeSetnje() {
+export default function MojeSetnje() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
@@ -29,7 +49,20 @@ export default function MojeSetnje() {
     const [uploading, setUploading] = useState(false);
     const [prosleSetnje, setprosle] = useState([]);
     const [buduceSetnje, setbuduce] = useState([]);
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
+    const [imagePreview, setImagePreview] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [prosleSetnje, setprosle] = useState([]);
+    const [buduceSetnje, setbuduce] = useState([]);
+
+    useEffect(() => {
+        const API = `${BACKEND_URL}/api/me`;
+        fetch(API, { credentials: "include" })
+            .then((r) => {
+                if (!r.ok) throw new Error("Not authenticated");
     useEffect(() => {
         const API = `${BACKEND_URL}/api/me`;
         fetch(API, { credentials: "include" })
@@ -47,66 +80,52 @@ export default function MojeSetnje() {
             });
     }, []);
 
-    useEffect(() => {
-        if (!user || !user.idkorisnik) return;
-        const loadprosle = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const response = await fetch(
-                    `${BACKEND_URL}/api/prosleSetnje/${user.idkorisnik}`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                    },
-                );
-                if (!response.ok)
-                    throw new Error(`Server returned ${response.status}`);
-                const data = await response.json();
-                setprosle(
-                    Array.isArray(data)
-                        ? data
-                        : (data?.prosleSetnje ?? data?.proslesetnje ?? []),
-                );
-            } catch (err) {
-                setError(err.message || "Greška pri dohvaćanju podataka");
-                setprosle([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadprosle();
-    }, [user]);
+    async function loadProsleSetnje(userId) {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await fetch(`${BACKEND_URL}/api/prosleSetnje/${userId}`, {
+                method: "GET",
+                credentials: "include",
+            });
+            if (!response.ok) throw new Error(`Server returned ${response.status}`);
+            const data = await response.json();
+            setprosle(Array.isArray(data) ? data : (data?.prosleSetnje ?? data?.proslesetnje ?? []));
+        } catch (err) {
+            setError(err.message || "Greška pri dohvaćanju podataka");
+            setprosle([]);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         if (!user || !user.idkorisnik) return;
-        const loadbuduce = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                const response = await fetch(
-                    `${BACKEND_URL}/api/buduceSetnje/${user.idkorisnik}`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                    },
-                );
-                if (!response.ok)
-                    throw new Error(`Server returned ${response.status}`);
-                const data = await response.json();
-                setbuduce(
-                    Array.isArray(data)
-                        ? data
-                        : (data?.buduceSetnje ?? data?.buducesetnje ?? []),
-                );
-            } catch (err) {
-                setError(err.message || "Greška pri dohvaćanju podataka");
-                setbuduce([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadbuduce();
+        loadProsleSetnje(user.idkorisnik);
+    }, [user]);
+
+    async function loadBuduceSetnje(userId) {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await fetch(`${BACKEND_URL}/api/buduceSetnje/${userId}`, {
+                method: "GET",
+                credentials: "include",
+            });
+            if (!response.ok) throw new Error(`Server returned ${response.status}`);
+            const data = await response.json();
+            setbuduce(Array.isArray(data) ? data : (data?.buduceSetnje ?? data?.buducesetnje ?? []));
+        } catch (err) {
+            setError(err.message || "Greška pri dohvaćanju podataka");
+            setbuduce([]);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (!user || !user.idkorisnik) return;
+        loadBuduceSetnje(user.idkorisnik);
     }, [user]);
 
     const njegoveProsleSetnje = prosleSetnje || [
@@ -137,14 +156,42 @@ export default function MojeSetnje() {
 
     function handleSubmit(e) {
         e.preventDefault();
+        let id = recenzija.idRezervacija ?? recenzija.idrezervacija;
+        if (!id) {
+            try {
+                const el = document.querySelector('form.formazarecenziju input[name="idRezervacija"]');
+                if (el && el.value) id = el.value;
+            } catch (err) {
+                console.warn('Could not read hidden idRezervacija input:', err);
+            }
+        }
+        if (!id) {
+            alert('Neodređena rezervacija — pokušaj ponovno otvoriti formu putem "Ostavi recenziju"');
+            return;
+        }
+        const payload = { ...recenzija, idRezervacija: Number(id) };
+
         fetch(`${BACKEND_URL}/recenzija`, {
-            //TODO link provjeri
             method: "POST",
+            credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(recenzija),
-        });
+            body: JSON.stringify(payload),
+        })
+            .then(async (res) => {
+                if (res.status === 201) {
+                    if (user && user.idkorisnik) await loadProsleSetnje(user.idkorisnik);
+                    setPrikaziFormu(false);
+                } else {
+                    const body = await res.json().catch(() => ({}));
+                    alert('Greška pri slanju recenzije: ' + (body?.error || `Server returned ${res.status}`));
+                }
+            })
+            .catch((err) => alert('Greška pri slanju recenzije: ' + (err.message || err)));
+    }
+
+    function odustani() {
         setPrikaziFormu(false);
     }
 
@@ -188,9 +235,31 @@ export default function MojeSetnje() {
         });
     }
 
+    async function zavrsi(idRezervacija) {
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/rezervacija/${idRezervacija}/zavrsi`, {
+                method: 'PATCH',
+                credentials: 'include',
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                throw new Error(body?.error || 'Neuspjelo završavanje šetnje');
+            }
+            if (user && user.idkorisnik) {
+                await loadProsleSetnje(user.idkorisnik);
+                await loadBuduceSetnje(user.idkorisnik);
+            }
+        } catch (err) {
+            alert('Greška: ' + (err.message || 'Neuspjelo'));
+        }
+    }
+
     const handleImageUpload = async () => {
         if (!selectedImage) return;
 
+        setUploading(true);
+        const formData = new FormData();
+        formData.append("profileImage", selectedImage);
         setUploading(true);
         const formData = new FormData();
         formData.append("profileImage", selectedImage);
@@ -274,11 +343,18 @@ export default function MojeSetnje() {
                                         </p>
                                         <p>Recenzija: {setnja.recenzija}</p>
                                     </div>
-                                    <button
-                                        onClick={() => setPrikaziFormu(true)}
-                                    >
-                                        Ostavi recenziju
-                                    </button>
+                                    {setnja.status === 'odradeno' && (
+                                        <button
+                                            onClick={() => {
+                                                const id = setnja.idRezervacija ?? setnja.idrezervacija ?? (setnja.idrezervacija?.toString && setnja.idrezervacija.toString());
+                                                console.log('Opening review form for reservation id:', id, setnja);
+                                                setrecenzija((r) => ({ ...r, idRezervacija: id }));
+                                                setPrikaziFormu(true);
+                                            }}
+                                        >
+                                            Ostavi recenziju
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -289,6 +365,7 @@ export default function MojeSetnje() {
                             onSubmit={handleSubmit}
                             className="formazarecenziju"
                         >
+                            <input type="hidden" name="idRezervacija" value={recenzija.idRezervacija || ''} />
                             <label>Opis: </label>
                             <input
                                 type="text"
@@ -367,14 +444,24 @@ export default function MojeSetnje() {
                                         Zakazana: {formatDatumHR(setnja.datum)} {formatVrijeme(setnja.vrijeme)}
                                     </p>
                                 </div>
-                                <button
-                                    className="ms-otkazi"
-                                    onClick={() =>
-                                        izbrisi(setnja.idrezervacija)
-                                    }
-                                >
-                                    Otkaži
-                                </button>
+                                <div className="ms-actions">
+                                    <button
+                                        className="ms-otkazi"
+                                        onClick={() =>
+                                            izbrisi(setnja.idrezervacija)
+                                        }
+                                    >
+                                        Otkaži
+                                    </button>
+                                    {(user && (user.uloga === 'vlasnik' || user.role === 'vlasnik')) && (
+                                        <button
+                                            className="ms-zavrsi"
+                                            onClick={() => zavrsi(setnja.idrezervacija)}
+                                        >
+                                            Završi šetnju
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>

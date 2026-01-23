@@ -1,242 +1,206 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import HeaderUlogiran from '../components/HeaderUlogiran';
-import Footer from '../components/Footer';
-import './Placanje.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import HeaderUlogiran from "../components/HeaderUlogiran";
+import Footer from "../components/Footer";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import "./Placanje.css";
 
-// formatira da uvijek budu samo znamenke 
-const samoZnamenke = (s) => (s ?? '').replace(/\D/g, '');
-
-const formatirajBrojKartice = (value) => {
-  const znamenke = samoZnamenke(value).slice(0, 16);
-  return znamenke;
-};
-
-const formatirajDatumIsteka = (value) => {
-  const znamenke = samoZnamenke(value).slice(0, 4);
-  if (znamenke.length <= 2) return znamenke;
-  return `${znamenke.slice(0, 2)}/${znamenke.slice(2)}`;
-};
-
-const validatePayment = ({ brojKartice, datumIsteka, nositelj, cvv }) => {
-  if (samoZnamenke(brojKartice).length !== 16)
-    return 'Broj kartice mora imati 16 znamenki.';
-
-  if (!/^\d{2}\/\d{2}$/.test(datumIsteka))
-    return 'Datum isteka mora biti u formatu MM/GG.';
-
-  if (!nositelj || nositelj.trim().length < 3)
-    return 'Unesi ime nositelja kartice.';
-
-  if (samoZnamenke(cvv).length !== 3)
-    return 'CVV mora imati 3 znamenke.';
-
-  return null;
+const initialOptions = {
+    "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID || "test",
+    "disable-funding": "card,credit",
+    "buyer-country": "US",
+    currency: "EUR",
+    "data-page-type": "product-details",
+    components: "buttons",
+    "data-sdk-integration-source": "developer-studio",
 };
 
 function formatDatumHR(datum) {
-  if (!datum) return '';
+    if (!datum) return "";
 
-  const d = new Date(datum);
+    const d = new Date(datum);
 
-  const dan = String(d.getDate()).padStart(2, '0');
-  const mjesec = String(d.getMonth() + 1).padStart(2, '0');
-  const godina = d.getFullYear();
+    const dan = String(d.getDate()).padStart(2, "0");
+    const mjesec = String(d.getMonth() + 1).padStart(2, "0");
+    const godina = d.getFullYear();
 
-  return `${dan}.${mjesec}.${godina}.`;
+    return `${dan}.${mjesec}.${godina}.`;
 }
 
 function formatVrijeme(vrijeme) {
-  if (!vrijeme) return '';
+    if (!vrijeme) return "";
 
-  return vrijeme.slice(0, 5);
+    return vrijeme.slice(0, 5);
 }
 
 export default function Placanje() {
-  const navigate = useNavigate();
-  const { idrezervacija } = useParams();
+    const navigate = useNavigate();
+    const { idrezervacija } = useParams();
 
-  const [rezervacija, setRezervacija] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [rezervacija, setRezervacija] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [paid, setPaid] = useState(false);
 
-  const [brojKartice, setBrojKartice] = useState('');
-  const [datumIsteka, setDatumIsteka] = useState('');
-  const [nositelj, setNositelj] = useState('');
-  const [cvv, setCvv] = useState('');
+    /* dohvat rezervacije */
+    useEffect(() => {
+        async function fetchRezervacija() {
+            try {
+                const res = await fetch(`/api/rezervacije/${idrezervacija}`, {
+                    credentials: "include",
+                });
+                if (!res.ok) throw new Error(`Server vratio ${res.status}`);
+                const data = await res.json();
+                setRezervacija(data);
 
-  const [paying, setPaying] = useState(false);
-  const [paid, setPaid] = useState(false);
-  const [formError, setFormError] = useState('');
-
-  /* dohvat rezervacije */
-  useEffect(() => {
-    async function fetchRezervacija() {
-      try {
-        const res = await fetch(`/api/rezervacije/${idrezervacija}`, {
-          credentials: 'include',
-        });
-        if (!res.ok) throw new Error(`Server vratio ${res.status}`);
-        const data = await res.json();
-        setRezervacija(data);
-
-        if (data.status === 'placeno') {
-          setPaid(true);
+                if (data.status === "placeno") {
+                    setPaid(true);
+                }
+            } catch (err) {
+                setError("Ne mogu dohvatiti rezervaciju.");
+            } finally {
+                setLoading(false);
+            }
         }
-      } catch (err) {
-        setError('Ne mogu dohvatiti rezervaciju.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchRezervacija();
-  }, [idrezervacija]);
+        fetchRezervacija();
+    }, [idrezervacija]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormError('');
+    const karticnoPlacanje = rezervacija?.nacinplacanja === "kreditna kartica";
 
-    const err = validatePayment({ brojKartice, datumIsteka, nositelj, cvv });
-    if (err) {
-      setFormError(err);
-      return;
-    }
+    return (
+        <>
+            <HeaderUlogiran />
 
-    setPaying(true);
-    await new Promise((r) => setTimeout(r, 2000)); // "procesiranje placanja"
+            <div className="placanje-container">
+                <h2>Plaćanje</h2>
 
-    try {
-      const res = await fetch(`/api/rezervacije/${idrezervacija}/placanje`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!res.ok) throw new Error();
+                <div className="placanje-card">
+                    {loading ? (
+                        <p>Učitavanje...</p>
+                    ) : error ? (
+                        <p className="placanje-error">{error}</p>
+                    ) : (
+                        <>
+                            <p>
+                                <strong>Datum:</strong>{" "}
+                                {formatDatumHR(rezervacija.datum)}
+                            </p>
+                            <p>
+                                <strong>Vrijeme:</strong>{" "}
+                                {formatVrijeme(rezervacija.vrijeme)}
+                            </p>
+                            <p>
+                                <strong>Polazište:</strong>{" "}
+                                {rezervacija.polaziste}
+                            </p>
+                            <p>
+                                <strong>Način plaćanja:</strong>{" "}
+                                {rezervacija.nacinplacanja}
+                            </p>
+                            <p>
+                                <strong>Status:</strong> {rezervacija.status}
+                            </p>
+                            <p>
+                                <strong>Tip šetnje:</strong>{" "}
+                                {rezervacija.tipsetnja}
+                            </p>
+                            <p>
+                                <strong>Trajanje:</strong>{" "}
+                                {rezervacija.trajanje} minuta
+                            </p>
+                            {rezervacija.dodnapomene && (
+                                <p>
+                                    <strong>Dodatne napomene:</strong>{" "}
+                                    {rezervacija.dodnapomene}
+                                </p>
+                            )}
+                            <p>
+                                <strong>Cijena:</strong> {rezervacija.cijena}{" "}
+                                EUR
+                            </p>
+                            <div id="paypal-button-container"></div>
+                        </>
+                    )}
+                </div>
 
-      setPaid(true);
-    } catch {
-      setFormError('Greška pri plaćanju.');
-    } finally {
-      setPaying(false);
-    }
-  };
+                {!loading && !error && rezervacija && (
+                    <div className="placanje-card">
+                        {paid && (
+                            <div className="placanje-success">
+                                <p>
+                                    <strong>Plaćeno!</strong>
+                                </p>
+                                <button
+                                    onClick={() => navigate("/main")}
+                                    className="placanje-btn primary"
+                                >
+                                    Povratak
+                                </button>
+                            </div>
+                        )}
 
-  const karticnoPlacanje =
-    rezervacija?.nacinplacanja === 'kreditna kartica';
+                        {!paid && karticnoPlacanje && (
+                            <PayPalScriptProvider options={initialOptions}>
+                                <PayPalButtons
+                                    style={{
+                                        shape: "rect",
+                                        layout: "vertical",
+                                        color: "gold",
+                                        label: "paypal",
+                                    }}
+                                    createOrder={(data, actions) => {
+                                        return actions.order.create({
+                                            purchase_units: [
+                                                {
+                                                    amount: {
+                                                        value: rezervacija.cijena.toString(),
+                                                        currency_code: "EUR",
+                                                    },
+                                                    description: `Šetnja ${rezervacija.tipsetnja}`,
+                                                },
+                                            ],
+                                        });
+                                    }}
+                                    onApprove={async (data, actions) => {
+                                        const details =
+                                            await actions.order.capture();
+                                        const response = await fetch(
+                                            `/api/rezervacije/${idrezervacija}/placanje`,
+                                            {
+                                                method: "PATCH",
+                                                credentials: "include",
+                                            },
+                                        );
+                                        if (!response.ok) {
+                                            setError(
+                                                "Greška pri ažuriranju statusa plaćanja.",
+                                            );
+                                            return;
+                                        }
+                                        setPaid(true);
+                                    }}
+                                    onError={(err) => {
+                                        setError("Greška pri PayPal plaćanju.");
+                                    }}
+                                />
+                            </PayPalScriptProvider>
+                        )}
 
-  return (
-    <>
-      <HeaderUlogiran />
-
-      <div className="placanje-container">
-        <h2>Plaćanje</h2>
-
-        <div className="placanje-card">
-          {loading ? (
-            <p>Učitavanje...</p>
-          ) : error ? (
-            <p className="placanje-error">{error}</p>
-          ) : (
-            <>
-              <p><strong>Datum:</strong> {formatDatumHR(rezervacija.datum)}</p>
-              <p><strong>Vrijeme:</strong> {formatVrijeme(rezervacija.vrijeme)}</p>
-              <p><strong>Polazište:</strong> {rezervacija.polaziste}</p>
-              <p><strong>Način plaćanja:</strong> {rezervacija.nacinplacanja}</p>
-              <p><strong>Status:</strong> {rezervacija.status}</p>
-            </>
-          )}
-        </div>
-
-        {!loading && !error && rezervacija && (
-          <div className="placanje-card">
-
-            {paid && (
-              <div className="placanje-success">
-                <p><strong>Plaćeno!</strong></p>
-                <button onClick={() => navigate('/main')} className="placanje-btn primary">
-                  Povratak
-                </button>
-              </div>
-            )}
-
-            {!paid && karticnoPlacanje && (
-              <>
-                <h3>Podaci kartice</h3>
-                <form onSubmit={handleSubmit} className="placanje-form">
-                  <input
-                    className="placanje-input"
-                    placeholder="Broj kartice"
-                    value={brojKartice}
-                    onChange={(e) =>
-                      setBrojKartice(formatirajBrojKartice(e.target.value))
-                    }
-                    disabled={paying}
-                  />
-
-                  <input
-                    className="placanje-input"
-                    placeholder="MM/GG"
-                    value={datumIsteka}
-                    onChange={(e) =>
-                      setDatumIsteka(formatirajDatumIsteka(e.target.value))
-                    }
-                    disabled={paying}
-                  />
-
-                  <input
-                    className="placanje-input"
-                    placeholder="Nositelj kartice"
-                    value={nositelj}
-                    onChange={(e) => setNositelj(e.target.value)}
-                    disabled={paying}
-                  />
-
-                  <input
-                    className="placanje-input"
-                    placeholder="CVV"
-                    value={cvv}
-                    onChange={(e) =>
-                      setCvv(samoZnamenke(e.target.value).slice(0, 3))
-                    }
-                    disabled={paying}
-                  />
-
-                  {formError && (
-                    <p className="placanje-error">{formError}</p>
-                  )}
-
-                  {paying && (
-                    <p className="placanje-processing">
-                      Provođenje transakcije...
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="placanje-btn primary"
-                    disabled={paying}
-                  >
-                    Potvrdi plaćanje
-                  </button>
-                </form>
-              </>
-            )}
-
-            {!paid && !karticnoPlacanje && (
-              <div className="placanje-info">
-                <p>
-                  <strong>Plaćanje gotovinom</strong>
-                </p>
-                <p>
-                  Plaćanje se vrši gotovinom nakon odrađene šetnje.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <Footer />
-    </>
-  );
+                        {!paid && !karticnoPlacanje && (
+                            <div className="placanje-info">
+                                <p>
+                                    <strong>Plaćanje gotovinom</strong>
+                                </p>
+                                <p>
+                                    Plaćanje se vrši gotovinom nakon odrađene
+                                    šetnje.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            <Footer />
+        </>
+    );
 }

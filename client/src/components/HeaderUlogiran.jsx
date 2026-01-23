@@ -151,10 +151,10 @@ export default function Header() {
               <p>Za sva pitanja se možete javiti na naš mail pawpal.pomoc@gmail.com</p>
               <br></br>
               <h3>Sigurnost</h3>
-              <p>Svi vašii podatci su sigurni na našoj stranici.</p>
+              <p>Svi vaši podatci su sigurni na našoj stranici.</p>
               <br></br>
               <h3>Preporučite nas!</h3>
-              <p>Ako Vam se svidjela naša stranica, preporučite ju prijateljima</p>
+              <p>Ako Vam se svidjela naša stranica, preporučite ju prijateljima!</p>
             </div>
             )}
       </>

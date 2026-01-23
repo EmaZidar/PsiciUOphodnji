@@ -9,6 +9,20 @@ import multer from "multer";
 import cors from "cors";
 import * as calendar from "./calendar.js";
 import * as chat from "./chat.js";
+import {
+    ApiError,
+    CheckoutPaymentIntent,
+    Client,
+    Environment,
+    LogLevel,
+    OrdersController,
+    PaymentsController,
+    PaypalExperienceLandingPage,
+    PaypalExperienceUserAction,
+    ShippingPreference,
+} from "@paypal/paypal-server-sdk";
+import bodyParser from "body-parser";
+
 
 db.testConnection();
 const imgContainer = await imgDb.initializeBlobStorage();
@@ -70,13 +84,15 @@ const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
-
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:8000/google/callback";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
 //  "https://www.googleapis.com/auth/calendar.events",
 ];
+
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
 app.get("/login/auth", async (_req, res) => {
     const state = "some_state";
@@ -233,11 +249,34 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
         const userId = dbUser.idkorisnik ?? dbUser.idKorisnik;
         const userWithRole = await db.getUserWithRole(userId);
         //console.log('/api/me - returning userWithRole:', userWithRole);
-
+        userWithRole.isAdmin = userWithRole.email === process.env.ADMIN_EMAIL;
         res.json({ session: sessionUser, user: userWithRole });
     } catch (err) {
         console.error('Error in /api/me:', err);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)
+// svrha: azuriranje osobnih podataka za oba korisnika
+// vlasnik: ime, prezime, email, telefon, setac: ime, prezime, email, telefon, lokDjelovanja
+// znaci ak je vlasnik u pitanju updatea se samo tablica KORISNIK, ak je setac onda se updatea KORISNIK i SETAC
+// ako nije setac nego vlasnik lokdjelovanja se ignorira
+// provjera: korisnik mora biti ulogiran
+// korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
+// slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
+// edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"
+app.patch('/api/me', checkIsAuthenticated, async (req, res) => {
+    try {
+        const idKorisnik = req.session.user.id;
+        const { imekorisnik, prezkorisnik, telefon, lokdjelovanja } = req.body;
+        await db.patchUser(idKorisnik, imekorisnik, prezkorisnik, telefon, lokdjelovanja);
+        return res.sendStatus(200);
+    } catch (err) {
+        if (err.code === '23505') // UNIQUE_VIOLATION
+            return res.status(400).json({ error: 'Telefon je već u upotrebi' });
+        console.error('Error in /api/me:', err);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -265,6 +304,16 @@ app.get('/api/setaci', async (_req, res) => {
         res.status(200).json(setaci)
     } catch (err) {
         console.error('Error in /api/setaci:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/godisnja', async (_req, res) => {
+    try {
+        const godisnja = await db.getGodisnjaClanarina();
+        res.status(200).json({ godisnja: godisnja?.godisnja ?? 0 });
+    } catch (err) {
+        console.error('Error in /api/godisnja:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -729,6 +778,28 @@ export default app;
 // tu se mora neki veliki merge tablica napravit: SETAC, SETNJA, REZERVACIJA, RECENZIJA tak da se moze doc do ocjena
 // znaci treba se izracunat prosjek ocjena iz recenzija za sve setnje tog setaca i prebrojat koliko taj setac ima recenzija i poslat nam u response
 
+// POST /api/me/profile-image (zove se u Profile.jsx)
+// svrha: setac uploada novu profilnu sliku -> front salje multipart/form-data s fieldom "profilfoto" (File - vrsta Bloba)
+// provjera: korisnik mora biti ulogiran i mora bit setac, idkorisnik se dobije iz sessiona
+// dozvoljeni mime: image/jpeg, image/png, image/jpg
+// backend treba spremiti sliku u object storage i dobiti URL/key koji se sprema u bazu
+// napomena za URL: ak se vraca puni url front moze direkt prikazat a ak se vraca relativna putanja front mora znat prefiks
+// backend treba updateat putanju profilne slike u tablici SETAC za tog korisnika
+// frontend ocekuje da se odmah osvjezi user
+// sad cu tu copy pasteat TODO koji mi je chatgpt dao jer ne znam kak se to treba raditi tocno pa ak vam treba helper
+//TODO koraci:
+//Pročitati datoteku iz requesta (multer memory storage ili stream).
+//Generirati jedinstveni key npr: profile-images/{idKorisnik}/{timestamp}-{random}.{ext}
+//Upload u object storage bucket (S3/MinIO/Azure Blob… ovisi što koristite):
+    //postaviti Content-Type na mime filea
+    //opcionalno Cache-Control (npr. public, max-age=31536000 ako su verzionirani keyevi)
+//Spremiti rezultat:
+    //ili public URL (npr. https://.../bucket/...)
+    //ili key + vi ga kasnije mapirate na URL
+//Ako imate staru sliku: opcionalno obrisati stari objekt u storage-u (da se ne gomila).
+//DB update
+    //Upisati novu putanju u tablicu šetača (ili gdje već držite profilnu):
+    //Paziti da ovo radi samo za šetače (ako vlasnici nemaju profilnu ili drugačije).
 
 
 

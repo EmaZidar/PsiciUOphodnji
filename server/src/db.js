@@ -470,6 +470,24 @@ export async function getOtherChatParticipantIdForVlasnik(idRezervacija, idKoris
     return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
 }
 
+export async function getMjesecnaClanarina() {
+    const res = await pool.query("SELECT iznos FROM clanarina WHERE clanarina = 'cijenaMjClanarina'");
+    return +res.rows[0].iznos;
+}
+
+export async function getGodisnjaClanarina() {
+    const res = await pool.query("SELECT iznos FROM clanarina WHERE clanarina = 'cijenaGodClanarina'");
+    return +res.rows[0].iznos;
+}
+
+export async function setMjesecnaClanarina(iznos) {
+    await pool.query("UPDATE clanarina SET iznos = $1 WHERE clanarina = 'cijenaMjClanarina'", [iznos]);
+}
+
+export async function setGodisnjaClanarina(iznos) {
+    await pool.query("UPDATE clanarina SET iznos = $1 WHERE clanarina = 'cijenaGodClanarina'", [iznos]);
+}
+
 export async function testConnection() {
     try {
         const rows = await pool.query("SELECT * FROM korisnik");

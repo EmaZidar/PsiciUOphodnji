@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import "./SetnjeSetacu.css";
 
 export default function SetnjeSetacu() {
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
-    const [setnje, setSetnje] = useState([]);
-    const [loading, setLoading] = useState(true);
-    function formatDatumHR(datum) {
-        if (!datum) return "";
+  const [setnje, setSetnje] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+ function formatDatumHR(datum) {
+  if (!datum) return '';
 
         const d = new Date(datum);
 
@@ -24,18 +24,18 @@ export default function SetnjeSetacu() {
         return vrijeme.slice(0, 5);
     }
 
-    useEffect(() => {
-        fetch(`${BACKEND_URL}/api/setnje-setaca`, { credentials: "include" })
-            .then((res) => res.json())
-            .then((data) => {
-                setSetnje(data);
-                setLoading(false);
-            })
-            .catch(() => {
-                console.error("Greška pri dohvaćanju šetnji");
-                setLoading(false);
-            });
-    }, []);
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/api/setnje-setaca`, { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        setSetnje(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        console.error('Greška pri dohvaćanju šetnji');
+        setLoading(false);
+      });
+  }, []);
 
     if (loading) {
         return <p>Učitavanje šetnji...</p>;

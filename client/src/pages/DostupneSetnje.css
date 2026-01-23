@@ -18,14 +18,15 @@
 }
 
 .ds-avatar-wrapper {
-   flex: 0 0 72px;
-   width: 72px;
-   height: 72px;
+   flex: 0 0 100px;
+   width: 100px;
+   height: 100px;
+   margin-right: 12px;
 }
 
 .ds-avatar {
-   width: 72px;
-   height: 72px;
+   width: 100px;
+   height: 100px;
    border-radius: 50%;
    object-fit: cover;
    display: block;
@@ -43,8 +44,8 @@
 }
 
 .ds-container .ds-avatar {
-   width: 72px;
-   height: 72px;
+   width: 100px;
+   height: 100px;
    border-radius: 50%;
    object-fit: cover;
    border: none;
@@ -133,8 +134,8 @@
 
 @media (max-width: 768px) {
    .ds-container { flex-direction: row; align-items: center; }
-   .ds-avatar-wrapper { width: 64px; height: 64px; }
-   .ds-avatar { width: 64px; height: 64px; }
+   .ds-avatar-wrapper { width: 80px; height: 80px; }
+   .ds-avatar { width: 80px; height: 80px; }
    .setnja-item { flex-direction: column; align-items: stretch; }
    .setnja-actions { display: flex; justify-content: flex-end; }
 }

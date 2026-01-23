@@ -254,11 +254,13 @@ app.patch('/api/me', checkIsAuthenticated, async (req, res) => {
     try {
         const idKorisnik = req.session.user.id;
         const { imekorisnik, prezkorisnik, email, telefon, lokdjelovanja } = req.body;
-        db.patchUser(idKorisnik, imekorisnik, prezkorisnik, email, telefon, lokdjelovanja);
+        await db.patchUser(idKorisnik, imekorisnik, prezkorisnik, email, telefon, lokdjelovanja);
         return res.sendStatus(200);
     } catch (err) {
+        if (err.code === '23505') // UNIQUE_VIOLATION
+            return res.status(400).json({ error: 'Email je već u upotrebi' });
         console.error('Error in /api/me:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });
 

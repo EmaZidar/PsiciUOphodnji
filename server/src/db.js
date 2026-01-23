@@ -280,6 +280,14 @@ export async function deleteSetnja(idSetnja) {
     return res;
 }
 
+export async function deleteRezervacija(idRezervacija) {
+    const res = await pool.query(
+        `DELETE FROM rezervacija WHERE idRezervacija = $1`,
+        [idRezervacija]
+    );
+    return res;
+}
+
 export async function getSetacNotifikacije(idKorisnik) {
     const res = await pool.query(
         `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, k.imeKorisnik, k.prezKorisnik, r.datum, r.vrijeme, r.polaziste, r.dodNapomene

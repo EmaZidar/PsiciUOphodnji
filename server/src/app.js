@@ -518,6 +518,17 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     }
 });
 
+app.delete('/api/rezervacija/:idRezervacija', async (req, res) => {
+    try {
+        const idRezervacija = parseInt(req.params.idrezervacija, 10);
+        await db.deleteRezervacija(idRezervacija);
+        res.json({ message: 'Rezervacija deleted' });
+    } catch (err) {
+        console.error('Error deleting rezervacija:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 function checkIsSetac(req, res, next) {
     if (req.session.user?.role === 'setac')
         return next();

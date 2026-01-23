@@ -549,6 +549,45 @@ app.delete('/api/setnje/:id', async (req, res) => {
 });
 
 
+// GET /api/setaci/:idkorisnik/rating-summary (zove se u Profile.jsx i Reviews.jsx (kasnije))
+// svrha: dohvatiti srednju ocjenu i broj recenzija za setaca
+// provjera: korisnik mora biti ulogiran i mora biti setac
+// backend treba vratiti objekt: {ukocjena: float, brojrecenzija: int}
+// edge case: ako setac nema recenzija, ukocjena treba biti null, brojrecenzija treba biti 0
+// tu se mora neki veliki merge tablica napravit: SETAC, SETNJA, REZERVACIJA, RECENZIJA tak da se moze doc do ocjena
+// znaci treba se izracunat prosjek ocjena iz recenzija za sve setnje tog setaca i prebrojat koliko taj setac ima recenzija i poslat nam u response
+app.get('/api/setaci/:idkorisnik/rating-summary', async (req, res) => {
+    try {
+        const idKorisnik = req.params.idkorisnik;
+        const [ avgOcjena, cntOcjena ] = await db.getAverageRating(idKorisnik);
+        return res.status(200).json({
+            ukocjena: avgOcjena,
+            brojrecenzija: cntOcjena,
+        });
+    } catch (err) {
+        console.error('Error in /api/setaci/*/rating-summary:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// GET /api/setaci/:idkorisnik/recenzije (zove se u Reviews.jsx)
+// svrha: dohvatiti sve recenzije za setaca s idkorisnik
+// nema neke provjere
+// backend treba vratiti array recenzija pod imenom "recenzije" - svaki objekt recenzije treba imati:
+// idrecenzija, ocjena, tekst (ako ga ima), fotografija (ako je ima), imekorisnik, prezkorisnik (ime i prezime vlasnika koji je ostavio recenziju)
+// to se dobije mergeanjem tablica SETAC, SETNJA, REZERVACIJA, RECENZIJA, VLASNIK, KORISNIK
+// edge case: ako setac nema recenzija, treba vratiti prazan array
+app.get('/api/setaci/:idkorisnik/recenzije', async (req, res) => {
+    try {
+        const idKorisnik = req.params.idkorisnik;
+        const ratings = await db.getAllRatings(idKorisnik);
+        return res.status(200).json(ratings);
+    } catch (err) {
+        console.error('Error in /api/setaci/*/recenzije:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.use('/api/calendar', calendar.router)
 
 
@@ -770,14 +809,6 @@ export default app;
 
 // provjerite jel sam dobro stavila ovaj BACKEND_URL u fetchove
 
-// GET /api/setaci/:idkorisnik/rating-summary (zove se u Profile.jsx i Reviews.jsx (kasnije))
-// svrha: dohvatiti srednju ocjenu i broj recenzija za setaca
-// provjera: korisnik mora biti ulogiran i mora biti setac
-// backend treba vratiti objekt: {ukocjena: float, brojrecenzija: int}
-// edge case: ako setac nema recenzija, ukocjena treba biti null, brojrecenzija treba biti 0
-// tu se mora neki veliki merge tablica napravit: SETAC, SETNJA, REZERVACIJA, RECENZIJA tak da se moze doc do ocjena
-// znaci treba se izracunat prosjek ocjena iz recenzija za sve setnje tog setaca i prebrojat koliko taj setac ima recenzija i poslat nam u response
-
 // POST /api/me/profile-image (zove se u Profile.jsx)
 // svrha: setac uploada novu profilnu sliku -> front salje multipart/form-data s fieldom "profilfoto" (File - vrsta Bloba)
 // provjera: korisnik mora biti ulogiran i mora bit setac, idkorisnik se dobije iz sessiona
@@ -801,27 +832,5 @@ export default app;
     //Upisati novu putanju u tablicu šetača (ili gdje već držite profilnu):
     //Paziti da ovo radi samo za šetače (ako vlasnici nemaju profilnu ili drugačije).
 
-
-
-// PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)
-// svrha: azuriranje osobnih podataka za oba korisnika
-// vlasnik: ime, prezime, email, telefon, setac: ime, prezime, email, telefon, lokDjelovanja
-// znaci ak je vlasnik u pitanju updatea se samo tablica KORISNIK, ak je setac onda se updatea KORISNIK i SETAC
-// ako nije setac nego vlasnik lokdjelovanja se ignorira
-// provjera: korisnik mora biti ulogiran
-// korisnik se updateta samo ako ima neceg u bodyju (znaci npr ak promijeni samo mail, updatea se samo mail)
-// slucaj setaca kad se updateaju 2 tablice treba rijesit transakcijom da se ne desi da se updatea samo jedna tablica (BEGIN -> COMMIT -> ROLLBACK)
-// edge case: unique violation za email - treba vratiti 400 s porukom "Email je već u upotrebi"
-
-
-
 // API ZA RECENZIJE
 // provjerite jel sam dobro stavila ovaj BACKEND_URL u fetch
-
-// GET /api/setaci/:idkorisnik/recenzije (zove se u Reviews.jsx)
-// svrha: dohvatiti sve recenzije za setaca s idkorisnik
-// nema neke provjere
-// backend treba vratiti array recenzija pod imenom "recenzije" - svaki objekt recenzije treba imati:
-// idrecenzija, ocjena, tekst (ako ga ima), fotografija (ako je ima), imekorisnik, prezkorisnik (ime i prezime vlasnika koji je ostavio recenziju)
-// to se dobije mergeanjem tablica SETAC, SETNJA, REZERVACIJA, RECENZIJA, VLASNIK, KORISNIK
-// edge case: ako setac nema recenzija, treba vratiti prazan array

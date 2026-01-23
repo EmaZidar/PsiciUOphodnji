@@ -7,12 +7,12 @@
   --text-strong: #334155;
 }
 
-.sveSetnje{
+.setacu-sve-setnje{
   display:block;
   padding: 6px 4px;
 }
 
-.sveSetnje h2{
+.setacu-sve-setnje h2{
   margin: 0 0 12px 0;
   font-size: 1.3rem;
   color: var(--home-accent);
@@ -20,14 +20,14 @@
 }
 
 
-.sveSetnje + .sveSetnje{
+.setacu-sve-setnje + .setacu-sve-setnje{
   border-top: 1px dashed rgba(2,6,23,0.04);
   padding-top: 18px;
 }
 
-.jednaSetnja{
-  background: linear-gradient(180deg, #ffffff, #fbfdff);
-  border: 1px solid rgba(2,6,23,0.06);
+.setacu-jedna-setnja{
+  background:linear-gradient(180deg, #ffffff, #fbfdff);
+  border: 2px solid rgba(44,123,229);
   border-radius: 16px;
   padding: 18px;
   box-shadow: 0 14px 40px rgba(2,6,23,0.08);
@@ -36,11 +36,11 @@
   transition: transform .18s ease, box-shadow .18s ease;
 }
 
-.jednaSetnja h3{ margin:0; color:var(--home-accent); font-weight:900; font-size:1.1rem; letter-spacing:0.2px; }
-.jednaSetnja p{ margin:6px 0; color:var(--text-strong); font-weight:600; font-size:1rem; }
+.setacu-jedna-setnja h3{ margin:0; color:var(--home-accent); font-weight:900; font-size:1.1rem; letter-spacing:0.2px; }
+.setacu-jedna-setnja p{ margin:6px 0; color:var(--text-strong); font-weight:600; font-size:1rem; }
 
 
-.jednaSetnja:hover{ box-shadow: 0 22px 50px rgba(2,6,23,0.12); }
+.setacu-jedna-setnja:hover{ box-shadow: 0 22px 50px rgba(2,6,23,0.12); }
 
 
 .ms-kartica{ display:flex; flex-direction:column; justify-content:space-between; gap:8px; }

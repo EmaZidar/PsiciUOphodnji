@@ -39,23 +39,23 @@ export default function VlasnikInfo() {
   return (
     <>
       <HeaderUlogiran />
-      <main className="vlasnik-page">
-        <div className="vlasnik-info">
+      <main className="vinfo-page">
+        <div className="vinfo-container">
           <h2>Profil vlasnika</h2>
 
-          <div className="owner-card">
+          <div className="vinfo-owner-card">
             <p><strong>Ime:</strong> {vlasnik.imekorisnik}</p>
             <p><strong>Prezime:</strong> {vlasnik.prezkorisnik}</p>
             <p><strong>Email:</strong> {vlasnik.email}</p>
             <p><strong>Telefon:</strong> {vlasnik.telefon}</p>
           </div>
 
-          <section className="psi-section">
+          <section className="vinfo-psi-section">
             <h3>PSI VLASNIKA</h3>
-            <ul className="psi-lista">
+            <ul className="vinfo-psi-lista">
               {vlasnik.psi?.map(p => (
-                <li key={p.idpas} className="pas-kartica">
-                  <p className="imePsa"><strong>Ime psa:</strong> {p.imepas}</p>
+                <li key={p.idpas} className="vinfo-pas-kartica">
+                  <p className="vinfo-imePsa"><strong>Ime psa:</strong> {p.imepas}</p>
                   <p><strong>Pasmina:</strong> {p.pasmina}</p>
                   <p><strong>Godine:</strong> {p.starost}</p>
                   <p><strong>Razina energije:</strong> {p.razinaenergije}/5</p>

@@ -46,9 +46,9 @@ function formatVrijeme(vrijeme) {
   }
 
   return (
-    <div className="sveSetnje">
+    <div className="setacu-sve-setnje">
       {setnje.map((s) => (
-        <div key={s.idsetnja} className="jednaSetnja">
+        <div key={s.idsetnja} className="setacu-jedna-setnja">
           <p><strong>Datum:</strong> {formatDatumHR(s.datum)}</p>
           <p><strong>Vrijeme:</strong> {formatVrijeme(s.vrijeme)}</p>
           <p><strong>Polazište:</strong> {s.polaziste}</p>

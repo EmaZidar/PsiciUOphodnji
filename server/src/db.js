@@ -282,7 +282,8 @@ export async function deleteSetnja(idSetnja) {
 
 export async function deleteRezervacija(idRezervacija) {
     const res = await pool.query(
-        `DELETE FROM rezervacija WHERE idRezervacija = $1`,
+        `DELETE FROM setnja WHERE idSetnja = 
+            (SELECT idSetnja FROM rezervacija WHERE idRezervacija = $1)`,
         [idRezervacija]
     );
     return res;

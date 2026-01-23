@@ -518,10 +518,11 @@ app.delete('/api/delete-profile', checkIsAuthenticated, async (req, res) => {
     }
 });
 
-app.delete('/api/rezervacija/:idRezervacija', async (req, res) => {
+app.delete('/api/delete/rezervacija/:idRezervacija', async (req, res) => {
     try {
-        const idRezervacija = parseInt(req.params.idrezervacija, 10);
+        const idRezervacija = parseInt(req.params.idRezervacija, 10);
         await db.deleteRezervacija(idRezervacija);
+        console.log(`Rezervacija ${idRezervacija} deleted`);
         res.json({ message: 'Rezervacija deleted' });
     } catch (err) {
         console.error('Error deleting rezervacija:', err);

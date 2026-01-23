@@ -7,8 +7,8 @@ function formatDatumHR(datum) {
     if (!datum) return "";
     const d = new Date(datum);
     if (isNaN(d)) return datum;
-    const dan = String(d.getDate()).padStart(2, '0');
-    const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+    const dan = String(d.getDate()).padStart(2, "0");
+    const mjesec = String(d.getMonth() + 1).padStart(2, "0");
     const godina = d.getFullYear();
     return `${dan}.${mjesec}.${godina}.`;
 }
@@ -169,9 +169,16 @@ export default function MojeSetnje() {
     }
 
     function izbrisi(idRezervacija) {
-        fetch(`${BACKEND_URL}/delete/setnja/${idRezervacija}`, {
-            // tu mozda napravi da se odma opet izrendera stranica pa ga nece bit sad
+        fetch(`${BACKEND_URL}/api/delete/rezervacija/${idRezervacija}`, {
             method: "DELETE",
+        }).then((res) => {
+            if (res.ok) {
+                setbuduce((prev) =>
+                    prev.filter(
+                        (setnja) => setnja.idrezervacija !== idRezervacija,
+                    ),
+                );
+            }
         });
     }
 
@@ -242,19 +249,30 @@ export default function MojeSetnje() {
                     {loading ? (
                         <p>Učitavanje...</p>
                     ) : prosleSetnje.length === 0 ? (
-                        <div className="emptyState">Još niste imali šetnju — rezervirajte jednu.</div>
+                        <div className="emptyState">
+                            Još niste imali šetnju — rezervirajte jednu.
+                        </div>
                     ) : (
                         <div className="ms-grid">
-                        {prosleSetnje.map((setnja) => (
-                            <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
-                                <h3 className="ms-naslov">Šetnja</h3>
-                                                                <div className="ms-meta">
-                                                                    <p>Datum: {formatDatumHR(setnja.datum)}</p>
-                                                                    <p>Recenzija: {setnja.recenzija}</p>
-                                                                </div>
-                                <button onClick={() => setPrikaziFormu(true)}>Ostavi recenziju</button>
-                            </div>
-                        ))}
+                            {prosleSetnje.map((setnja) => (
+                                <div
+                                    className="jednaSetnja ms-kartica"
+                                    key={setnja.idRezervacija || setnja.datum}
+                                >
+                                    <h3 className="ms-naslov">Šetnja</h3>
+                                    <div className="ms-meta">
+                                        <p>
+                                            Datum: {formatDatumHR(setnja.datum)}
+                                        </p>
+                                        <p>Recenzija: {setnja.recenzija}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setPrikaziFormu(true)}
+                                    >
+                                        Ostavi recenziju
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     )}
 
@@ -329,17 +347,29 @@ export default function MojeSetnje() {
                 <div className="sveSetnje">
                     <h2>Moje buduće šetnje:</h2>
 
-                        <div className="ms-grid">
-                            {njegoveBuduceSetnje.map((setnja) => (
-                                <div className="jednaSetnja ms-kartica" key={setnja.idrezervacija || setnja.datum}>
-                                    <h3 className="ms-naslov">Šetnja</h3>
-                                    <div className="ms-meta">
-                                        <p>Zakazana: {formatDatumHR(setnja.datum)}</p>
-                                    </div>
-                                    <button className="ms-otkazi" onClick={() => izbrisi(setnja.idrezervacija)}>Otkaži</button>
+                    <div className="ms-grid">
+                        {njegoveBuduceSetnje.map((setnja) => (
+                            <div
+                                className="jednaSetnja ms-kartica"
+                                key={setnja.idrezervacija || setnja.datum}
+                            >
+                                <h3 className="ms-naslov">Šetnja</h3>
+                                <div className="ms-meta">
+                                    <p>
+                                        Zakazana: {formatDatumHR(setnja.datum)}
+                                    </p>
                                 </div>
-                            ))}
-                        </div>
+                                <button
+                                    className="ms-otkazi"
+                                    onClick={() =>
+                                        izbrisi(setnja.idrezervacija)
+                                    }
+                                >
+                                    Otkaži
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </>

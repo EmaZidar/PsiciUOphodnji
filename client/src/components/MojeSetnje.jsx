@@ -331,12 +331,12 @@ export default function MojeSetnje() {
 
                         <div className="ms-grid">
                             {njegoveBuduceSetnje.map((setnja) => (
-                                <div className="jednaSetnja ms-kartica" key={setnja.idRezervacija || setnja.datum}>
+                                <div className="jednaSetnja ms-kartica" key={setnja.idrezervacija || setnja.datum}>
                                     <h3 className="ms-naslov">Šetnja</h3>
                                     <div className="ms-meta">
                                         <p>Zakazana: {formatDatumHR(setnja.datum)}</p>
                                     </div>
-                                    <button className="ms-otkazi" onClick={() => izbrisi(setnja.idRezervacija)}>Otkaži</button>
+                                    <button className="ms-otkazi" onClick={() => izbrisi(setnja.idrezervacija)}>Otkaži</button>
                                 </div>
                             ))}
                         </div>

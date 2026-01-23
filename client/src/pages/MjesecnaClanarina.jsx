@@ -42,11 +42,10 @@ const [mjclanarina, setmjclanarina]=useState(0);
 		  try {
 			setLoading(true);
 			setError(null);
-			//TODO VRATI OVO KAD POPRAVE NA BEKU
-			//const response = await fetch('/api/mjesecna', {  method: 'GET',credentials: 'include' });
-			//if (!response.ok) throw new Error(`Server returned ${response.status}`);
-			//const data = await response.json();
-			//setmjclanarina(data.mjesecna?? 0);
+			const response = await fetch('/api/mjesecna', { credentials: 'include' });
+			if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			const data = await response.json();
+			setmjclanarina(data ?? 0);
 		  } catch (err) {
 			  setError(err.message || 'Greška pri dohvaćanju podataka');
 			  setmjclanarina(0);
@@ -67,20 +66,17 @@ const [mjclanarina, setmjclanarina]=useState(0);
   }
 
   function spremi(e){
+	fetch("http://localhost:8000/mjesecna", {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(mjclanarina)
+	});
 	e.preventDefault();
 	setPrikaziFormu(false);
-
   }
 
   function spremi1(e){
 	setmjclanarina(e.target.value);
-	fetch("http://localhost:8000/mjesecna", {   //TODO
-    method: "POST",
-    headers: {
-    "Content-Type": "application/json"
-  },
-    body: JSON.stringify(mjclanarina)
-  });
   };
 
     const mjesecnisetaci=setaci.filter((setac)=>{ return setac.tipclanarina==="mjesečna"});

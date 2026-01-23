@@ -43,11 +43,10 @@ const [godclanarina, setgodclanarina]=useState(0);
 		  try {
 			setLoading(true);
 			setError(null);
-			//TODO VRATI I OVO KAD POSALJU S BEAKA
-			//const response = await fetch('/api/godisnja', {   method: 'GET', credentials: 'include' });
-			//if (!response.ok) throw new Error(`Server returned ${response.status}`);
-			//const data = await response.json();
-			//setgodclanarina(data.godisnja?? 0);
+			const response = await fetch('/api/godisnja', { credentials: 'include' });
+			if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			const data = await response.json();
+			setgodclanarina(data ?? 0);
 		  } catch (err) {
 			  setError(err.message || 'Greška pri dohvaćanju podataka');
 			  setgodclanarina(0);
@@ -67,20 +66,17 @@ const [godclanarina, setgodclanarina]=useState(0);
   }
 
   function spremi(e){
+	fetch("http://localhost:8000/godisnja", {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(godclanarina)
+	});
 	e.preventDefault();
 	setPrikaziFormu(false);
-
   }
 
   function spremi1(e){
 	setgodclanarina(e.target.value);
-	fetch("http://localhost:8000/godisnja", {   //TODO
-    method: "POST",
-    headers: {
-    "Content-Type": "application/json"
-  },
-    body: JSON.stringify(godclanarina)
-  });
   };
 
   const godisnjisetaci=setaci.filter((setac)=>{ return setac.tipclanarina==="godišnja"});

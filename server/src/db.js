@@ -67,7 +67,7 @@ export async function getUserWithRole(userId) {
     const user = userResult.rows[0];
 
     // Dohvati ulogu i dodatne podatke
-    const [adminResult, setacResult, vlasnikResult] = await Promise.all([
+    const [setacResult, vlasnikResult] = await Promise.all([
         pool.query("SELECT * FROM SETAC WHERE idKorisnik = $1", [userId]),
         pool.query("SELECT * FROM VLASNIK WHERE idKorisnik = $1", [userId]),
     ]);
@@ -75,10 +75,7 @@ export async function getUserWithRole(userId) {
     let role = "unassigned";
     let roleData = {};
 
-    if (adminResult.rows.length > 0) {
-        role = "admin";
-        roleData = adminResult.rows[0];
-    } else if (setacResult.rows.length > 0) {
+    if (setacResult.rows.length > 0) {
         role = "setac";
         roleData = setacResult.rows[0];
     } else if (vlasnikResult.rows.length > 0) {

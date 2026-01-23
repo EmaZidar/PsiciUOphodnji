@@ -19,9 +19,11 @@
   "dependencies": {
     "@azure/identity": "^4.13.0",
     "@azure/storage-blob": "^12.30.0",
+    "@paypal/paypal-server-sdk": "^1.0.0",
+    "body-parser": "^2.2.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "express-session": "^1.18.2",
     "googleapis": "^170.0.0",
     "multer": "^2.0.2",

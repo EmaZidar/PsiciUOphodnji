@@ -748,7 +748,6 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, chec
         const idRezervacija = req.params.idRezervacija;
         const idkorisnik = req.session.user.id;
 
-        // db.platiRezervaciju expects (idKorisnik, idRezervacija)
         const success = await db.platiRezervaciju(idkorisnik, idRezervacija);
         if (success)
             return res.sendStatus(204); // no content

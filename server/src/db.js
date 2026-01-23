@@ -149,8 +149,6 @@ export async function updateUserProfileImage(idKorisnik, imagePath) {
 }
 
 export async function getProsleSetnjeVlasnika(idKorisnik) {
-    // ovo da vrati samo odradene setnje za vlasnika
-    // status = 'odradeno'
     const res = await pool.query(
         `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, r.datum, r.vrijeme, r.status
             FROM rezervacija r

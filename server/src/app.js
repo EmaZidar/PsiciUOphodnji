@@ -268,7 +268,14 @@ app.get('/api/setaci', async (_req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
+// POST /api/me/profile-image (zove se u Profile.jsx)
+// svrha: setac uploada novu profilnu sliku -> front salje multipart/form-data s fieldom "profilfoto" (File - vrsta Bloba)
+// provjera: korisnik mora biti ulogiran i mora bit setac, idkorisnik se dobije iz sessiona
+// dozvoljeni mime: image/jpeg, image/png, image/jpg
+// backend treba spremiti sliku u object storage i dobiti URL/key koji se sprema u bazu
+// napomena za URL: ak se vraca puni url front moze direkt prikazat a ak se vraca relativna putanja front mora znat prefiks
+// backend treba updateat putanju profilne slike u tablici SETAC za tog korisnika
+// frontend ocekuje da se odmah osvjezi user
 app.post('/api/me/profile-image', checkIsAuthenticated, upload.single('profilfoto'), async (req, res) => {
     try {
         // Access the uploaded file via req.file
@@ -722,28 +729,7 @@ export default app;
 // tu se mora neki veliki merge tablica napravit: SETAC, SETNJA, REZERVACIJA, RECENZIJA tak da se moze doc do ocjena
 // znaci treba se izracunat prosjek ocjena iz recenzija za sve setnje tog setaca i prebrojat koliko taj setac ima recenzija i poslat nam u response
 
-// POST /api/me/profile-image (zove se u Profile.jsx)
-// svrha: setac uploada novu profilnu sliku -> front salje multipart/form-data s fieldom "profilfoto" (File - vrsta Bloba)
-// provjera: korisnik mora biti ulogiran i mora bit setac, idkorisnik se dobije iz sessiona
-// dozvoljeni mime: image/jpeg, image/png, image/jpg
-// backend treba spremiti sliku u object storage i dobiti URL/key koji se sprema u bazu
-// napomena za URL: ak se vraca puni url front moze direkt prikazat a ak se vraca relativna putanja front mora znat prefiks
-// backend treba updateat putanju profilne slike u tablici SETAC za tog korisnika
-// frontend ocekuje da se odmah osvjezi user
-// sad cu tu copy pasteat TODO koji mi je chatgpt dao jer ne znam kak se to treba raditi tocno pa ak vam treba helper
-//TODO koraci:
-//Pročitati datoteku iz requesta (multer memory storage ili stream).
-//Generirati jedinstveni key npr: profile-images/{idKorisnik}/{timestamp}-{random}.{ext}
-//Upload u object storage bucket (S3/MinIO/Azure Blob… ovisi što koristite):
-    //postaviti Content-Type na mime filea
-    //opcionalno Cache-Control (npr. public, max-age=31536000 ako su verzionirani keyevi)
-//Spremiti rezultat:
-    //ili public URL (npr. https://.../bucket/...)
-    //ili key + vi ga kasnije mapirate na URL
-//Ako imate staru sliku: opcionalno obrisati stari objekt u storage-u (da se ne gomila).
-//DB update
-    //Upisati novu putanju u tablicu šetača (ili gdje već držite profilnu):
-    //Paziti da ovo radi samo za šetače (ako vlasnici nemaju profilnu ili drugačije).
+
 
 
 // PATCH /api/me (zove se u Profile.jsx i podatciVlasnika.jsx)

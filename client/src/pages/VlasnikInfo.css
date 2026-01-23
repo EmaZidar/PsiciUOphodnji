@@ -6,7 +6,7 @@
   --text-strong: #334155;
 }
 
-.vlasnik-info{
+.vinfo-container{
   max-width: 1120px;
   margin: 24px auto;
   padding: 20px;
@@ -17,13 +17,13 @@
   color: var(--text-strong);
 }
 
-.vlasnik-info h2{ margin:0 0 12px 0; font-size:1.4rem; color:var(--home-accent); }
+.vinfo-container h2{ margin:0 0 12px 0; font-size:1.4rem; color:var(--home-accent); }
 
-.vlasnik-info p{ margin:6px 0; font-weight:600; }
+.vinfo-container p{ margin:6px 0; font-weight:600; }
 
-.vlasnik-info strong{ font-weight:800; }
+.vinfo-container strong{ font-weight:800; }
 
-.psi-lista{
+.vinfo-psi-lista{
   list-style:none;
   padding:18px 0 0 0;
   margin:0;
@@ -32,7 +32,7 @@
   gap:16px;
 }
 
-.pas-kartica{
+.vinfo-pas-kartica{
   background:#ffffff;
   border:1px solid var(--card-border);
   border-radius: var(--card-radius);
@@ -45,23 +45,29 @@
   font-size: 15px;
 }
 
-.pas-kartica:hover{ transform: translateY(-4px); box-shadow: 0 14px 34px rgba(2,6,23,0.06); }
+.vinfo-pas-kartica:hover{ transform: translateY(-4px); box-shadow: 0 14px 34px rgba(2,6,23,0.06); }
 
-.pas-kartica .imePsa{ margin:0; font-size:1.2rem; font-weight:800; color:var(--home-accent); }
+.vinfo-psi-section .vinfo-pas-kartica:hover{
+  transform: none;
+  box-shadow: var(--card-shadow);
+  cursor: default;
+}
 
-.pas-kartica p{ font-size:15px; }
+.vinfo-pas-kartica .vinfo-imePsa{ margin:0; font-size:1.2rem; font-weight:800; color:var(--home-accent); }
 
-.pas-kartica p{ margin:6px 0; color:var(--text-strong); font-weight:600; }
+.vinfo-pas-kartica p{ font-size:15px; }
 
-@media (max-width:720px){ .psi-lista{ grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); } .pas-kartica .imePsa{ font-size:1.05rem; } }
+.vinfo-pas-kartica p{ margin:6px 0; color:var(--text-strong); font-weight:600; }
 
-.vlasnik-page{ display:flex; flex-direction:column; min-height: calc(100vh - 120px); }
+@media (max-width:720px){ .vinfo-psi-lista{ grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); } .vinfo-pas-kartica .vinfo-imePsa{ font-size:1.05rem; } }
 
-.owner-card{ max-width:920px; width: min(920px, 96%); margin: 18px auto; padding: 22px; background:#fff; border-radius:12px; border:1px solid var(--card-border); box-shadow: var(--card-shadow); text-align:left; }
+.vinfo-page{ display:flex; flex-direction:column; min-height: calc(100vh - 120px); }
 
-.owner-card p{ font-size:16px; line-height:1.4; }
+.vinfo-owner-card{ max-width:920px; width: min(920px, 96%); margin: 18px auto; padding: 22px; background:#fff; border-radius:12px; border:1px solid var(--card-border); box-shadow: var(--card-shadow); text-align:left; }
 
-.psi-section{ margin-top:28px; padding-top:18px; border-top:1px dashed rgba(2,6,23,0.06); }
+.vinfo-owner-card p{ font-size:16px; line-height:1.4; }
 
-.psi-section h3{ margin:0 0 12px 0; }
+.vinfo-psi-section{ margin-top:28px; padding-top:18px; border-top:1px dashed rgba(2,6,23,0.06); }
+
+.vinfo-psi-section h3{ margin:0 0 12px 0; }
 

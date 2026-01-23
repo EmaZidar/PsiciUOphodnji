@@ -16,7 +16,6 @@ const initialOptions = {
     components: "buttons",
     "data-sdk-integration-source": "developer-studio",
 };
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 function formatDatumHR(datum) {
     if (!datum) return "";
 

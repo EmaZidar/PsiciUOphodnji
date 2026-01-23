@@ -239,7 +239,7 @@ export default function Profile() {
   }
 
   const defaultImage = new URL('/images/profile.png', import.meta.url).href;
-  const avatarSrc = imagePreviewUrl || (user.profilfoto ? user.profilfoto : defaultImage);
+  const avatarSrc = imagePreviewUrl || user.profilfoto;
 
   return (
     <>

@@ -345,7 +345,7 @@ app.post('/api/me/profile-image', checkIsAuthenticated, upload.single('profilfot
             return res.status(404).json({ error: 'User not found' });
         }
         
-        const userEmail = sessionUser.email.replace(/@/g, '_'); // Sanitize email for blob name
+        const userEmail = sessionUser.email.replace(/@/g, '_'); // makni @
         const fileExtension = req.file.mimetype.split('/')[1]; // jpeg, png, webp
         const blobName = `${userEmail}-profile-${Date.now()}.${fileExtension}`;
         

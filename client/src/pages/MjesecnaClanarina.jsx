@@ -53,9 +53,28 @@ export default function MjesecnaClanarina() {
                 setLoading(false);
             }
         };
+	});
 
-        loadmjcl();
-    }, []);
+  useEffect(() => {
+		
+		const loadmjcl = async () => {
+		  try {
+			setLoading(true);
+			setError(null);
+			const response = await fetch('/api/mjesecna', { credentials: 'include' });
+			if (!response.ok) throw new Error(`Server returned ${response.status}`);
+			const data = await response.json();
+			setmjclanarina(data ?? 0);
+		  } catch (err) {
+			  setError(err.message || 'Greška pri dohvaćanju podataka');
+			  setmjclanarina(0);
+		  } finally {
+			  setLoading(false);
+		  }
+		};
+	
+	loadmjcl();
+  }, []);
 
     function uredi() {
         setPrikaziFormu(true);

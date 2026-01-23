@@ -322,6 +322,31 @@ export async function deleteRezervacija(idRezervacija) {
     return res;
 }
 
+export async function getAverageRating(idKorisnik) {
+    const res = await pool.query(
+        `SELECT AVG(ocjena) as avgOcjena, COUNT(ocjena) as cntOcjena
+            FROM (SELECT idSetnja FROM setnja WHERE idKorisnik = $1) as s
+                NATURAL JOIN rezervacija
+                NATURAL JOIN recenzija`,
+        [idKorisnik]
+    );
+    const avgOcjena = res.rows[0].avgocjena;
+    const cntOcjena = res.rows[0].cntocjena;
+    return [avgOcjena !== null ? +avgOcjena : null, +cntOcjena];
+}
+
+export async function getAllRatings(idKorisnik) {
+    const res = await pool.query(
+        `SELECT idrecenzija, ocjena, tekst, fotografija, imekorisnik, prezkorisnik
+            FROM (SELECT idSetnja FROM setnja WHERE idKorisnik = $1) as s
+                NATURAL JOIN rezervacija
+                NATURAL JOIN recenzija
+                JOIN korisnik k ON k.idKorisnik = $1`,
+        [idKorisnik]
+    );
+    return res.rows;
+}
+
 export async function getSetacNotifikacije(idKorisnik) {
     const res = await pool.query(
         `SELECT r.idRezervacija, s.tipSetnja, s.cijena, s.trajanje, k.imeKorisnik, k.prezKorisnik, r.datum, r.vrijeme, r.polaziste, r.dodNapomene
@@ -444,6 +469,24 @@ export async function getOtherChatParticipantIdForVlasnik(idRezervacija, idKoris
         [idRezervacija, idKorisnik]
     );
     return res.rows.length > 0 ? res.rows[0].idkorisnik : undefined;
+}
+
+export async function getMjesecnaClanarina() {
+    const res = await pool.query("SELECT iznos FROM clanarina WHERE clanarina = 'cijenaMjClanarina'");
+    return +res.rows[0].iznos;
+}
+
+export async function getGodisnjaClanarina() {
+    const res = await pool.query("SELECT iznos FROM clanarina WHERE clanarina = 'cijenaGodClanarina'");
+    return +res.rows[0].iznos;
+}
+
+export async function setMjesecnaClanarina(iznos) {
+    await pool.query("UPDATE clanarina SET iznos = $1 WHERE clanarina = 'cijenaMjClanarina'", [iznos]);
+}
+
+export async function setGodisnjaClanarina(iznos) {
+    await pool.query("UPDATE clanarina SET iznos = $1 WHERE clanarina = 'cijenaGodClanarina'", [iznos]);
 }
 
 export async function testConnection() {

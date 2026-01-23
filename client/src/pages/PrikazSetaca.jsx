@@ -7,6 +7,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 export default function PrikazSetaca() {
   const [setaci, setSetaci] = useState([]);
   const [sortBy, setSortBy] = useState('ocjena-silazno');
+  const [lokacija, setLokacija] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,12 +34,23 @@ export default function PrikazSetaca() {
   }, []);
 
   const sortiraniSetaci = [...(setaci || [])].sort((a, b) => {
-      if (sortBy === 'cijena-uzlazno') return a.cijena - b.cijena;
-      if (sortBy === 'cijena-silazno') return b.cijena - a.cijena;
-      if (sortBy === 'ocjena-uzlazno') return a.ocjena - b.ocjena;
-      if (sortBy === 'ocjena-silazno') return b.ocjena - a.ocjena;
-      // za lokaciju mi trebaju podaci o tom di je vlasnik
+    if (sortBy === 'lokacija') {
+      const unos = lokacija.trim().toLowerCase();
+      if (!unos) return 0;
+
+      const aIma = a.lokdjelovanja.toLowerCase().includes(unos);
+      const bIma = b.lokdjelovanja.toLowerCase().includes(unos);
+
+      if (aIma && !bIma) return -1; // a ide gore
+      if (!aIma && bIma) return 1; // b ide gore
       return 0;
+    }
+
+    if (sortBy === 'cijena-uzlazno') return a.cijena - b.cijena;
+    if (sortBy === 'cijena-silazno') return b.cijena - a.cijena;
+    if (sortBy === 'ocjena-uzlazno') return a.ocjena - b.ocjena;
+    if (sortBy === 'ocjena-silazno') return b.ocjena - a.ocjena;
+    return 0;
    })
   
    return (
@@ -54,6 +66,15 @@ export default function PrikazSetaca() {
             <option value="ocjena-silazno">Ocjena: viša prema najnižoj</option>
             <option value="lokacija">Od najbližih do najdaljih </option>
           </select>
+          {sortBy === 'lokacija' && (
+            <input
+              type="text"
+              placeholder="Unesite grad ili kvart (npr. Trešnjevka)"
+              value={lokacija}
+              onChange={(e) => setLokacija(e.target.value)}
+              className="setaci-lokacija-input"
+            />
+          )}
         </div>
       </div>
         

@@ -96,7 +96,7 @@ export default function Rezervacija() {
                Način plaćanja
                <select name="nacinPlacanja" value={rezervacija.nacinPlacanja} onChange={handleChange}>
                   <option value="gotovina">Gotovina</option>
-                  <option value="kreditna kartica">Kreditna kartica</option>
+                  <option value="kreditna kartica">PayPal</option>
                </select>
             </label>
             <label>

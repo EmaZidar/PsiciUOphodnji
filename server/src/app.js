@@ -581,7 +581,7 @@ app.get('/api/setaci/:idkorisnik/recenzije', async (req, res) => {
     try {
         const idKorisnik = req.params.idkorisnik;
         const ratings = await db.getAllRatings(idKorisnik);
-        return res.status(200).json(ratings);
+        return res.status(200).json({ recenzije: ratings });
     } catch (err) {
         console.error('Error in /api/setaci/*/recenzije:', err);
         res.status(500).json({ error: 'Internal server error' });

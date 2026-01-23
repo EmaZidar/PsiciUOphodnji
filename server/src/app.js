@@ -27,7 +27,6 @@ import bodyParser from "body-parser";
 db.testConnection();
 const imgContainer = await imgDb.initializeBlobStorage();
 
-// Configure multer for file uploads (memory storage)
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
@@ -44,7 +43,6 @@ const upload = multer({
 const app = express();
 app.use(express.json());
 
-// Trust Render's reverse proxy for secure cookies
 if (process.env.NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
@@ -273,14 +271,14 @@ app.patch('/api/me', checkIsAuthenticated, async (req, res) => {
         await db.patchUser(idKorisnik, imekorisnik, prezkorisnik, telefon, lokdjelovanja);
         return res.sendStatus(200);
     } catch (err) {
-        if (err.code === '23505') // UNIQUE_VIOLATION
+        if (err.code === '23505') 
             return res.status(400).json({ error: 'Telefon je već u upotrebi' });
         console.error('Error in /api/me:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Logout endpoint: destroy session and clear cookie
+// Logout endpoint
 app.post('/api/logout', (req, res) => {
     try {
         req.session.destroy((err) => {
@@ -327,7 +325,6 @@ app.get('/api/godisnja', async (_req, res) => {
 // frontend ocekuje da se odmah osvjezi user
 app.post('/api/me/profile-image', checkIsAuthenticated, upload.single('profilfoto'), async (req, res) => {
     try {
-        // Access the uploaded file via req.file
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
         }
@@ -349,19 +346,16 @@ app.post('/api/me/profile-image', checkIsAuthenticated, upload.single('profilfot
         const fileExtension = req.file.mimetype.split('/')[1]; // jpeg, png, webp
         const blobName = `${userEmail}-profile-${Date.now()}.${fileExtension}`;
         
-        // Upload file buffer to Azure Blob Storage
         const uploadResult = await imgDb.uploadImage(blobName, imgContainer, req.file.buffer);
         
         console.log('Image uploaded successfully:', uploadResult.url);
         
-        // TODO: Update database with photo URL
         const updateResult = await db.updateUserProfileImage(dbUser.idkorisnik, uploadResult.url);
         if (!updateResult) {
             return res.status(500).json({ error: 'Failed to update user profile image in database' });
         } else {
             console.log('Database updated with new profile image URL');
         }
-        // Refresh user data
         const userId = dbUser.idkorisnik;
         const userWithRole = await db.getUserWithRole(userId);
         
@@ -656,7 +650,7 @@ function changeRezervacijaStatus(newStatus) {
 
             const success = await db.changeRezervacijaStatus(idkorisnik, idRezervacija, newStatus);
             if (success)
-                return res.sendStatus(204); // no content
+                return res.sendStatus(204);
             return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
         } catch (err) {
             console.error(`Error in /api/rezervacija/*/${newStatus}`, err);
@@ -749,7 +743,7 @@ app.patch('/api/rezervacije/:idRezervacija/placanje', checkIsAuthenticated, chec
 
         const success = await db.platiRezervaciju(idkorisnik, idRezervacija);
         if (success)
-            return res.sendStatus(204); // no content
+            return res.sendStatus(204);
         return res.status(404).json({ error: "Ne postoji takva rezervacija na čekanju" });
     } catch (err) {
         console.error('Error in /api/rezervacije/*/placanje', err);

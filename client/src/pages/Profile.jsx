@@ -276,7 +276,7 @@ export default function Profile() {
                       <span>Učitavanje ocjene…</span>
                     ) : rating.ukOcjena ? (
                       <span>
-                        {rating.ukOcjena}/5 ⭐ ({rating.brojRecenzija} recenzija)
+                        {Number(rating.ukOcjena).toFixed(2)}/5 ⭐ ({rating.brojRecenzija} recenzija)
                       </span>
                     ) : (
                       <span>Još nema recenzija</span>

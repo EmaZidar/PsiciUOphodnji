@@ -670,6 +670,25 @@ app.patch('/api/rezervacija/:idRezervacija/prihvati', checkIsAuthenticated, chec
 
 app.patch('/api/rezervacija/:idRezervacija/odbij', checkIsAuthenticated, checkIsSetac, changeRezervacijaStatus('odbijeno'));
 
+// ovo sam dodala molim da vlasnik moze oznacit rezervaciju kao odradenu
+// provjerite jel je ok
+// koristi funkciju iz db.js changeRezervacijaStatusVlasnik
+// koja radi slicno kao changeRezervacijaStatus ali za vlasnika
+// i moze samo postavit status na 'odradeno'
+app.patch('/api/rezervacija/:idRezervacija/zavrsi', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
+    try {
+        const idRezervacija = req.params.idRezervacija;
+        const idkorisnik = req.session.user.id;
+
+        const success = await db.changeRezervacijaStatusVlasnik(idkorisnik, idRezervacija, 'odradeno');
+        if (success) return res.sendStatus(204);
+        return res.status(404).json({ error: "Ne postoji takva rezervacija za završiti" });
+    } catch (err) {
+        console.error('Error in /api/rezervacija/:idRezervacija/zavrsi', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, checkIsVlasnik, async (req, res) => {
     try {
         const notifications = await db.getVlasnikNotifikacije(req.session.user.id);
@@ -677,6 +696,33 @@ app.get('/api/vlasnik/notifikacije', checkIsAuthenticated, checkIsVlasnik, async
         return res.status(200).json(notifications);
     } catch (err) {
         console.error('Error in /api/vlasnik/notifikacije:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// ovo takoder pogledajte jel ok
+// POST /recenzija
+// vlasnik ostavlja recenziju za odradenu setnju
+// body: { idRezervacija, ocjena, tekst, fotografija }
+// provjere:
+// - korisnik mora biti ulogiran
+// - rezervacija s idRezervacija mora postojati i mora pripadati ulogiranom korisniku
+// - status rezervacije mora biti 'odradeno' (samo za odradene setnje se moze ostavit recenzija)
+// backend kreira novu recenziju u tablici RECENZIJA
+app.post('/recenzija', checkIsAuthenticated, async (req, res) => {
+    try {
+        const { idRezervacija, ocjena, tekst, fotografija } = req.body;
+        if (!idRezervacija) return res.status(400).json({ error: 'idRezervacija required' });
+
+        const idKorisnik = req.session.user.id;
+        const rezervacija = await db.getRezervacija(idKorisnik, idRezervacija);
+        if (!rezervacija) return res.status(404).json({ error: 'Rezervacija nije pronađena za ovog korisnika' });
+        if (rezervacija.status !== 'odradeno') return res.status(400).json({ error: 'Recenzija se može ostaviti samo za odrađene šetnje' });
+
+        const created = await db.createRecenzija(idRezervacija, ocjena, tekst, fotografija);
+        return res.status(201).json(created);
+    } catch (err) {
+        console.error('Error creating recenzija:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -739,6 +785,21 @@ app.get('/api/setnje-setaca', async (req, res) => {
         return res.status(200).json(setnje);
     } catch (err) {
         console.error('Error in /api/setnje-setaca:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+// API – prosle setnje setaca
+// setac na svom home pageu (UlogiranSetac) treba vidjeti sve setnje koje je vec odradio
+// pogledajte SetnjeSetacu.jsx da vidite kako frontend salje request i sta ocekuje kao odgovor
+app.get('/api/setac/prosle', checkIsAuthenticated, checkIsSetac, async (req, res) => {
+    try {
+        const { idkorisnik } = await db.getUserWithEmail(req.session.user.email);
+        const prosle = await db.getProsleSetnjeSetaca(idkorisnik);
+        return res.status(200).json(prosle);
+    } catch (err) {
+        console.error('Error in /api/setac/prosle:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

@@ -5,6 +5,24 @@ import './SetnjeSetacu.css';
 export default function SetnjeSetacu() {
   const [setnje, setSetnje] = useState([]);
   const [loading, setLoading] = useState(true);
+ function formatDatumHR(datum) {
+  if (!datum) return '';
+
+  const d = new Date(datum);
+
+  const dan = String(d.getDate()).padStart(2, '0');
+  const mjesec = String(d.getMonth() + 1).padStart(2, '0');
+  const godina = d.getFullYear();
+
+  return `${dan}.${mjesec}.${godina}.`;
+}
+
+function formatVrijeme(vrijeme) {
+  if (!vrijeme) return '';
+
+  return vrijeme.slice(0, 5);
+}
+
 
   useEffect(() => {
     fetch('/api/setnje-setaca', { credentials: 'include' })
@@ -28,11 +46,11 @@ export default function SetnjeSetacu() {
   }
 
   return (
-    <div className="setnje-lista">
+    <div className="sveSetnje">
       {setnje.map((s) => (
-        <div key={s.idsetnja} className="setnja-kartica">
-          <p><strong>Datum:</strong> {s.datum}</p>
-          <p><strong>Vrijeme:</strong> {s.vrijeme}</p>
+        <div key={s.idsetnja} className="jednaSetnja">
+          <p><strong>Datum:</strong> {formatDatumHR(s.datum)}</p>
+          <p><strong>Vrijeme:</strong> {formatVrijeme(s.vrijeme)}</p>
           <p><strong>Polazište:</strong> {s.polaziste}</p>
           <p><strong>Tip šetnje:</strong> {s.tipsetnja}</p>
           <p><strong>Trajanje:</strong> {s.trajanje} min</p>

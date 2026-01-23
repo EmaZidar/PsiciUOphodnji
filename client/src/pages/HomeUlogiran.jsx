@@ -13,7 +13,6 @@ export default function HomeUlogiran() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch user info from server
     const fetchCall = async () => {
       const API = `${BACKEND_URL}/api/me`;
       const response = await fetch(API, { credentials: 'include' });

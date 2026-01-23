@@ -407,7 +407,7 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
         `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status, setnja.tipSetnja, setnja.cijena, setnja.trajanje, dodNapomene
             FROM rezervacija join setnja on rezervacija.idSetnja = setnja.idSetnja
             WHERE idRezervacija = $1 AND rezervacija.idKorisnik = $2`,
-        [idKorisnik, idRezervacija]
+        [idRezervacija, idKorisnik]
     );
     return res.rows.length >= 1 ? res.rows[0] : undefined;
 }

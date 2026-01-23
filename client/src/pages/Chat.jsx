@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ChatList from "../components/ChatList";
 import ChatWindow from "../components/ChatWindow";
+import Footer from "../components/Footer";
+import HeaderUlogiran from "../components/HeaderUlogiran";
 import "../components/Chat.css";
 
 const SAMPLE_CHATS = [
@@ -59,20 +61,24 @@ export default function Chat() {
   };
 
   return (
-    <div className="chat-page">
-      <div className="chat-container">
-        <div className="chat-list-column">
-          <h3>Razgovori</h3>
-          <ChatList chats={chats} onSelect={handleSelect} selectedId={selected?.idrezervacija} />
-        </div>
-        <div className="chat-window-column">
-          {selected ? (
-            <ChatWindow key={selected.idrezervacija} chat={selected} me={me} />
-          ) : (
-            <div className="placeholder">Odaberite razgovor s lijeve strane</div>
-          )}
+    <>
+      <HeaderUlogiran />
+      <div className="chat-page">
+        <div className="chat-container">
+          <div className="chat-list-column">
+            <h3>Razgovori</h3>
+            <ChatList chats={chats} onSelect={handleSelect} selectedId={selected?.idrezervacija} />
+          </div>
+          <div className="chat-window-column">
+            {selected ? (
+              <ChatWindow key={selected.idrezervacija} chat={selected} me={me} />
+            ) : (
+              <div className="placeholder">Odaberite razgovor s lijeve strane</div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

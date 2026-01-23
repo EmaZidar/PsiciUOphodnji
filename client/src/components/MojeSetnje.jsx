@@ -20,23 +20,6 @@ function formatVrijeme(vrijeme) {
 
   return vrijeme.slice(0, 5);
 }
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
-
-function formatDatumHR(datum) {
-    if (!datum) return "";
-    const d = new Date(datum);
-    if (isNaN(d)) return datum;
-    const dan = String(d.getDate()).padStart(2, "0");
-    const mjesec = String(d.getMonth() + 1).padStart(2, "0");
-    const godina = d.getFullYear();
-    return `${dan}.${mjesec}.${godina}.`;
-}
-
-function formatVrijeme(vrijeme) {
-  if (!vrijeme) return '';
-
-  return vrijeme.slice(0, 5);
-}
 
 export default function MojeSetnje() {
 export default function MojeSetnje() {
@@ -174,6 +157,7 @@ export default function MojeSetnje() {
         fetch(`${BACKEND_URL}/recenzija`, {
             method: "POST",
             credentials: 'include',
+            credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
             },
@@ -189,10 +173,6 @@ export default function MojeSetnje() {
                 }
             })
             .catch((err) => alert('Greška pri slanju recenzije: ' + (err.message || err)));
-    }
-
-    function odustani() {
-        setPrikaziFormu(false);
     }
 
     function odustani() {

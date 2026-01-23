@@ -104,6 +104,42 @@ export async function getUserWithId(idKorisnik) {
     return res.rows[0];
 }
 
+export async function patchUser(idKorisnik, ime, prezime, email, telefon, lokDjelovanja) {
+    let query = '';
+
+    const fieldsToUpdate = []
+    if (ime)     fieldsToUpdate.push('imeKorisnik = $2');
+    if (prezime) fieldsToUpdate.push('prezKorisnik = $3');
+    if (email)   fieldsToUpdate.push('email = $4');
+    if (telefon) fieldsToUpdate.push('telefon = $5');
+    
+    if (fieldsToUpdate.length > 0)
+        query = `UPDATE korisnik
+                SET ${fieldsToUpdate.join(',')}
+                WHERE idKorisnik = $1;`;
+    
+    if (lokDjelovanja) {
+        const lokacijaUpdateQuery = `UPDATE setac
+            SET lokDjelovanja = $6
+            WHERE idKorisnik = $1;`
+        if (query)
+            query = 'BEGIN TRANSACTION;' + lokacijaUpdateQuery + 'COMMIT TRANSACTION;'
+        else query = lokacijaUpdateQuery;
+    }
+
+    if (!query)
+        return false;
+
+    console.log('params:', idKorisnik, ime, prezime, email, telefon, lokDjelovanja);
+    const res = await pool.query(
+        query,
+        [idKorisnik, ime ?? '', prezime ?? '', email ?? '', telefon ?? '', lokDjelovanja ?? '']
+    );
+    console.log(res);
+
+    return res.rows.length > 0;
+}
+
 export async function updateUserProfileImage(idKorisnik, imagePath) {
     const res = await pool.query(
         `UPDATE setac 

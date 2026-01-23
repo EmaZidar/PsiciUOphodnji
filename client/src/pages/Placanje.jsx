@@ -5,6 +5,8 @@ import Footer from "../components/Footer";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import "./Placanje.css";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
 const initialOptions = {
     "client-id": "test",
     "disable-funding": "card,credit",
@@ -46,7 +48,7 @@ export default function Placanje() {
     useEffect(() => {
         async function fetchRezervacija() {
             try {
-                const res = await fetch(`/api/rezervacije/${idrezervacija}`, {
+                const res = await fetch(`${BACKEND_URL}/api/rezervacije/${idrezervacija}`, {
                     credentials: "include",
                 });
                 if (!res.ok) throw new Error(`Server vratio ${res.status}`);

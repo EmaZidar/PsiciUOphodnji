@@ -33,7 +33,8 @@ export default function Chat() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch('/api/me', { credentials: 'include' });
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
       if (!res.ok) return;
       const json = await res.json();
       setMe(json.user);
@@ -42,7 +43,8 @@ export default function Chat() {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch('/api/chats', { credentials: 'include' });
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${BACKEND_URL}/api/chats`, { credentials: 'include' });
       if (!res.ok) {
         setChats(SAMPLE_CHATS);
         return;

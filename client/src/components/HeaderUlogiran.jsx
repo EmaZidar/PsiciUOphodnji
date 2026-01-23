@@ -88,7 +88,7 @@ export default function Header() {
   };
 
   const handlePay = (idrezervacija) => {
-    navigate(`${BACKEND_URL}/placanje/${idrezervacija}`);
+    navigate(`/placanje/${idrezervacija}`);
   };
   
   useEffect(() => {

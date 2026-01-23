@@ -859,10 +859,10 @@ app.put('/api/godisnja', async (req, res) => {
         const iznos = +req.body;
         if (!(iznos > 0))
             return res.status(400).json({ error: 'Nevalidni iznos' });
-        await db.setMjesecnaClanarina(iznos);
+        await db.setGodisnjaClanarina(iznos);
         return res.sendStatus(204);
     } catch (err) {
-        console.error('Error in /api/mjesecna:', err);
+        console.error('Error in /api/godisnja:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

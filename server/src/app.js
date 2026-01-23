@@ -9,6 +9,20 @@ import multer from "multer";
 import cors from "cors";
 import * as calendar from "./calendar.js";
 import * as chat from "./chat.js";
+import {
+    ApiError,
+    CheckoutPaymentIntent,
+    Client,
+    Environment,
+    LogLevel,
+    OrdersController,
+    PaymentsController,
+    PaypalExperienceLandingPage,
+    PaypalExperienceUserAction,
+    ShippingPreference,
+} from "@paypal/paypal-server-sdk";
+import bodyParser from "body-parser";
+
 
 db.testConnection();
 const imgContainer = await imgDb.initializeBlobStorage();
@@ -70,13 +84,15 @@ const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
-
 const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:8000/google/callback";
 const GOOGLE_OAUTH_SCOPES = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
 //  "https://www.googleapis.com/auth/calendar.events",
 ];
+
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
 app.get("/login/auth", async (_req, res) => {
     const state = "some_state";
@@ -233,7 +249,8 @@ app.get('/api/me', checkIsAuthenticated, async (req, res) => {
         const userId = dbUser.idkorisnik ?? dbUser.idKorisnik;
         const userWithRole = await db.getUserWithRole(userId);
         //console.log('/api/me - returning userWithRole:', userWithRole);
-
+        const isAdmin = userWithRole.email === process.env.ADMIN_EMAIL;
+        userWithRole.role = isAdmin ? 'admin' : userWithRole.role;
         res.json({ session: sessionUser, user: userWithRole });
     } catch (err) {
         console.error('Error in /api/me:', err);
@@ -288,6 +305,16 @@ app.get('/api/setaci', async (_req, res) => {
         res.status(200).json(setaci)
     } catch (err) {
         console.error('Error in /api/setaci:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/godisnja', async (_req, res) => {
+    try {
+        const godisnja = await db.getGodisnjaClanarina();
+        res.status(200).json({ godisnja: godisnja?.godisnja ?? 0 });
+    } catch (err) {
+        console.error('Error in /api/godisnja:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

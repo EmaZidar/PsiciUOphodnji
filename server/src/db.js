@@ -68,9 +68,6 @@ export async function getUserWithRole(userId) {
 
     // Dohvati ulogu i dodatne podatke
     const [adminResult, setacResult, vlasnikResult] = await Promise.all([
-        pool.query("SELECT * FROM ADMINISTRATOR WHERE idKorisnik = $1", [
-            userId,
-        ]),
         pool.query("SELECT * FROM SETAC WHERE idKorisnik = $1", [userId]),
         pool.query("SELECT * FROM VLASNIK WHERE idKorisnik = $1", [userId]),
     ]);
@@ -366,9 +363,9 @@ export async function getVlasnikNotifikacije(idKorisnik) {
 
 export async function getRezervacija(idKorisnik, idRezervacija) {
     const res = await pool.query(
-        `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status
-            FROM rezervacija
-            WHERE idRezervacija = $1 AND idKorisnik = $2`,
+        `SELECT idRezervacija, datum, vrijeme, polaziste, nacinPlacanja, status, setnja.tipSetnja, setnja.cijena, setnja.trajanje, dodNapomene
+            FROM rezervacija join setnja on rezervacija.idSetnja = setnja.idSetnja
+            WHERE idRezervacija = $1 AND rezervacija.idKorisnik = $2`,
         [idRezervacija, idKorisnik]
     );
     return res.rows.length >= 1 ? res.rows[0] : undefined;

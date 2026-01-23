@@ -12,9 +12,7 @@ const initialOptions = {
     "disable-funding": "card,credit",
     "buyer-country": "US",
     currency: "EUR",
-    "data-page-type": "product-details",
     components: "buttons",
-    "data-sdk-integration-source": "developer-studio",
 };
 function formatDatumHR(datum) {
     if (!datum) return "";
@@ -42,6 +40,7 @@ export default function Placanje() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [paid, setPaid] = useState(false);
+    const [message, setMessage] = useState("");
 
     /* dohvat rezervacije */
     useEffect(() => {
@@ -126,7 +125,7 @@ export default function Placanje() {
 
                 {!loading && !error && rezervacija && (
                     <div className="placanje-card">
-                        {paid && (
+                            {paid && (
                             <div className="placanje-success">
                                 <p>
                                     <strong>Plaćeno!</strong>
@@ -149,43 +148,51 @@ export default function Placanje() {
                                         color: "gold",
                                         label: "paypal",
                                     }}
-                                    createOrder={(data, actions) => {
+                                    createOrder={async (data, actions) => {
+                                        // postaviti iznos plaćanja
+                                        const value = rezervacija?.cijena ?? 0;
                                         return actions.order.create({
                                             purchase_units: [
                                                 {
-                                                    amount: {
-                                                        value: rezervacija.cijena.toString(),
-                                                        currency_code: "EUR",
-                                                    },
-                                                    description: `Šetnja ${rezervacija.tipsetnja}`,
+                                                    amount: { value: String(value), currency_code: "EUR" },
                                                 },
                                             ],
                                         });
                                     }}
                                     onApprove={async (data, actions) => {
-                                        const details =
-                                            await actions.order.capture();
-                                        const response = await fetch(
-                                            `${BACKEND_URL}/api/rezervacije/${idrezervacija}/placanje`,
-                                            {
+                                        try {
+                                            const capture = await actions.order.capture();
+
+                                    
+                                            const res = await fetch(`${BACKEND_URL}/api/rezervacije/${idrezervacija}/placanje`, {
                                                 method: "PATCH",
                                                 credentials: "include",
-                                            },
-                                        );
-                                        if (!response.ok) {
-                                            setError(
-                                                "Greška pri ažuriranju statusa plaćanja.",
-                                            );
-                                            return;
+                                            });
+
+                                            if (!res.ok) {
+                                                const body = await res.json().catch(() => ({}));
+                                                setMessage(body?.error || "Nemoguće potvrditi plaćanje na serveru.");
+                                                return;
+                                            }
+
+                                            setPaid(true);
+                                            setMessage("Uspješno plaćanje.");
+                                        } catch (error) {
+                                            console.error(error);
+                                            setMessage(`Došlo je do pogreške: ${error}`);
                                         }
                                         setPaid(true);
                                     }}
                                     onError={(err) => {
-                                        setError("Greška pri PayPal plaćanju.");
+                                        console.error('PayPal error', err);
+                                        setMessage('Došlo je do pogreške u PayPalu.');
                                     }}
+                                    onCancel={() => setMessage('Plaćanje otkazano.')}
                                 />
                             </PayPalScriptProvider>
                         )}
+
+                        {message && <p className="placanje-message">{message}</p>}
 
                         {!paid && !karticnoPlacanje && (
                             <div className="placanje-info">

@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
+import { useNavigate } from 'react-router-dom';
 import HeaderUlogiran from '../components/HeaderUlogiran';
 import Footer from '../components/Footer';
 import Reviews from '../components/Reviews';
@@ -12,6 +13,7 @@ function buildUploadPreview(file) {
 }
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
@@ -91,7 +93,7 @@ export default function Profile() {
         const res = await fetch(`${BACKEND_URL}/api/setaci/${user.idkorisnik}/rating-summary`, {
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Greška pri dohvaćanju ocjena");
+        if (!res.ok) throw new Error("Greška pri dohvaćanju sažetka ocjena");
 
         const data = await res.json();
         if (!cancelled) {

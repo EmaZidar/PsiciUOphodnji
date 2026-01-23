@@ -1,30 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export default function Footer() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setUser(data.user ?? data.session ?? null);
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => { mounted = false };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${BACKEND_URL}/api/logout`, { method: 'POST', credentials: 'include' });
+    } catch (e) {
+      // ignore
+    }
+    localStorage.setItem('sessionExpired', 'true');
+    navigate('/', { replace: true });
+  }
+
   return (
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-columns">
-          <div className="col">
+          <div className="col footer-col-logo">
             <a href="/" aria-label="PawPal home">
-              <img src="images/logo.png" alt="PawPal logo" className="footer-logo" />
+              <img src="/images/logo.png" alt="PawPal logo" className="footer-logo" />
             </a>
           </div>
-          <div className="col">
-            <h4>Brze poveznice</h4>
-            <ul>
-              <li>Pronađi šetača</li>
-              <li>Postani šetač</li>
-              <li>Cjenik</li>
-            </ul>
-          </div>
-          <div className="col">
+
+          <div className="col footer-col-contact">
             <h4>Kontakt</h4>
-            <p>Email: info@pawpal.example</p>
+            <p>Email: pawpal.pomoc@email.com</p>
+          </div>
+
+          <div className="col footer-col-logout">
+            {user && (
+              <button onClick={handleLogout} className="footer-logout" aria-label="Odjavi se" title="Odjavi se">
+                <img src="/images/logout.png" alt="Odjavi se" className="logout-icon" />
+              </button>
+            )}
           </div>
         </div>
       </div>
-      <div className="footer-bottom">&copy; 2025 PawPal — sva prava pridržana</div>
+      <div className="footer-bottom">&copy; 2025 PawPal </div>
     </footer>
   );
 }

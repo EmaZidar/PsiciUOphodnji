@@ -268,10 +268,10 @@ export async function getRezervacija(idKorisnik, idRezervacija) {
 export async function getSetnjeSetaca(idKorisnik) {
     const res = await pool.query(
         `SELECT s.idSetnja, r.datum, r.vrijeme, r.polaziste, s.tipSetnja, s.trajanje, s.cijena, r.dodNapomene,
-                k.idKorisnik, k.imeKorisnik, k.prezKorisnik
+                r.idKorisnik, k.imeKorisnik, k.prezKorisnik
             FROM setnja s
-                JOIN korisnik k ON s.idKorisnik = k.idKorisnik
                 JOIN rezervacija r ON s.idSetnja = r.idSetnja
+                JOIN korisnik k ON r.idKorisnik = k.idKorisnik
             WHERE s.idKorisnik = $1 AND r.datum >= CURRENT_DATE AND (r.status = 'placeno' OR (r.status = 'potvrdeno' AND r.nacinPlacanja = 'gotovina'))
             ORDER BY r.datum, r.vrijeme`,
         [idKorisnik]

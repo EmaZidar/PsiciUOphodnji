@@ -14,7 +14,7 @@ const initialOptions = {
     components: "buttons",
     "data-sdk-integration-source": "developer-studio",
 };
-
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 function formatDatumHR(datum) {
     if (!datum) return "";
 
@@ -46,7 +46,7 @@ export default function Placanje() {
     useEffect(() => {
         async function fetchRezervacija() {
             try {
-                const res = await fetch(`/api/rezervacije/${idrezervacija}`, {
+                const res = await fetch(`${BACKEND_URL}/api/rezervacije/${idrezervacija}`, {
                     credentials: "include",
                 });
                 if (!res.ok) throw new Error(`Server vratio ${res.status}`);
@@ -165,7 +165,7 @@ export default function Placanje() {
                                         const details =
                                             await actions.order.capture();
                                         const response = await fetch(
-                                            `/api/rezervacije/${idrezervacija}/placanje`,
+                                            `${BACKEND_URL}/api/rezervacije/${idrezervacija}/placanje`,
                                             {
                                                 method: "PATCH",
                                                 credentials: "include",

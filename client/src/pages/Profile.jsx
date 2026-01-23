@@ -232,14 +232,14 @@ export default function Profile() {
         throw new Error(body?.error || "Greška pri brisanju profila");
       }
 
-      window.location.href = process.env.REACT_APP_URL || 'http://localhost:5173';
+      window.location.href = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
     } catch (e) {
       setError(e?.message || "Greška pri brisanju profila");
     }
   }
 
   const defaultImage = new URL('/images/profile.png', import.meta.url).href;
-  const avatarSrc = imagePreviewUrl || (user?.roleData?.profilfoto ? `${BACKEND_URL}${user.roleData.profilfoto}` : defaultImage);
+  const avatarSrc = imagePreviewUrl || (user.profilfoto ? user.profilfoto : defaultImage);
 
   return (
     <>

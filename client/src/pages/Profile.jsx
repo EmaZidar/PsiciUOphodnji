@@ -28,7 +28,6 @@ export default function Profile() {
   const [form, setForm] = useState({
     imekorisnik: "",
     prezkorisnik: "",
-    email: "",
     telefon: "",
     lokdjelovanja: "",
   });
@@ -77,7 +76,6 @@ export default function Profile() {
     setForm({
       imekorisnik: user.imekorisnik ?? "",
       prezkorisnik: user.prezkorisnik ?? "",
-      email: user.email ?? "",
       telefon: user.telefon ?? "",
       lokdjelovanja: user.roleData?.lokdjelovanja ?? "",
     });
@@ -182,7 +180,6 @@ export default function Profile() {
     setForm({
       imekorisnik: user?.imekorisnik ?? "",
       prezkorisnik: user?.prezkorisnik ?? "",
-      email: user?.email ?? "",
       telefon: user?.telefon ?? "",
       lokdjelovanja: user?.roleData?.lokdjelovanja ?? "",
     });
@@ -196,7 +193,6 @@ export default function Profile() {
       const payload = {
         imekorisnik: form.imekorisnik,
         prezkorisnik: form.prezkorisnik,
-        email: form.email,
         telefon: form.telefon,
         lokdjelovanja: form.lokdjelovanja, 
       };
@@ -309,12 +305,7 @@ export default function Profile() {
                     )}
                   </div>
                   <div className="profile-row">
-                    <strong>Email:</strong>{" "}
-                    {isEditing ? (
-                      <input type="email" name="email" value={form.email} onChange={handleChange} className="profile-input"/>
-                    ) : (
-                      user.email || '—'
-                    )}
+                    <strong>Email:</strong> {user.email || '—'}
                   </div>
                   <div className="profile-row">
                     <strong>Telefon:</strong>{" "}

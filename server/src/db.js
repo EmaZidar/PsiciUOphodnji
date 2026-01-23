@@ -104,12 +104,11 @@ export async function getUserWithId(idKorisnik) {
     return res.rows[0];
 }
 
-export async function patchUser(idKorisnik, ime, prezime, email, telefon, lokDjelovanja) {
+export async function patchUser(idKorisnik, ime, prezime, telefon, lokDjelovanja) {
     const fieldsToUpdate = [];
     const korisnikArgs = [idKorisnik];
     if (ime)     { fieldsToUpdate.push('imeKorisnik = $' + (korisnikArgs.length + 1));  korisnikArgs.push(ime); }
     if (prezime) { fieldsToUpdate.push('prezKorisnik = $' + (korisnikArgs.length + 1)); korisnikArgs.push(prezime); }
-    if (email)   { fieldsToUpdate.push('email = $' + (korisnikArgs.length + 1));        korisnikArgs.push(email); }
     if (telefon) { fieldsToUpdate.push('telefon = $' + (korisnikArgs.length + 1));      korisnikArgs.push(telefon); }
     
     let korisnikQuery = '';

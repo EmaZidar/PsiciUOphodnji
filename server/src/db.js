@@ -105,39 +105,43 @@ export async function getUserWithId(idKorisnik) {
 }
 
 export async function patchUser(idKorisnik, ime, prezime, email, telefon, lokDjelovanja) {
-    let query = '';
-
-    const fieldsToUpdate = []
-    if (ime)     fieldsToUpdate.push('imeKorisnik = $2');
-    if (prezime) fieldsToUpdate.push('prezKorisnik = $3');
-    if (email)   fieldsToUpdate.push('email = $4');
-    if (telefon) fieldsToUpdate.push('telefon = $5');
+    const fieldsToUpdate = [];
+    const korisnikArgs = [idKorisnik];
+    if (ime)     { fieldsToUpdate.push('imeKorisnik = $' + (korisnikArgs.length + 1));  korisnikArgs.push(ime); }
+    if (prezime) { fieldsToUpdate.push('prezKorisnik = $' + (korisnikArgs.length + 1)); korisnikArgs.push(prezime); }
+    if (email)   { fieldsToUpdate.push('email = $' + (korisnikArgs.length + 1));        korisnikArgs.push(email); }
+    if (telefon) { fieldsToUpdate.push('telefon = $' + (korisnikArgs.length + 1));      korisnikArgs.push(telefon); }
     
+    let korisnikQuery = '';
     if (fieldsToUpdate.length > 0)
-        query = `UPDATE korisnik
+        korisnikQuery = `UPDATE korisnik
                 SET ${fieldsToUpdate.join(',')}
                 WHERE idKorisnik = $1;`;
     
+    let lokacijaQuery = '';
     if (lokDjelovanja) {
-        const lokacijaUpdateQuery = `UPDATE setac
-            SET lokDjelovanja = $6
-            WHERE idKorisnik = $1;`
-        if (query)
-            query = 'BEGIN TRANSACTION;' + lokacijaUpdateQuery + 'COMMIT TRANSACTION;'
-        else query = lokacijaUpdateQuery;
+        lokacijaQuery = `UPDATE setac
+            SET lokDjelovanja = $2
+            WHERE idKorisnik = $1;`;
     }
 
-    if (!query)
-        return false;
-
-    console.log('params:', idKorisnik, ime, prezime, email, telefon, lokDjelovanja);
-    const res = await pool.query(
-        query,
-        [idKorisnik, ime ?? '', prezime ?? '', email ?? '', telefon ?? '', lokDjelovanja ?? '']
-    );
-    console.log(res);
-
-    return res.rows.length > 0;
+    if (korisnikQuery && lokacijaQuery) {
+        await pool.query('BEGIN TRANSACTION');
+        try {
+            await pool.query(korisnikQuery, korisnikArgs);
+            await pool.query(lokacijaQuery, [idKorisnik, lokDjelovanja]);
+            await pool.query('COMMIT');
+        } catch (err) {
+            try {
+                await pool.query('ROLLBACK');
+            } catch (_) { /* Ignoriraj gresku ovdje */ console.error(_); }
+            throw err;
+        }
+    } else if (korisnikQuery) {
+        await pool.query(korisnikQuery, korisnikArgs);
+    } else if (lokacijaQuery) {
+        await pool.query(lokacijaQuery, [idKorisnik, lokDjelovanja]);
+    }
 }
 
 export async function updateUserProfileImage(idKorisnik, imagePath) {

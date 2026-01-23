@@ -213,9 +213,7 @@ export default function Profile() {
         throw new Error(body?.error || "Spremanje nije uspjelo");
       }
 
-      const data = await res.json();
-      setUser(data.user ?? data);
-      setIsEditing(false);
+      window.location.reload();
     } catch (e) {
       setError(e?.message || "Greška pri spremanju");
     }

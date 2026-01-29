@@ -150,7 +150,7 @@ export default function MjesecnaClanarina() {
                                     <span>Cijena: {setac.cijena} €/sat</span>
                                 </p>
                                 <p>
-                                    <span>Ocjena: {setac.ocjena}/5 ⭐</span>
+                                    <span>Ocjena: {Number(setac.ocjena).toFixed(2)}/5 ⭐</span>
                                 </p>
                             </div>
 

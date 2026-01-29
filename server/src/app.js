@@ -309,7 +309,7 @@ app.get('/api/setaci', async (_req, res) => {
 app.get('/api/godisnja', async (_req, res) => {
     try {
         const godisnja = await db.getGodisnjaClanarina();
-        res.status(200).json({ godisnja: godisnja?.godisnja ?? 0 });
+        res.status(200).json({ godisnja: godisnja ?? 0 });
     } catch (err) {
         console.error('Error in /api/godisnja:', err);
         res.status(500).json({ error: 'Internal server error' });

@@ -35,25 +35,6 @@ export default function GodisnjaClanarina() {
         loadSetaci();
     }, []);
 
-    useEffect(() => {
-        const loadgodcl = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                //TODO VRATI I OVO KAD POSALJU S BEAKA
-                const response = await fetch(`${BACKEND_URL}/api/godisnja`, {   method: 'GET', credentials: 'include' });
-                if (!response.ok) throw new Error(`Server returned ${response.status}`);
-                const data = await response.json();
-                setgodclanarina(data.godisnja?? 0);
-            } catch (err) {
-                setError(err.message || "Greška pri dohvaćanju podataka");
-                setgodclanarina(0);
-            } finally {
-                setLoading(false);
-            }
-        };
-	});
-
   useEffect(() => {
 		
 		const loadgodcl = async () => {
@@ -63,7 +44,7 @@ export default function GodisnjaClanarina() {
 			const response = await fetch(`${BACKEND_URL}/api/godisnja`, { credentials: 'include' });
 			if (!response.ok) throw new Error(`Server returned ${response.status}`);
 			const data = await response.json();
-			setgodclanarina(data ?? 0);
+			setgodclanarina(data.godisnja ?? 0);
 		  } catch (err) {
 			  setError(err.message || 'Greška pri dohvaćanju podataka');
 			  setgodclanarina(0);
@@ -155,7 +136,7 @@ export default function GodisnjaClanarina() {
                                     <span>Cijena: {setac.cijena} €/sat</span>
                                 </p>
                                 <p>
-                                    <span>Ocjena: {setac.ocjena}/5 ⭐</span>
+                                    <span>Ocjena: {Number(setac.ocjena).toFixed(2)}/5 ⭐</span>
                                 </p>
                             </div>
 
